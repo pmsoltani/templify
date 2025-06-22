@@ -3,6 +3,7 @@ const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 
 // Load environment variables for local development
 if (process.env.NODE_ENV !== "production") {
@@ -31,6 +32,26 @@ const transporter = nodemailer.createTransport({
     pass: process.env.MAIL_PASS,
   },
 });
+
+// --- AUTHENTICATION MIDDLEWARE ---
+// This function acts as a gatekeeper for protected routes
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Format: "Bearer TOKEN"
+
+  if (token == null) {
+    return res.sendStatus(401); // Unauthorized
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.sendStatus(403); // Forbidden (token is no longer valid)
+    }
+    // If token is valid, attach the user payload to the request object
+    req.user = user;
+    next(); // Proceed to the protected route
+  });
+};
 
 // --- API ROUTES ---
 // Homepage route
@@ -134,6 +155,70 @@ app.get("/api/confirm", async (req, res) => {
   } catch (err) {
     console.error("Confirmation Error:", err);
     res.status(500).send("An error occurred during confirmation.");
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Email and password are required." });
+    }
+
+    const userResult = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+    const user = userResult.rows[0];
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials." });
+    }
+
+    if (!user.is_confirmed) {
+      return res
+        .status(403)
+        .json({ error: "Please confirm your email before logging in." });
+    }
+
+    // Compare the submitted password with the stored hash
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+    if (!validPassword) {
+      return res.status(401).json({ error: "Invalid credentials." });
+    }
+
+    // Password is correct, create a JWT
+    const payload = { userId: user.id, email: user.email };
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    }); // Token expires in 1 day
+
+    res.json({ accessToken: accessToken });
+  } catch (err) {
+    console.error("Login Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// NEW: A Protected Route for Testing
+app.get("/api/me", authenticateToken, async (req, res) => {
+  try {
+    const userResult = await pool.query(
+      "SELECT id, email, api_key, created_at FROM users WHERE id = $1",
+      [req.user.userId]
+    );
+    const user = userResult.rows[0];
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
