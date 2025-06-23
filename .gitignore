@@ -132,3 +132,8 @@ dist
 ### Node Patch ###
 # Serverless Webpack directories
 .webpack/
+
+
+### Misc ###
+playground.js
+playground.http
