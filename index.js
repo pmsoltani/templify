@@ -4,11 +4,19 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+} = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const AdmZip = require("adm-zip");
 const fs = require("fs");
 const path = require("path");
+const mustache = require("mustache");
+const puppeteer = require("puppeteer");
+const os = require("os");
 
 // Load environment variables for local development
 if (process.env.NODE_ENV !== "production") {
@@ -72,6 +80,38 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// --- API KEY AUTHENTICATION MIDDLEWARE ---
+// This function will protect our main PDF generation route
+const authenticateApiKey = async (req, res, next) => {
+  const apiKey = req.headers["x-api-key"]; // A common header for API keys
+
+  if (!apiKey) {
+    return res.status(401).json({ error: "API key is required." });
+  }
+
+  try {
+    const userResult = await pool.query("SELECT * FROM users WHERE api_key = $1", [
+      apiKey,
+    ]);
+    const user = userResult.rows[0];
+
+    if (!user) {
+      return res.status(403).json({ error: "Invalid API key." });
+    }
+
+    if (!user.is_confirmed) {
+      return res.status(403).json({ error: "User email not confirmed." });
+    }
+
+    // Attach the user object to the request for later use
+    req.user = user;
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 // --- API ROUTES ---
 // Homepage route
 app.get("/", (req, res) => {
@@ -83,19 +123,14 @@ app.post("/api/register", async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Email and password are required." });
+      return res.status(400).json({ error: "Email and password are required." });
     }
 
-    const existingUser = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
+    const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
     if (existingUser.rows.length > 0) {
-      return res
-        .status(409)
-        .json({ error: "User with this email already exists." });
+      return res.status(409).json({ error: "User with this email already exists." });
     }
 
     const saltRounds = 10;
@@ -181,15 +216,12 @@ app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Email and password are required." });
+      return res.status(400).json({ error: "Email and password are required." });
     }
 
-    const userResult = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
+    const userResult = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
     const user = userResult.rows[0];
 
     if (!user) {
@@ -298,6 +330,96 @@ app.post(
     }
   }
 );
+
+// --- FINAL PDF GENERATION ENDPOINT ---
+app.post("/api/templates/:id/generate", authenticateApiKey, async (req, res) => {
+  const templateId = req.params.id;
+  const userId = req.user.id;
+  const jsonData = req.body;
+
+  try {
+    // 1. AUTHORIZATION: Check if this user owns this template
+    const templateResult = await pool.query(
+      "SELECT * FROM templates WHERE id = $1 AND user_id = $2",
+      [templateId, userId]
+    );
+    const template = templateResult.rows[0];
+
+    if (!template) {
+      return res.status(404).json({ error: "Template not found" });
+    }
+
+    // 2. SETUP: Create a temporary local directory for processing
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), `templify-${templateId}-`));
+    const bucketPath = `user_files/${userId}/${templateId}/`;
+
+    // 3. FETCH: Download all template files from R2 to the temporary directory
+    const listObjectsResult = await s3Client.send(
+      new ListObjectsV2Command({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Prefix: bucketPath,
+      })
+    );
+
+    if (!listObjectsResult.Contents) throw new Error("Template is empty.");
+
+    for (const object of listObjectsResult.Contents) {
+      const getObjectResult = await s3Client.send(
+        new GetObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: object.Key,
+        })
+      );
+      const localPath = path.join(tempDir, path.basename(object.Key));
+      fs.writeFileSync(localPath, await getObjectResult.Body.transformToByteArray());
+    }
+
+    // 4. PROCESS: Read HTML, merge data with Mustache
+    const htmlPath = path.join(tempDir, template.html_entrypoint);
+    const htmlContent = fs.readFileSync(htmlPath, "utf-8");
+    const finalHtml = mustache.render(htmlContent, jsonData);
+
+    // 5. GENERATE PDF with Puppeteer
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    }); // Options for Render's environment
+    const page = await browser.newPage();
+    // We tell puppeteer to treat the temp directory as the base for linked assets (CSS, images)
+    await page.goto(`file://${tempDir}/${template.html_entrypoint}`, {
+      waitUntil: "networkidle0",
+    });
+    await page.setContent(finalHtml, { waitUntil: "networkidle0" }); // Set the final merged HTML
+    const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
+    await browser.close();
+
+    // 6. UPLOAD PDF to R2
+    const pdfFileName = `generated-${userId}-${templateId}-${Date.now()}.pdf`;
+    const pdfKey = `generated_pdfs/${userId}/${pdfFileName}`;
+
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: pdfKey,
+        Body: pdfBuffer,
+        ContentType: "application/pdf",
+      })
+    );
+
+    // 7. CLEANUP: Delete the temporary local directory
+    fs.rmSync(tempDir, { recursive: true, force: true });
+
+    // 8. RESPOND with the public URL
+    const publicUrl = `${process.env.R2_PUBLIC_URL}/${pdfKey}`;
+    res.status(200).json({
+      success: true,
+      message: "PDF generated successfully!",
+      url: publicUrl,
+    });
+  } catch (err) {
+    console.error(`[PDF Generation Error for TPL_ID:${templateId}]`, err);
+    res.status(500).json({ error: "Internal Server Error while generating PDF." });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
