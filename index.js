@@ -4,6 +4,11 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const multer = require("multer");
+const AdmZip = require("adm-zip");
+const fs = require("fs");
+const path = require("path");
 
 // Load environment variables for local development
 if (process.env.NODE_ENV !== "production") {
@@ -14,6 +19,20 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json()); // Middleware to parse JSON request bodies
+
+// --- MULTER CONFIGURATION ---
+// Configure where to temporarily store the uploaded zip file.
+const upload = multer({ dest: "storage/temp/" });
+
+// --- S3/R2 CLIENT CONFIGURATION ---
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: process.env.R2_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+});
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -221,6 +240,64 @@ app.get("/api/me", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+app.post(
+  "/api/templates",
+  authenticateToken,
+  upload.single("templateZip"),
+  async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      const templateName = req.body.name;
+      const htmlEntrypoint = req.body.html_entrypoint || "template.html";
+
+      if (!templateName || !req.file) {
+        return res
+          .status(400)
+          .json({ error: "Template name and zip file are required." });
+      }
+
+      const newTemplateQuery = `INSERT INTO templates (user_id, name, html_entrypoint) VALUES ($1, $2, $3) RETURNING id;`;
+      const templateResult = await pool.query(newTemplateQuery, [
+        userId,
+        templateName,
+        htmlEntrypoint,
+      ]);
+      const templateId = templateResult.rows[0].id;
+
+      const zip = new AdmZip(req.file.path);
+      const zipEntries = zip.getEntries();
+
+      const uploadPromises = zipEntries.map((zipEntry) => {
+        if (zipEntry.isDirectory) return null; // Skip directories
+
+        const filePathInBucket = `user_files/${userId}/${templateId}/${zipEntry.entryName}`;
+
+        const uploadParams = {
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: filePathInBucket,
+          Body: zipEntry.getData(), // Get file content directly from zip entry
+          ContentType: zipEntry.mimeType,
+        };
+
+        return s3Client.send(new PutObjectCommand(uploadParams));
+      });
+
+      await Promise.all(uploadPromises);
+
+      // Clean up the temporary zip file
+      fs.unlinkSync(req.file.path);
+
+      res.status(201).json({
+        message: "Template uploaded and processed successfully!",
+        template: { id: templateId, name: templateName },
+      });
+    } catch (err) {
+      console.error("Template Upload Error:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
