@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendConfirmationEmail = async (email, confirmationToken) => {
-  const appBaseUrl = process.env.APP_BASE_URL;
+  const appBaseUrl = process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL;
   const confirmationUrl = `${appBaseUrl}/api/confirm?token=${confirmationToken}`;
   await transporter.sendMail({
     from: `"Templify" <${process.env.MAIL_USER}>`,
