@@ -3,7 +3,8 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import mustache from "mustache";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import {
   S3Client,
   PutObjectCommand,
@@ -11,7 +12,6 @@ import {
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import * as db from "../services/databaseService.js";
-import { error } from "console";
 
 // --- S3/R2 CLIENT CONFIGURATION ---
 const s3Client = new S3Client({
@@ -73,6 +73,8 @@ const generatePdf = async (req, res) => {
   const userId = req.user.id;
   const jsonData = req.body;
 
+  let browser = null;
+
   try {
     const template = await db.getTemplateByIdAndUser(templateId, userId);
     if (!template) return res.status(404).json({ error: "Template not found" });
@@ -108,9 +110,13 @@ const generatePdf = async (req, res) => {
     const finalHtml = mustache.render(htmlContent, jsonData);
 
     // GENERATE PDF with Puppeteer
-    const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    }); // Options for Render's environment
+    console.log("Launching Puppeteer with @sparticuz/chromium...");
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
     const page = await browser.newPage();
     // Tell puppeteer to treat the temp dir as the base for linked assets (CSS, images)
     await page.goto(`file://${tempDir}/${template.html_entrypoint}`, {
@@ -133,13 +139,20 @@ const generatePdf = async (req, res) => {
       })
     );
 
-    fs.rmSync(tempDir, { recursive: true, force: true }); // Clean up temporary dir
-
     const publicUrl = `${process.env.R2_PUBLIC_URL}/${pdfKey}`;
     res.status(201).json({ message: "PDF generated successfully!", url: publicUrl });
   } catch (err) {
     console.error(`[PDF Generation Error for TPL_ID:${templateId}]`, err);
     res.status(500).json({ error: "Internal Server Error while generating PDF." });
+  } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (closeErr) {
+        console.error("Error closing Puppeteer browser:", closeErr);
+      }
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true }); // Clean up temporary dir
   }
 };
 
