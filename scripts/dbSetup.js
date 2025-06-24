@@ -1,5 +1,5 @@
-require("dotenv").config();
-const { Pool } = require("pg");
+import "dotenv/config";
+import { Pool } from "pg";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -21,7 +21,7 @@ const createUsersTableQuery = `
 `;
 
 const createTemplatesTableQuery = `
-  CREATE TABLE templates (
+  CREATE TABLE IF NOT EXISTS templates (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     name VARCHAR(255) NOT NULL,
