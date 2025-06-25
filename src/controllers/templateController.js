@@ -61,4 +61,31 @@ const deleteTemplate = async (req, res) => {
   }
 };
 
-export { listUserTemplates, uploadTemplate, generatePdf, deleteTemplate };
+const updateTemplate = async (req, res) => {
+  const templateId = req.params.id;
+  try {
+    if (!req.file) return res.status(400).json({ error: "Missing template zip file." });
+    const updatedTemplateDb = await templateService.update(
+      req.user.userId,
+      templateId,
+      req.body,
+      req.file.path
+    );
+    res.status(200).json({
+      message: "Template updated successfully!",
+      template: updatedTemplateDb,
+    });
+  } catch (err) {
+    console.error(`[Template Update Error for TPL_ID:${templateId}]`, err);
+    if (req.file) fs.unlinkSync(req.file.path); // Clean up the temp file
+    res.status(500).json({ error: "Internal Server Error while updating template." });
+  }
+};
+
+export {
+  listUserTemplates,
+  uploadTemplate,
+  generatePdf,
+  deleteTemplate,
+  updateTemplate,
+};

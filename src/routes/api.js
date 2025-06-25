@@ -19,6 +19,7 @@ router.get("/", (req, res) => {
       uploadTemplate: "POST /api/templates",
       generatePdf: "POST /api/templates/:id/generate",
       deleteTemplate: "DELETE /api/templates/:id",
+      updateTemplate: "PUT /api/templates/:id",
     },
   });
 });
@@ -41,5 +42,11 @@ router.post(
   templateController.generatePdf
 );
 router.delete("/templates/:id", authenticateToken, templateController.deleteTemplate);
+router.put(
+  "/templates/:id",
+  authenticateToken,
+  upload.single("templateZip"),
+  templateController.updateTemplate
+);
 
 export default router;
