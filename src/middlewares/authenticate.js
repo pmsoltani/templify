@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import * as db from "../services/databaseService.js";
+import * as userRepo from "../repositories/userRepository.js";
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -18,7 +18,7 @@ const authenticateApiKey = async (req, res, next) => {
   if (!apiKey) return res.status(401).json({ error: "Missing API key." });
 
   try {
-    const user = await db.getUserByApiKey(apiKey);
+    const user = await userRepo.getByApiKey(apiKey);
     if (!user || !user.is_confirmed) {
       return res.status(403).json({ error: "Invalid API key or user not confirmed." });
     }
