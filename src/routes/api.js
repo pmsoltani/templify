@@ -26,6 +26,7 @@ router.post("/login", authController.login);
 
 // --- Authenticated Routes ---
 router.get("/me", authenticateToken, authController.getMe);
+router.get("/templates", authenticateToken, templateController.listUserTemplates);
 router.post(
   "/templates",
   authenticateToken,

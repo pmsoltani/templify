@@ -1,6 +1,16 @@
 import fs from "fs";
 import * as templateService from "../services/templateService.js";
 
+const listUserTemplates = async (req, res) => {
+  try {
+    const templates = await templateService.getAllByUserId(req.user.userId);
+    res.json(templates);
+  } catch (err) {
+    console.error("Error fetching user templates:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const uploadTemplate = async (req, res) => {
   try {
     const { name, htmlEntrypoint } = req.body;
@@ -40,4 +50,4 @@ const generatePdf = async (req, res) => {
   }
 };
 
-export { uploadTemplate, generatePdf };
+export { listUserTemplates, uploadTemplate, generatePdf };

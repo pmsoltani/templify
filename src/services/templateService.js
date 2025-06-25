@@ -6,6 +6,11 @@ import { getBrowserInstance } from "../config/puppeteer.js";
 import * as fileService from "./fileService.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 
+const getAllByUserId = async (userId) => {
+  // TODO: add logic for pagination, etc.
+  return await templateRepo.getAllByUser(userId);
+};
+
 const create = async (userId, templateName, htmlEntrypoint, tempZipPath) => {
   const templateDb = await templateRepo.create(userId, templateName, htmlEntrypoint);
   await fileService.unzipAndUpload(tempZipPath, `userFiles/${userId}/${templateDb.id}`);
@@ -49,4 +54,4 @@ const generatePdf = async (userId, templateId, jsonData) => {
   }
 };
 
-export { create, generatePdf };
+export { getAllByUserId, create, generatePdf };
