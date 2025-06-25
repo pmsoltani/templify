@@ -15,8 +15,10 @@ router.get("/", (req, res) => {
       confirm: "GET /api/confirm",
       login: "POST /api/login",
       me: "GET /api/me",
+      templates: "GET /api/templates",
       uploadTemplate: "POST /api/templates",
       generatePdf: "POST /api/templates/:id/generate",
+      deleteTemplate: "DELETE /api/templates/:id",
     },
   });
 });
@@ -38,5 +40,6 @@ router.post(
   authenticateApiKey,
   templateController.generatePdf
 );
+router.delete("/templates/:id", authenticateToken, templateController.deleteTemplate);
 
 export default router;

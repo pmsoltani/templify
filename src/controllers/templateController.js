@@ -37,11 +37,10 @@ const uploadTemplate = async (req, res) => {
 };
 
 const generatePdf = async (req, res) => {
+  const templateId = req.params.id;
   try {
-    const templateId = req.params.id;
     const userId = req.user.id;
     const jsonData = req.body;
-
     const pdfUrl = await templateService.generatePdf(userId, templateId, jsonData);
     res.status(200).json({ message: "PDF generated successfully!", url: pdfUrl });
   } catch (err) {
@@ -50,4 +49,16 @@ const generatePdf = async (req, res) => {
   }
 };
 
-export { listUserTemplates, uploadTemplate, generatePdf };
+const deleteTemplate = async (req, res) => {
+  const templateId = req.params.id;
+  try {
+    const userId = req.user.userId;
+    await templateService.deleteTemplate(userId, templateId);
+    res.status(204).send();
+  } catch (err) {
+    console.error(`[Template Deletion Error for TPL_ID:${templateId}]`, err);
+    res.status(500).json({ error: "Internal Server Error while deleting template." });
+  }
+};
+
+export { listUserTemplates, uploadTemplate, generatePdf, deleteTemplate };

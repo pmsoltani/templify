@@ -8,7 +8,7 @@ import * as templateRepo from "../repositories/templateRepository.js";
 
 const getAllByUserId = async (userId) => {
   // TODO: add logic for pagination, etc.
-  return await templateRepo.getAllByUser(userId);
+  return await templateRepo.getAllByUserId(userId);
 };
 
 const create = async (userId, templateName, htmlEntrypoint, tempZipPath) => {
@@ -24,7 +24,7 @@ const generatePdf = async (userId, templateId, jsonData) => {
 
   try {
     // Authenticate and fetch template record
-    const templateDb = await templateRepo.getByIdAndUser(templateId, userId);
+    const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
     if (!templateDb) throw new Error("Template not found.");
 
     // Fetch template files from storage
@@ -54,4 +54,14 @@ const generatePdf = async (userId, templateId, jsonData) => {
   }
 };
 
-export { getAllByUserId, create, generatePdf };
+const deleteTemplate = async (userId, templateId) => {
+  const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
+  if (!templateDb) throw new Error("Template not found.");
+
+  const bucketPath = `userFiles/${userId}/${templateId}/`;
+  await fileService.deleteTemplate(bucketPath);
+  await templateRepo.deleteById(templateId);
+  return { id: templateId };
+};
+
+export { getAllByUserId, create, generatePdf, deleteTemplate };

@@ -1,6 +1,6 @@
 import db from "../config/database.js";
 
-const getByIdAndUser = async (templateId, userId) => {
+const getByIdAndUserId = async (templateId, userId) => {
   const res = await db.query("SELECT * FROM templates WHERE id = $1 AND user_id = $2", [
     templateId,
     userId,
@@ -8,7 +8,7 @@ const getByIdAndUser = async (templateId, userId) => {
   return res.rows[0];
 };
 
-const getAllByUser = async (userId) => {
+const getAllByUserId = async (userId) => {
   const res = await db.query(
     "SELECT * FROM templates WHERE user_id = $1 ORDER BY created_at DESC",
     [userId]
@@ -28,4 +28,11 @@ const create = async (userId, name, htmlEntrypoint) => {
   return res.rows[0];
 };
 
-export { getAllByUser, getByIdAndUser, create };
+const deleteById = async (templateId) => {
+  const res = await db.query("DELETE FROM templates WHERE id = $1 RETURNING id", [
+    templateId,
+  ]);
+  return res.rows[0];
+};
+
+export { getAllByUserId, getByIdAndUserId, create, deleteById };

@@ -3,6 +3,7 @@ import path from "path";
 import os from "os";
 import AdmZip from "adm-zip";
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
@@ -73,4 +74,24 @@ const uploadPdf = async (userId, pdfBuffer) => {
   return `${process.env.R2_PUBLIC_URL}/${pdfKey}`;
 };
 
-export { unzipAndUpload, downloadTemplate, uploadPdf };
+const deleteTemplate = async (bucketPath) => {
+  const listObjectsResult = await s3Client.send(
+    new ListObjectsV2Command({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Prefix: bucketPath,
+    })
+  );
+  if (!listObjectsResult.Contents || listObjectsResult.Contents.length === 0) return;
+
+  const deletePromises = listObjectsResult.Contents.map((object) => {
+    return s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: object.Key,
+      })
+    );
+  });
+  await Promise.all(deletePromises);
+};
+
+export { unzipAndUpload, downloadTemplate, uploadPdf, deleteTemplate };
