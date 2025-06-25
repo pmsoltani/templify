@@ -60,7 +60,7 @@ const downloadTemplate = async (bucketPath) => {
 
 const uploadPdf = async (userId, pdfBuffer) => {
   const pdfFileName = `generated-${userId}-${Date.now()}.pdf`;
-  const pdfKey = `generated_pdfs/${userId}/${pdfFileName}`;
+  const pdfKey = `generatedPdfs/${userId}/${pdfFileName}`;
 
   await s3Client.send(
     new PutObjectCommand({
