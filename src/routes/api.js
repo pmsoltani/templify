@@ -1,14 +1,10 @@
 import express from "express";
-import multer from "multer";
-
+import upload from "../config/multer.js";
 import * as authController from "../controllers/authController.js";
 import * as templateController from "../controllers/templateController.js";
-import { authenticateToken, authenticateApiKey } from "../middleware/authenticate.js";
+import { authenticateToken, authenticateApiKey } from "../middlewares/authenticate.js";
 
 const router = express.Router();
-
-// Multer setup for file uploads: set where to temporarily store the uploaded zip file.
-const upload = multer({ dest: "storage/temp/" });
 
 // --- Public Routes ---
 router.get("/", (req, res) => {
@@ -16,7 +12,7 @@ router.get("/", (req, res) => {
     message: "Welcome to Templify API!",
     endpoints: {
       register: "POST /api/register",
-      confirmEmail: "GET /api/confirm",
+      confirm: "GET /api/confirm",
       login: "POST /api/login",
       me: "GET /api/me",
       uploadTemplate: "POST /api/templates",
@@ -25,7 +21,7 @@ router.get("/", (req, res) => {
   });
 });
 router.post("/register", authController.register);
-router.get("/confirm", authController.confirmEmail);
+router.get("/confirm", authController.confirm);
 router.post("/login", authController.login);
 
 // --- Authenticated Routes ---
@@ -42,4 +38,4 @@ router.post(
   templateController.generatePdf
 );
 
-export { router };
+export default router;
