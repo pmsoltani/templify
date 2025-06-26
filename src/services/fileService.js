@@ -8,6 +8,7 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3Client from "../config/s3Client.js";
 
 const unzipAndUpload = async (zipFilePath, bucketPathPrefix) => {
@@ -71,7 +72,9 @@ const uploadPdf = async (userId, pdfBuffer) => {
     })
   );
 
-  return `${process.env.R2_PUBLIC_URL}/${pdfKey}`;
+  const cmd = new GetObjectCommand({ Bucket: process.env.R2_BUCKET_NAME, Key: pdfKey });
+  const signedUrl = await getSignedUrl(s3Client, cmd, { expiresIn: 900 }); // 15 minutes
+  return signedUrl;
 };
 
 const removeTemplate = async (bucketPath) => {
