@@ -1,28 +1,20 @@
-import bcrypt from "bcrypt";
-import crypto from "crypto";
-import jwt from "jsonwebtoken";
 import * as userRepo from "../repositories/userRepository.js";
-import * as mailer from "../services/mailerService.js";
+import * as authService from "../services/authService.js";
+import * as secretService from "../services/secretService.js";
 
 const register = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: "Missing email and/or password." });
-    }
-    if (await userRepo.getByEmail(email)) {
+    if (!email) return res.status(400).json({ error: "Missing email." });
+    if (!password) return res.status(400).json({ error: "Missing password." });
+    if (await userRepo.getByEmailOrNewEmail(email)) {
       return res.status(409).json({ error: "Email already in use." });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const confirmationToken = crypto.randomBytes(32).toString("hex");
-    const newUser = await userRepo.create(email, passwordHash, confirmationToken);
-
-    await mailer.sendConfirmationEmail(email, confirmationToken);
-
+    const userDb = await authService.register(email, password);
     res.status(201).json({
       message: "User created successfully! Check your email for the confirmation link.",
-      user: { id: newUser.id, email: newUser.email },
+      user: { id: userDb.id, email: userDb.email },
     });
   } catch (err) {
     console.error("Registration Error:", err);
@@ -35,52 +27,78 @@ const confirm = async (req, res) => {
     const { token } = req.query;
     if (!token) return res.status(400).json({ error: "Missing confirmation token." });
 
-    const user = await userRepo.confirmAndSetApiKey(token);
-    if (!user) return res.status(404).json({ error: "Invalid confirmation token." });
-
-    res.json({ message: "Email confirmed successfully! Log in to get your API key" });
+    await authService.confirmEmail(token);
+    res.json({ message: "Email confirmed successfully!" });
   } catch (err) {
     console.error("Confirmation Error:", err);
     res.status(500).json({ error: "An error occurred during confirmation." });
   }
 };
 
+const resendConfirmation = async (req, res) => {
+  try {
+    await authService.resendConfirmation(req.body.email);
+    res.json({ message: "If an account exists, confirmation link will be sent." });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: "Missing email and/or password." });
-    }
-    const user = await userRepo.getByEmail(email);
+    if (!email) return res.status(400).json({ error: "Missing email." });
+    if (!password) return res.status(400).json({ error: "Missing password." });
 
+    const userDb = await userRepo.getByEmail(email);
     if (
-      !user ||
-      !user.is_confirmed ||
-      !(await bcrypt.compare(password, user.password_hash))
+      !userDb ||
+      !(await secretService.verifyPassword(password, userDb.password_hash))
     ) {
-      return res.status(401).json({ error: "Invalid credentials/user not confirmed." });
+      return res.status(401).json({ error: "Invalid credentials." });
     }
-
-    const payload = { userId: user.id, email: user.email };
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
-
-    res.json({ accessToken });
+    if (!userDb.is_confirmed) {
+      return res.status(401).json({ error: "User has not confirmed." });
+    }
+    res.json({ accessToken: secretService.generateAuthToken(userDb) });
   } catch (err) {
     console.error("Login Error:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-const getMe = async (req, res) => {
-  try {
-    // Re-fetch the up-to-date user from DB using the req data from authenticateToken
-    const user = await userRepo.getById(req.user.userId);
-    if (!user) return res.status(404).json({ error: "User not found." });
+const logout = (req, res) => {
+  res.json({ message: "Logged out successfully." });
+};
 
-    res.json(user);
+const forgotPassword = async (req, res) => {
+  try {
+    await authService.sendPasswordResetEmail(req.body.email);
+    res.json({ message: "If an account exists, reset link will be sent." });
   } catch (err) {
+    console.error("Forgot Password Error:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-export { register, confirm, login, getMe };
+const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ error: "Missing token and/or new password." });
+    }
+
+    await authService.resetPassword(token, password);
+    res.json({ message: "Password has been reset successfully." });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+export {
+  register,
+  confirm,
+  resendConfirmation,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+};

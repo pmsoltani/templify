@@ -74,7 +74,7 @@ const uploadPdf = async (userId, pdfBuffer) => {
   return `${process.env.R2_PUBLIC_URL}/${pdfKey}`;
 };
 
-const deleteTemplate = async (bucketPath) => {
+const removeTemplate = async (bucketPath) => {
   const listObjectsResult = await s3Client.send(
     new ListObjectsV2Command({
       Bucket: process.env.R2_BUCKET_NAME,
@@ -83,7 +83,7 @@ const deleteTemplate = async (bucketPath) => {
   );
   if (!listObjectsResult.Contents || listObjectsResult.Contents.length === 0) return;
 
-  const deletePromises = listObjectsResult.Contents.map((object) => {
+  const removePromises = listObjectsResult.Contents.map((object) => {
     return s3Client.send(
       new DeleteObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME,
@@ -91,7 +91,7 @@ const deleteTemplate = async (bucketPath) => {
       })
     );
   });
-  await Promise.all(deletePromises);
+  await Promise.all(removePromises);
 };
 
-export { unzipAndUpload, downloadTemplate, uploadPdf, deleteTemplate };
+export { unzipAndUpload, downloadTemplate, uploadPdf, removeTemplate };

@@ -1,7 +1,8 @@
 import transporter from "../config/mailer.js";
 
+const appBaseUrl = process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL;
+
 const sendConfirmationEmail = async (email, confirmationToken) => {
-  const appBaseUrl = process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL;
   const confirmationUrl = `${appBaseUrl}/api/confirm?token=${confirmationToken}`;
   await transporter.sendMail({
     from: `"Templify" <${process.env.MAIL_USER}>`,
@@ -15,4 +16,18 @@ const sendConfirmationEmail = async (email, confirmationToken) => {
   });
 };
 
-export { sendConfirmationEmail };
+const sendPasswordResetEmail = async (email, resetToken) => {
+  const resetUrl = `${appBaseUrl}/reset-password?token=${resetToken}`;
+  await transporter.sendMail({
+    from: `"Templify" <${process.env.MAIL_USER}>`,
+    to: email,
+    subject: "Password Reset Request",
+    html: `
+    <h1>Templify: Password Reset Request</h1>
+    <p>Click the link below to reset your password:</p>
+    <a href="${resetUrl}">${resetUrl}</a>
+    `,
+  });
+};
+
+export { sendConfirmationEmail, sendPasswordResetEmail };
