@@ -54,13 +54,13 @@ const generatePdf = async (userId, templateId, jsonData) => {
   }
 };
 
-const deleteTemplate = async (userId, templateId) => {
+const remove = async (userId, templateId) => {
   const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
   if (!templateDb) throw new Error("Template not found.");
 
   const bucketPath = `userFiles/${userId}/${templateId}/`;
-  await fileService.deleteTemplate(bucketPath);
-  await templateRepo.deleteById(templateId);
+  await fileService.removeTemplate(bucketPath);
+  await templateRepo.remove(templateId);
   return { id: templateId };
 };
 
@@ -68,7 +68,7 @@ const update = async (userId, templateId, updateData, tempZipPath) => {
   const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
   if (!templateDb) throw new Error("Template not found.");
   const bucketPath = `userFiles/${userId}/${templateId}/`;
-  await fileService.deleteTemplate(bucketPath);
+  await fileService.removeTemplate(bucketPath);
   await fileService.unzipAndUpload(tempZipPath, bucketPath);
   fs.unlinkSync(tempZipPath); // Clean up the temp file
   return await templateRepo.update(
@@ -79,4 +79,4 @@ const update = async (userId, templateId, updateData, tempZipPath) => {
   );
 };
 
-export { getAllByUserId, create, generatePdf, deleteTemplate, update };
+export { getAllByUserId, create, generatePdf, remove, update };

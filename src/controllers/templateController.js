@@ -11,7 +11,7 @@ const listUserTemplates = async (req, res) => {
   }
 };
 
-const uploadTemplate = async (req, res) => {
+const create = async (req, res) => {
   try {
     const { name, htmlEntrypoint } = req.body;
     if (!name || !req.file) {
@@ -49,11 +49,11 @@ const generatePdf = async (req, res) => {
   }
 };
 
-const deleteTemplate = async (req, res) => {
+const remove = async (req, res) => {
   const templateId = req.params.id;
   try {
     const userId = req.user.userId;
-    await templateService.deleteTemplate(userId, templateId);
+    await templateService.remove(userId, templateId);
     res.status(204).send();
   } catch (err) {
     console.error(`[Template Deletion Error for TPL_ID:${templateId}]`, err);
@@ -61,7 +61,7 @@ const deleteTemplate = async (req, res) => {
   }
 };
 
-const updateTemplate = async (req, res) => {
+const update = async (req, res) => {
   const templateId = req.params.id;
   try {
     if (!req.file) return res.status(400).json({ error: "Missing template zip file." });
@@ -82,10 +82,4 @@ const updateTemplate = async (req, res) => {
   }
 };
 
-export {
-  listUserTemplates,
-  uploadTemplate,
-  generatePdf,
-  deleteTemplate,
-  updateTemplate,
-};
+export { listUserTemplates, create, generatePdf, remove, update };

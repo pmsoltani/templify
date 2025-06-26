@@ -28,7 +28,7 @@ const create = async (userId, name, htmlEntrypoint) => {
   return res.rows[0];
 };
 
-const deleteById = async (templateId) => {
+const remove = async (templateId) => {
   const res = await db.query("DELETE FROM templates WHERE id = $1 RETURNING id", [
     templateId,
   ]);
@@ -39,7 +39,7 @@ const update = async (userId, templateId, name, htmlEntrypoint) => {
   const res = await db.query(
     `
     UPDATE templates
-    SET name = $1, html_entrypoint = $2
+    SET name = $1, html_entrypoint = $2, updated_at = NOW()
     WHERE id = $3 AND user_id = $4
     RETURNING id, name
     `,
@@ -48,4 +48,4 @@ const update = async (userId, templateId, name, htmlEntrypoint) => {
   return res.rows[0];
 };
 
-export { getAllByUserId, getByIdAndUserId, create, deleteById, update };
+export { getAllByUserId, getByIdAndUserId, create, remove, update };
