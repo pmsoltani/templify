@@ -36,6 +36,29 @@ const createTemplatesTableQuery = `
   );
 `;
 
+const setupTriggersQuery = `
+  CREATE OR REPLACE FUNCTION update_timestamp_column()
+  RETURNS TRIGGER AS $$
+  BEGIN
+      NEW.updated_at = NOW(); 
+      RETURN NEW;
+  END;
+  $$ language 'plpgsql';
+
+  DROP TRIGGER IF EXISTS update_users_updated_at ON users;
+  DROP TRIGGER IF EXISTS update_templates_updated_at ON templates;
+
+  CREATE TRIGGER update_users_updated_at
+  BEFORE UPDATE ON users
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp_column();
+
+  CREATE TRIGGER update_templates_updated_at
+  BEFORE UPDATE ON templates
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp_column();
+`;
+
 async function setupDatabase() {
   console.log("Connecting to database...");
   const client = await pool.connect();
@@ -45,6 +68,8 @@ async function setupDatabase() {
     console.log("Table 'users' created successfully or already exists.");
     await client.query(createTemplatesTableQuery);
     console.log("Table 'templates' created successfully or already exists.");
+    await client.query(setupTriggersQuery);
+    console.log("Triggers for updating timestamps created successfully.");
   } catch (err) {
     console.error("Error creating table:", err);
   } finally {

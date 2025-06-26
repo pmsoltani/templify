@@ -39,7 +39,7 @@ const update = async (userId, templateId, name, htmlEntrypoint) => {
   const res = await db.query(
     `
     UPDATE templates
-    SET name = $1, html_entrypoint = $2, updated_at = NOW()
+    SET name = $1, html_entrypoint = $2
     WHERE id = $3 AND user_id = $4
     RETURNING id, name
     `,

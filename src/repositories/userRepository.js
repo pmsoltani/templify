@@ -75,7 +75,7 @@ const update = async (userId, updateData) => {
   const res = await db.query(
     `
     UPDATE users
-    SET ${setClause}, updated_at = NOW()
+    SET ${setClause}
     WHERE id = $${updateEntries.length + 1}
     RETURNING id, email, api_key;
     `,
