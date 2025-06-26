@@ -135,5 +135,5 @@ dist
 
 
 ### Misc ###
-playground.js
-playground.http
+playground*.js
+playground*.http
