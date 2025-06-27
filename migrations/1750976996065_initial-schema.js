@@ -38,7 +38,7 @@ const up = async (pgm) => {
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
       template_id INTEGER NOT NULL,
-      r2_object_key VARCHAR(255) NOT NULL UNIQUE,
+      storage_object_key VARCHAR(255) NOT NULL UNIQUE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
       FOREIGN KEY (template_id) REFERENCES templates (id) ON DELETE CASCADE
