@@ -1,7 +1,7 @@
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as fileService from "../services/fileService.js";
 
-export const getAll = async (req, res) => {
+const getAll = async (req, res) => {
   try {
     const pdfs = await pdfRepo.getAllByUserId(req.user.userId);
     res.status(200).json(pdfs);
@@ -11,7 +11,7 @@ export const getAll = async (req, res) => {
   }
 };
 
-export const getDownloadLink = async (req, res) => {
+const getDownloadLink = async (req, res) => {
   try {
     const pdfId = req.params.id;
     const userId = req.user.userId;
@@ -26,3 +26,5 @@ export const getDownloadLink = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export { getAll, getDownloadLink };
