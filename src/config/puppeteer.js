@@ -4,34 +4,34 @@ import chromium from "@sparticuz/chromium";
 let browserInstance = null;
 
 /**
- * Gets a single, shared instance of a Puppeteer browser.
- * This function is now environment-aware.
- * @returns {Promise<import('puppeteer-core').Browser>}
+ * Launch and initialize the shared browser instance.
+ * This should be called once, when the application starts.
  */
-const getBrowserInstance = async () => {
-  if (browserInstance) return browserInstance;
+const initializeBrowser = async () => {
+  if (browserInstance) return;
 
-  let exePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
-  let launchArgs = [];
+  let args = [];
+  let executablePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"; // prettier-ignore
   let headless = "new";
   if (process.env.NODE_ENV === "production") {
-    exePath = await chromium.executablePath();
-    launchArgs = chromium.args;
+    args = chromium.args;
+    executablePath = await chromium.executablePath();
     headless = chromium.headless;
   }
 
-  try {
-    console.log("Launching new browser instance...");
-    browserInstance = await puppeteer.launch({
-      args: launchArgs,
-      executablePath: exePath,
-      headless: headless,
-    });
-    return browserInstance;
-  } catch (error) {
-    console.error("Error launching Puppeteer browser:", error);
-    throw new Error("Failed to launch Puppeteer browser instance.");
-  }
+  console.log("Launching new browser instance...");
+  browserInstance = await puppeteer.launch({ args, executablePath, headless });
+  console.log("Browser instance initialized successfully.");
+};
+
+/**
+ * Gets the already-initialized browser instance.
+ * @returns {Promise<import('puppeteer-core').Browser>}
+ * @throws {Error} If the browser has not been initialized.
+ */
+const getBrowserInstance = async () => {
+  if (!browserInstance) throw new Error("Browser has not been initialized.");
+  return browserInstance;
 };
 
 /**
@@ -39,9 +39,11 @@ const getBrowserInstance = async () => {
  */
 const closeBrowserInstance = async () => {
   if (browserInstance) {
+    console.log("Closing the browser instance...");
     await browserInstance.close();
+    console.log("Browser instance closed successfully.");
     browserInstance = null;
   }
 };
 
-export { getBrowserInstance, closeBrowserInstance };
+export { initializeBrowser, getBrowserInstance, closeBrowserInstance };
