@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "node -r dotenv/config index.js",
+    "dev": "nodemon -r dotenv/config index.js",
     "db:setup": "node utils/dbSetup.js",
     "migrate": "node-pg-migrate -j js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,5 +29,8 @@
     "nodemailer": "^7.0.3",
     "pg": "^8.16.2",
     "puppeteer-core": "^24.10.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
