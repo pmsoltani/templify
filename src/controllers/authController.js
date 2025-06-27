@@ -1,6 +1,7 @@
 import * as userRepo from "../repositories/userRepository.js";
 import * as authService from "../services/authService.js";
 import * as secretService from "../services/secretService.js";
+import AppError from "../utils/AppError.js";
 
 const register = async (req, res) => {
   try {
@@ -43,27 +44,22 @@ const resendConfirmation = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email) return res.status(400).json({ error: "Missing email." });
-    if (!password) return res.status(400).json({ error: "Missing password." });
 
-    const userDb = await userRepo.getByEmail(email);
-    if (
-      !userDb ||
-      !(await secretService.verifyPassword(password, userDb.password_hash))
-    ) {
-      return res.status(401).json({ error: "Invalid credentials." });
-    }
-    if (!userDb.is_confirmed) {
-      return res.status(401).json({ error: "User has not confirmed." });
-    }
-    res.json({ accessToken: secretService.generateAuthToken(userDb) });
-  } catch (err) {
-    console.error("Login Error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email) throw new AppError("Missing email.", 400);
+  if (!password) throw new AppError("Missing password.", 400);
+
+  const userDb = await userRepo.getByEmail(email);
+  if (
+    !userDb ||
+    !(await secretService.verifyPassword(password, userDb.password_hash))
+  ) {
+    throw new AppError("Invalid credentials.", 401);
   }
+  if (!userDb.is_confirmed) throw new AppError("User has not confirmed.", 401);
+
+  res.json({ accessToken: secretService.generateAuthToken(userDb) });
 };
 
 const logout = (req, res) => {
