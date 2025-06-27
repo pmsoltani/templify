@@ -4,6 +4,7 @@ import { pathToFileURL } from "url";
 import mustache from "mustache";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as fileService from "./fileService.js";
+import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 
 const getAllByUserId = async (userId) => {
@@ -47,7 +48,13 @@ const generatePdf = async (userId, templateId, jsonData) => {
     const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
     // Upload PDF to storage and return the public URL
-    return await fileService.uploadPdf(userId, pdfBuffer);
+    const storageObjectKey = fileService.uploadPdf(userId, pdfBuffer);
+
+    // Log the usage
+    await pdfRepo.create(userId, templateId, storageObjectKey);
+
+    // Return a presigned URL for the PDF
+    return await fileService.getPresignedUrl(storageObjectKey);
   } finally {
     if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
     if (page) await page.close();
