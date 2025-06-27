@@ -2,6 +2,7 @@ import express from "express";
 import apiRoutes from "./src/routes/api.js";
 import db from "./src/config/database.js";
 import { initializeBrowser, closeBrowserInstance } from "./src/config/puppeteer.js";
+import errorHandler from "./src/middlewares/errorHandler.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,9 @@ const runServer = async () => {
     app.use(express.json()); // Middleware to parse JSON request bodies
     app.use("/api", apiRoutes);
     app.get("/", (req, res) => res.json({ message: "Welcome to Templify!" }));
+
+    // Global error handler (must be after all routes)
+    app.use(errorHandler);
 
     const server = app.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
