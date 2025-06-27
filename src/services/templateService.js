@@ -48,7 +48,7 @@ const generatePdf = async (userId, templateId, jsonData) => {
     const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
     // Upload PDF to storage and return the public URL
-    const storageObjectKey = fileService.uploadPdf(userId, pdfBuffer);
+    const storageObjectKey = await fileService.uploadPdf(userId, pdfBuffer);
 
     // Log the usage
     await pdfRepo.create(userId, templateId, storageObjectKey);
