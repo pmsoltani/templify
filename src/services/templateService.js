@@ -1,6 +1,7 @@
 import fs from "fs";
 import * as fileService from "./fileService.js";
 import * as templateRepo from "../repositories/templateRepository.js";
+import AppError from "../utils/AppError.js";
 
 const getAllByUserId = async (userId) => {
   // TODO: add logic for pagination, etc.
@@ -27,7 +28,7 @@ const create = async (
 
 const remove = async (userId, templateId) => {
   const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
-  if (!templateDb) throw new Error("Template not found.");
+  if (!templateDb) throw new AppError("Template not found.", 404);
 
   const bucketPath = `userFiles/${userId}/${templateId}/`;
   await fileService.removeTemplate(bucketPath);
@@ -37,7 +38,7 @@ const remove = async (userId, templateId) => {
 
 const update = async (userId, templateId, updateData, tempZipPath) => {
   const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
-  if (!templateDb) throw new Error("Template not found.");
+  if (!templateDb) throw new AppError("Template not found.", 404);
   const bucketPath = `userFiles/${userId}/${templateId}/`;
   await fileService.removeTemplate(bucketPath);
   await fileService.unzipAndUpload(tempZipPath, bucketPath);

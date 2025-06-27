@@ -10,6 +10,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3Client from "../config/s3Client.js";
+import AppError from "../utils/AppError.js";
 
 const getPresignedUrl = async (objectKey, expiresIn = 900) => {
   const params = { Bucket: process.env.R2_BUCKET_NAME, Key: objectKey };
@@ -42,7 +43,7 @@ const downloadTemplate = async (bucketPath) => {
   // List all files in the template
   const listParams = { Bucket: process.env.R2_BUCKET_NAME, Prefix: bucketPath };
   const listObjectsResult = await s3Client.send(new ListObjectsV2Command(listParams));
-  if (!listObjectsResult.Contents) throw new Error("Template is empty.");
+  if (!listObjectsResult.Contents) throw new AppError("Template is empty.", 404);
 
   // Download each file into the temp directory
   for (const object of listObjectsResult.Contents) {

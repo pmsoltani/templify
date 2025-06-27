@@ -3,6 +3,7 @@ import { pathToFileURL } from "url";
 import mustache from "mustache";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
+import AppError from "../utils/AppError.js";
 
 const generatePdf = async (userId, templateId, jsonData) => {
   let tempDir = null;
@@ -11,7 +12,7 @@ const generatePdf = async (userId, templateId, jsonData) => {
   try {
     // Authenticate and fetch template record
     const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
-    if (!templateDb) throw new Error("Template not found.");
+    if (!templateDb) throw new AppError("Template not found.", 404);
 
     // Fetch template files from storage
     const bucketPath = `userFiles/${userId}/${templateId}/`;

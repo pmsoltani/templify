@@ -1,6 +1,7 @@
 import * as userRepo from "../repositories/userRepository.js";
 import * as mailer from "../services/mailerService.js";
 import * as secretService from "../services/secretService.js";
+import AppError from "../utils/AppError.js";
 
 const register = async (email, password) => {
   const passwordHash = await secretService.generatePasswordHash(password);
@@ -13,7 +14,7 @@ const register = async (email, password) => {
 
 const confirmEmail = async (token) => {
   let userDb = await userRepo.getByConfirmationToken(token);
-  if (!userDb) throw new Error("Invalid confirmation token.");
+  if (!userDb) throw new AppError("Invalid confirmation token.", 401);
 
   const updateData = { is_confirmed: true, confirmation_token: null };
   if (userDb.new_email) {
@@ -51,7 +52,7 @@ const sendPasswordResetEmail = async (email) => {
 
 const resetPassword = async (token, newPassword) => {
   const userDb = await userRepo.getByResetToken(token);
-  if (!userDb) throw new Error("Password reset token is invalid or has expired.");
+  if (!userDb) throw new AppError("Invalid or expired password reset token.", 401);
 
   const newPasswordHash = await secretService.generatePasswordHash(newPassword);
   return userRepo.update(userDb.id, {

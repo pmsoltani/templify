@@ -1,32 +1,26 @@
 import jwt from "jsonwebtoken";
 import * as userRepo from "../repositories/userRepository.js";
+import AppError from "../utils/AppError.js";
 
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) return res.status(401).json({ error: "Missing token." });
+  if (token == null) throw new AppError("Missing authentication token.", 401);
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: "Invalid token." });
-    req.user = user;
-    next();
-  });
+  req.user = jwt.verify(token, process.env.JWT_SECRET);
+  next();
 };
 
 const authenticateApiKey = async (req, res, next) => {
   const apiKey = req.headers["x-api-key"];
-  if (!apiKey) return res.status(401).json({ error: "Missing API key." });
+  if (!apiKey) throw new AppError("Missing API key.", 401);
 
-  try {
-    const user = await userRepo.getByApiKey(apiKey);
-    if (!user || !user.is_confirmed) {
-      return res.status(403).json({ error: "Invalid API key or user not confirmed." });
-    }
-    req.user = user;
-    next();
-  } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+  const userDb = await userRepo.getByApiKey(apiKey);
+  if (!userDb || !userDb.is_confirmed) {
+    throw new AppError("Invalid API key or user not confirmed.", 403);
   }
+  req.user = userDb;
+  next();
 };
 
 export { authenticateToken, authenticateApiKey };

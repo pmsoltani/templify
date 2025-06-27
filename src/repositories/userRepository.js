@@ -53,22 +53,7 @@ const create = async (email, passwordHash, confirmationToken) => {
 };
 
 const update = async (userId, updateData) => {
-  const allowedFields = [
-    "email",
-    "new_email",
-    "password_hash",
-    "api_key",
-    "is_confirmed",
-    "confirmation_token",
-    "password_reset_token",
-    "password_reset_expires",
-  ];
-  const isValid = Object.keys(updateData).every((k) => allowedFields.includes(k));
-  if (!isValid) throw new Error("Invalid fields in update data");
-
-  const updateEntries = Object.entries(updateData);
-  if (updateEntries.length === 0) throw new Error("No fields to update");
-
+  const updateEntries = Object.entries(updateData); // Assume updateEntries isn't empty
   const setClause = updateEntries.map(([k], idx) => `"${k}" = $${idx + 1}`).join(", ");
   const values = updateEntries.map(([, v]) => v);
 
