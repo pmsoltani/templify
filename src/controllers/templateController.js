@@ -13,7 +13,7 @@ const listUserTemplates = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { name, htmlEntrypoint } = req.body;
+    const { name, htmlEntrypoint, description = null } = req.body;
     if (!name || !req.file) {
       return res.status(400).json({ error: "Missing template name or zip file." });
     }
@@ -22,6 +22,7 @@ const create = async (req, res) => {
       req.user.userId,
       name,
       htmlEntrypoint || "template.html",
+      description,
       req.file.path
     );
 

@@ -16,14 +16,14 @@ const getAllByUserId = async (userId) => {
   return res.rows;
 };
 
-const create = async (userId, name, htmlEntrypoint) => {
+const create = async (userId, name, htmlEntrypoint, description) => {
   const res = await db.query(
     `
-    INSERT INTO templates (user_id, name, html_entrypoint)
-    VALUES ($1, $2, $3)
+    INSERT INTO templates (user_id, name, html_entrypoint, description)
+    VALUES ($1, $2, $3, $4)
     RETURNING id, name
     `,
-    [userId, name, htmlEntrypoint]
+    [userId, name, htmlEntrypoint, description]
   );
   return res.rows[0];
 };
@@ -35,15 +35,15 @@ const remove = async (templateId) => {
   return res.rows[0];
 };
 
-const update = async (userId, templateId, name, htmlEntrypoint) => {
+const update = async (userId, templateId, name, htmlEntrypoint, description) => {
   const res = await db.query(
     `
     UPDATE templates
-    SET name = $1, html_entrypoint = $2
-    WHERE id = $3 AND user_id = $4
+    SET name = $1, html_entrypoint = $2, description = $3
+    WHERE id = $4 AND user_id = $5
     RETURNING id, name
     `,
-    [name, htmlEntrypoint, templateId, userId]
+    [name, htmlEntrypoint, description, templateId, userId]
   );
   return res.rows[0];
 };

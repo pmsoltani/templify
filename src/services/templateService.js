@@ -7,8 +7,19 @@ const getAllByUserId = async (userId) => {
   return await templateRepo.getAllByUserId(userId);
 };
 
-const create = async (userId, templateName, htmlEntrypoint, tempZipPath) => {
-  const templateDb = await templateRepo.create(userId, templateName, htmlEntrypoint);
+const create = async (
+  userId,
+  templateName,
+  htmlEntrypoint,
+  description,
+  tempZipPath
+) => {
+  const templateDb = await templateRepo.create(
+    userId,
+    templateName,
+    htmlEntrypoint,
+    description
+  );
   await fileService.unzipAndUpload(tempZipPath, `userFiles/${userId}/${templateDb.id}`);
   fs.unlinkSync(tempZipPath); // Clean up the temp file
   return templateDb;
@@ -35,7 +46,8 @@ const update = async (userId, templateId, updateData, tempZipPath) => {
     userId,
     templateId,
     updateData.name || templateDb.name,
-    updateData.htmlEntrypoint || templateDb.html_entrypoint
+    updateData.htmlEntrypoint || templateDb.html_entrypoint,
+    updateData.description || templateDb.description
   );
 };
 
