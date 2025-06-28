@@ -1,5 +1,6 @@
 import fs from "fs";
 import * as templateService from "../services/templateService.js";
+import * as pdfService from "../services/pdfService.js";
 import AppError from "../utils/AppError.js";
 
 const listUserTemplates = async (req, res) => {
@@ -34,7 +35,7 @@ const generatePdf = async (req, res) => {
   const templateId = req.params.id;
   const userId = req.user.id;
   const jsonData = req.body;
-  const pdfUrl = await templateService.generatePdf(userId, templateId, jsonData);
+  const pdfUrl = await pdfService.generatePdf(userId, templateId, jsonData);
   res.json({ message: "PDF generated successfully!", url: pdfUrl });
 };
 

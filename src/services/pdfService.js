@@ -1,9 +1,12 @@
+import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
 import mustache from "mustache";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
+import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
+import * as fileService from "./fileService.js";
 
 const generatePdf = async (userId, templateId, jsonData) => {
   let tempDir = null;
