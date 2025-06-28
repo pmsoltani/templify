@@ -3,12 +3,16 @@ import * as userRepo from "../repositories/userRepository.js";
 import AppError from "../utils/AppError.js";
 
 const authenticateToken = async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) throw new AppError("Missing authentication token.", 401);
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (token == null) throw new AppError("Missing authentication token.", 401);
 
-  req.user = jwt.verify(token, process.env.JWT_SECRET);
-  next();
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch (error) {
+    throw new AppError("Invalid token.", 401);
+  }
 };
 
 const authenticateApiKey = async (req, res, next) => {
