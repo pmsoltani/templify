@@ -7,7 +7,7 @@ const get = async (req, res) => {
   const userDb = await userRepo.getById(req.user.userId);
   if (!userDb) throw new AppError("User not found.", 404);
 
-  res.json({ message: "", user: publicUser.parse(userDb) });
+  res.json({ message: "User retrieved successfully!", user: publicUser.parse(userDb) });
 };
 
 const updateEmail = async (req, res) => {
