@@ -12,6 +12,15 @@ const register = async (email, password) => {
   return userDb;
 };
 
+const login = async (email, password) => {
+  const userDb = await userRepo.getByEmail(email);
+  if (!userDb) throw new AppError("Invalid credentials.", 401);
+  const validPass = await secretService.verifyPassword(password, userDb.password_hash);
+  if (!validPass) throw new AppError("Invalid credentials.", 401);
+  if (!userDb.is_confirmed) throw new AppError("User has not confirmed.", 401);
+  return secretService.generateAuthToken(userDb);
+};
+
 const confirmEmail = async (token) => {
   let userDb = await userRepo.getByConfirmationToken(token);
   if (!userDb) throw new AppError("Invalid confirmation token.", 401);
@@ -64,6 +73,7 @@ const resetPassword = async (token, newPassword) => {
 
 export {
   register,
+  login,
   confirmEmail,
   resendConfirmation,
   sendPasswordResetEmail,
