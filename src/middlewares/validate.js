@@ -1,0 +1,28 @@
+import { z } from "zod";
+import AppError from "../utils/AppError.js";
+
+/**
+ * A middleware factory that takes a Zod schema and validates the request against it.
+ * @param {z.ZodObject<any>} schema The Zod schema to validate against.
+ */
+const validate = (schema) => (req, res, next) => {
+  try {
+    schema.parse({
+      body: req.body,
+      query: req.query,
+      params: req.params,
+    });
+    next();
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const validationErrors = err.flatten().fieldErrors;
+      const appError = new AppError("Invalid input data.", 400, {
+        validation: validationErrors,
+      });
+      return next(appError);
+    }
+    next(err); // For any other unexpected errors, pass them on.
+  }
+};
+
+export default validate;
