@@ -5,16 +5,12 @@ const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
-  // Development: send detailed error.
-  let data = { status: err.status, message: err.message };
-  if (process.env.NODE_ENV === "development") {
-    return res.status(err.statusCode).json({ ...data, error: err, stack: err.stack });
-  }
+  let errorResponse = { status: err.status, message: err.message };
+  if (err.details) errorResponse.details = err.details;
+  if (process.env.NODE_ENV === "development") errorResponse.stack = err.stack;
+  if (err.isOperational) return res.status(err.statusCode).json(errorResponse);
 
-  // Production: for operational errors we trust, send the message to the client.
-  if (err.isOperational) return res.status(err.statusCode).json(data);
-
-  // Production: for programming or unknown errors, don't leak details.
+  // In production, don't leak details for programming or unknown errors.
   console.error("ERROR", err);
   res.status(500).json({ status: "error", message: "Something went wrong!" });
 };
