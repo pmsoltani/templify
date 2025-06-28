@@ -15,7 +15,7 @@ registerRoute(router, "post", "/:id/generate", authenticateApiKey, templateContr
 // Routes for managing templates (require JWT)
 router.use(catchAsync(authenticateToken));
 
-registerRoute(router, "get", "/", templateController.listUserTemplates);
+registerRoute(router, "get", "/", templateController.getAllByUserId);
 registerRoute(router, "post", "/", upload.single("templateZip"), validate(templateSchema.create), templateController.create); // prettier-ignore
 registerRoute(router, "put", "/:id", upload.single("templateZip"), validate(templateSchema.update), templateController.update); // prettier-ignore
 registerRoute(router, "delete", "/:id", templateController.remove);

@@ -1,10 +1,11 @@
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as fileService from "../services/fileService.js";
 import AppError from "../utils/AppError.js";
+import { publicPdfs } from "../schemas/pdfSchema.js";
 
 const getAll = async (req, res) => {
-  const pdfs = await pdfRepo.getAllByUserId(req.user.userId);
-  res.json(pdfs);
+  const pdfsDb = await pdfRepo.getAllByUserId(req.user.userId);
+  res.json(publicPdfs.parse(pdfsDb));
 };
 
 const getDownloadLink = async (req, res) => {
