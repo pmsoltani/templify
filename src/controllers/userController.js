@@ -11,7 +11,6 @@ const get = async (req, res) => {
 
 const updateEmail = async (req, res) => {
   const newEmail = req.body.email;
-  if (!newEmail) throw new AppError("Missing new email.", 400);
   if (req.user.email === newEmail) {
     throw new AppError("Cannot use the current email.", 400);
   }
@@ -21,9 +20,6 @@ const updateEmail = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  if (!currentPassword || !newPassword) {
-    throw new AppError("Missing current and/or new password.", 400);
-  }
   await userService.updatePassword(req.user.userId, currentPassword, newPassword);
   res.json({ message: "Password updated successfully." });
 };
@@ -34,10 +30,7 @@ const regenerateApiKey = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  const { password } = req.body;
-  if (!password) throw new AppError("Missing password.", 400);
-
-  await userService.remove(req.user.userId, password);
+  await userService.remove(req.user.userId, req.body.password);
   res.status(204).send();
 };
 

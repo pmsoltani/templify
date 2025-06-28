@@ -10,7 +10,7 @@ const listUserTemplates = async (req, res) => {
 const create = async (req, res, next) => {
   try {
     const { name, htmlEntrypoint, description = null } = req.body;
-    if (!name || !req.file) throw new AppError("Missing template name/zip file.", 400);
+    if (!req.file) throw new AppError("Missing template file.", 400);
 
     const templateDb = await templateService.create(
       req.user.userId,
@@ -21,7 +21,7 @@ const create = async (req, res, next) => {
     );
 
     res.status(201).json({
-      message: "Template uploaded successfully!",
+      message: "Template created successfully!",
       template: templateDb,
     });
   } catch (err) {
@@ -48,7 +48,7 @@ const remove = async (req, res) => {
 const update = async (req, res, next) => {
   const templateId = req.params.id;
   try {
-    if (!req.file) throw new AppError("Missing template zip file.", 400);
+    if (!req.file) throw new AppError("Missing template file.", 400);
     const updatedTemplateDb = await templateService.update(
       req.user.userId,
       templateId,
