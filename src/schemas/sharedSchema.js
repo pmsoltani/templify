@@ -12,4 +12,8 @@ const token = z
   .string({ required_error: "Token is required." })
   .length(64, "Invalid token length.");
 
-export { email, password, token };
+const templateHtmlEntrypoint = z.string().optional().default("template.html");
+
+const templateDescription = z.string().optional();
+
+export { email, password, token, templateHtmlEntrypoint, templateDescription };

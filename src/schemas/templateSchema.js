@@ -1,12 +1,20 @@
 import { z } from "zod";
+import { templateDescription, templateHtmlEntrypoint } from "./sharedSchema.js";
 
 const create = z.object({
   body: z.object({
     name: z.string("Template name is required"),
-    htmlEntrypoint: z.string().optional().default("template.html"),
-    description: z.string().optional(),
+    htmlEntrypoint: templateHtmlEntrypoint,
+    description: templateDescription,
   }),
-  file: z,
 });
 
-export { create };
+const update = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    htmlEntrypoint: templateHtmlEntrypoint,
+    description: templateDescription,
+  }),
+});
+
+export { create, update };

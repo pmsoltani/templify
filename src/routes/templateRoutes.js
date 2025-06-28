@@ -17,7 +17,7 @@ router.use(catchAsync(authenticateToken));
 
 registerRoute(router, "get", "/", templateController.listUserTemplates);
 registerRoute(router, "post", "/", upload.single("templateZip"), validate(templateSchema.create), templateController.create); // prettier-ignore
-registerRoute(router, "put", "/:id", upload.single("templateZip"), templateController.update); // prettier-ignore
+registerRoute(router, "put", "/:id", upload.single("templateZip"), validate(templateSchema.update), templateController.update); // prettier-ignore
 registerRoute(router, "delete", "/:id", templateController.remove);
 
 export default router;
