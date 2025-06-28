@@ -45,7 +45,7 @@ const create = async (email, passwordHash, confirmationToken) => {
     `
     INSERT INTO users (email, password_hash, confirmation_token)
     VALUES ($1, $2, $3)
-    RETURNING id, email, created_at
+    RETURNING *
     `,
     [email, passwordHash, confirmationToken]
   );
@@ -62,7 +62,7 @@ const update = async (userId, updateData) => {
     UPDATE users
     SET ${setClause}
     WHERE id = $${updateEntries.length + 1}
-    RETURNING id, email, api_key;
+    RETURNING *
     `,
     [...values, userId]
   );

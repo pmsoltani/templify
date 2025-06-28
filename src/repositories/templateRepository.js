@@ -21,7 +21,7 @@ const create = async (userId, name, htmlEntrypoint, description) => {
     `
     INSERT INTO templates (user_id, name, html_entrypoint, description)
     VALUES ($1, $2, $3, $4)
-    RETURNING id, name
+    RETURNING *
     `,
     [userId, name, htmlEntrypoint, description]
   );
@@ -29,7 +29,7 @@ const create = async (userId, name, htmlEntrypoint, description) => {
 };
 
 const remove = async (templateId) => {
-  const res = await db.query("DELETE FROM templates WHERE id = $1 RETURNING id", [
+  const res = await db.query("DELETE FROM templates WHERE id = $1 RETURNING *", [
     templateId,
   ]);
   return res.rows[0];
@@ -41,7 +41,7 @@ const update = async (userId, templateId, name, htmlEntrypoint, description) => 
     UPDATE templates
     SET name = $1, html_entrypoint = $2, description = $3
     WHERE id = $4 AND user_id = $5
-    RETURNING id, name
+    RETURNING *
     `,
     [name, htmlEntrypoint, description, templateId, userId]
   );
