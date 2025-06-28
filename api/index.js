@@ -14,6 +14,11 @@ const runServer = async () => {
     await db.query("SELECT 1");
     console.log("Database connection verified.");
 
+    const corsOptions = {
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    };
+    app.use(cors(corsOptions));
+
     app.use(express.json()); // Middleware to parse JSON request bodies
     app.use("/api", apiRoutes);
     app.get("/", (req, res) => res.json({ message: "Welcome to Templify!" }));
