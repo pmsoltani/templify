@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const id = z.number().int();
+
 const email = z
   .string({ required_error: "Email is required." })
   .email("Invalid email address.");
@@ -12,8 +14,21 @@ const token = z
   .string({ required_error: "Token is required." })
   .length(64, "Invalid token length.");
 
+const dateTime = z.date().or(z.string());
+
+const templateName = z.string("Template name is required");
+
 const templateHtmlEntrypoint = z.string().optional().default("template.html");
 
 const templateDescription = z.string().optional();
 
-export { email, password, token, templateHtmlEntrypoint, templateDescription };
+export {
+  id,
+  email,
+  password,
+  token,
+  dateTime,
+  templateName,
+  templateHtmlEntrypoint,
+  templateDescription,
+};
