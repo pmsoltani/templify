@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import apiRoutes from "./src/routes/api.js";
 import db from "./src/config/database.js";
 import { initializeBrowser, closeBrowserInstance } from "./src/config/puppeteer.js";
