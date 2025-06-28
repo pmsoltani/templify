@@ -9,12 +9,24 @@ const updatePassword = z.object({
 
 const remove = z.object({ body: z.object({ password }) });
 
-const publicUser = z.object({
+const publicUserDb = z.object({
   id: id,
   email: email,
-  apiKey: token.optional(),
-  createdAt: dateTime,
-  updatedAt: dateTime,
+  api_key: token.nullable(),
+  created_at: dateTime,
+  updated_at: dateTime,
 });
 
-export { updateEmail, updatePassword, remove, publicUser };
+const publicUser = publicUserDb.transform((dbData) => {
+  return {
+    id: dbData.id,
+    email: dbData.email,
+    apiKey: dbData.api_key,
+    createdAt: dbData.created_at,
+    updatedAt: dbData.updated_at,
+  };
+});
+
+const publicUsers = z.array(publicUser);
+
+export { updateEmail, updatePassword, remove, publicUser, publicUsers, publicUserDb };

@@ -23,14 +23,26 @@ const update = z.object({
   }),
 });
 
-const publicTemplate = z.object({
+const publicTemplateDb = z.object({
   id: id,
-  user: id,
+  user_id: id,
   name: templateName,
-  htmlEntrypoint: templateHtmlEntrypoint,
-  description: templateDescription,
-  createdAt: dateTime,
-  updatedAt: dateTime,
+  html_entrypoint: templateHtmlEntrypoint,
+  description: templateDescription.nullable(),
+  created_at: dateTime,
+  updated_at: dateTime,
+});
+
+const publicTemplate = publicTemplateDb.transform((dbData) => {
+  return {
+    id: dbData.id,
+    userId: dbData.user_id,
+    name: dbData.name,
+    htmlEntrypoint: dbData.html_entrypoint,
+    description: dbData.description,
+    templateId: dbData.template_id,
+    createdAt: dbData.created_at,
+  };
 });
 
 const publicTemplates = z.array(publicTemplate);

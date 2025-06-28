@@ -1,11 +1,20 @@
 import { z } from "zod";
 import { id, dateTime } from "./sharedSchema.js";
 
-const publicPdf = z.object({
+const publicPdfDb = z.object({
   id: id,
   user_id: id,
   template_id: id,
-  createdAt: dateTime,
+  created_at: dateTime,
+});
+
+const publicPdf = publicPdfDb.transform((dbData) => {
+  return {
+    id: dbData.id,
+    userId: dbData.user_id,
+    templateId: dbData.template_id,
+    createdAt: dbData.created_at,
+  };
 });
 
 const publicPdfs = z.array(publicPdf);
