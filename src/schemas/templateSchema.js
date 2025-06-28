@@ -1,9 +1,15 @@
 import { z } from "zod";
-import { templateDescription, templateHtmlEntrypoint } from "./sharedSchema.js";
+import {
+  id,
+  dateTime,
+  templateName,
+  templateDescription,
+  templateHtmlEntrypoint,
+} from "./sharedSchema.js";
 
 const create = z.object({
   body: z.object({
-    name: z.string("Template name is required"),
+    name: templateName,
     htmlEntrypoint: templateHtmlEntrypoint,
     description: templateDescription,
   }),
@@ -11,10 +17,22 @@ const create = z.object({
 
 const update = z.object({
   body: z.object({
-    name: z.string().optional(),
+    name: templateName.optional(),
     htmlEntrypoint: templateHtmlEntrypoint,
     description: templateDescription,
   }),
 });
 
-export { create, update };
+const publicTemplate = z.object({
+  id: id,
+  user: id,
+  name: templateName,
+  htmlEntrypoint: templateHtmlEntrypoint,
+  description: templateDescription,
+  createdAt: dateTime,
+  updatedAt: dateTime,
+});
+
+const publicTemplates = z.array(publicTemplate);
+
+export { create, update, publicTemplate, publicTemplates };
