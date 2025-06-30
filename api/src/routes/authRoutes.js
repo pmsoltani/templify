@@ -11,8 +11,8 @@ registerRoute(router, "post", "/register", validate(authSchema.register), authCo
 registerRoute(router, "get", "/confirm", validate(authSchema.confirm), authController.confirm); // prettier-ignore
 registerRoute(router, "post", "/login", validate(authSchema.login), authController.login); // prettier-ignore
 registerRoute(router, "post", "/logout", authenticateToken, authController.logout);
-registerRoute(router, "post", "/forgot-password", validate(authSchema.forgotPassword), authController.forgotPassword); // prettier-ignore
-registerRoute(router, "post", "/reset-password", validate(authSchema.resetPassword), authController.resetPassword); // prettier-ignore
+registerRoute(router, "post", "/forgot", validate(authSchema.forgot), authController.forgot); // prettier-ignore
+registerRoute(router, "post", "/reset", validate(authSchema.reset), authController.reset); // prettier-ignore
 registerRoute(router, "post", "/resend-confirmation", validate(authSchema.resendConfirmation), authController.resendConfirmation); // prettier-ignore
 
 export default router;

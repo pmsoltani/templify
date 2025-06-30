@@ -9,8 +9,8 @@ const resendConfirmation = z.object({ body: z.object({ email }) });
 
 const login = z.object({ body: z.object({ email, password }) });
 
-const forgotPassword = z.object({ body: z.object({ email }) });
+const forgot = z.object({ body: z.object({ email }) });
 
-const resetPassword = z.object({ body: z.object({ token, password }) });
+const reset = z.object({ body: z.object({ token, password }) });
 
-export { register, confirm, resendConfirmation, login, forgotPassword, resetPassword };
+export { register, confirm, resendConfirmation, login, forgot, reset };

@@ -1,6 +1,5 @@
 import * as userRepo from "../repositories/userRepository.js";
 import * as authService from "../services/authService.js";
-import * as secretService from "../services/secretService.js";
 import AppError from "../utils/AppError.js";
 
 const register = async (req, res) => {
@@ -17,7 +16,7 @@ const register = async (req, res) => {
 };
 
 const confirm = async (req, res) => {
-  await authService.confirmEmail(req.query.token);
+  await authService.confirm(req.query.token);
   res.json({ message: "Email confirmed successfully!" });
 };
 
@@ -36,23 +35,15 @@ const logout = (req, res) => {
   res.json({ message: "Logged out successfully." });
 };
 
-const forgotPassword = async (req, res) => {
-  await authService.sendPasswordResetEmail(req.body.email);
+const forgot = async (req, res) => {
+  await authService.sendResetEmail(req.body.email);
   res.json({ message: "If an account exists, reset link will be sent." });
 };
 
-const resetPassword = async (req, res) => {
+const reset = async (req, res) => {
   const { token, password } = req.body;
   await authService.resetPassword(token, password);
   res.json({ message: "Password has been reset successfully." });
 };
 
-export {
-  register,
-  confirm,
-  resendConfirmation,
-  login,
-  logout,
-  forgotPassword,
-  resetPassword,
-};
+export { register, confirm, resendConfirmation, login, logout, forgot, reset };

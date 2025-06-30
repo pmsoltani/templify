@@ -3,7 +3,7 @@ import transporter from "../config/mailer.js";
 const appBaseUrl = process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL;
 
 const sendConfirmationEmail = async (email, confirmationToken) => {
-  const confirmationUrl = `${appBaseUrl}/api/confirm?token=${confirmationToken}`;
+  const confirmationUrl = `${appBaseUrl}/confirm?token=${confirmationToken}`;
   await transporter.sendMail({
     from: `"Templify" <${process.env.MAIL_USER}>`,
     to: email,
@@ -16,8 +16,8 @@ const sendConfirmationEmail = async (email, confirmationToken) => {
   });
 };
 
-const sendPasswordResetEmail = async (email, resetToken) => {
-  const resetUrl = `${appBaseUrl}/reset-password?token=${resetToken}`;
+const sendResetEmail = async (email, resetToken) => {
+  const resetUrl = `${appBaseUrl}/reset?token=${resetToken}`;
   await transporter.sendMail({
     from: `"Templify" <${process.env.MAIL_USER}>`,
     to: email,
@@ -30,4 +30,4 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   });
 };
 
-export { sendConfirmationEmail, sendPasswordResetEmail };
+export { sendConfirmationEmail, sendResetEmail };

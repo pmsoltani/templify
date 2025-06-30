@@ -21,7 +21,7 @@ const login = async (email, password) => {
   return secretService.generateAuthToken(userDb);
 };
 
-const confirmEmail = async (token) => {
+const confirm = async (token) => {
   let userDb = await userRepo.getByConfirmationToken(token);
   if (!userDb) throw new AppError("Invalid confirmation token.", 401);
 
@@ -42,7 +42,7 @@ const resendConfirmation = async (email) => {
   return true;
 };
 
-const sendPasswordResetEmail = async (email) => {
+const sendResetEmail = async (email) => {
   const userDb = await userRepo.getByEmail(email);
 
   // Only send an email if the user was found!
@@ -54,12 +54,12 @@ const sendPasswordResetEmail = async (email) => {
       password_reset_token: resetToken,
       password_reset_expires: expires,
     });
-    await mailer.sendPasswordResetEmail(email, resetToken);
+    await mailer.sendResetEmail(email, resetToken);
   }
   return true; // Always send a success response so as not to reveal if an email exists.
 };
 
-const resetPassword = async (token, newPassword) => {
+const reset = async (token, newPassword) => {
   const userDb = await userRepo.getByResetToken(token);
   if (!userDb) throw new AppError("Invalid or expired password reset token.", 401);
 
@@ -71,11 +71,4 @@ const resetPassword = async (token, newPassword) => {
   });
 };
 
-export {
-  register,
-  login,
-  confirmEmail,
-  resendConfirmation,
-  sendPasswordResetEmail,
-  resetPassword,
-};
+export { register, login, confirm, resendConfirmation, sendResetEmail, reset };
