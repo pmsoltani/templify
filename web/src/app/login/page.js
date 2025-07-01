@@ -37,7 +37,7 @@ export default function LoginPage() {
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Something went wrong!");
-      localStorage.setItem("authToken", data.accessToken);
+      localStorage.setItem("authToken", data.data.accessToken);
 
       router.push("/dashboard");
     } catch (err) {
