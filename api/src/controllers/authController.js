@@ -1,6 +1,7 @@
 import * as userRepo from "../repositories/userRepository.js";
 import * as authService from "../services/authService.js";
 import AppError from "../utils/AppError.js";
+import { publicUser } from "../schemas/userSchema.js";
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -11,7 +12,7 @@ const register = async (req, res) => {
   const userDb = await authService.register(email, password);
   res.status(201).json({
     message: "User created successfully! Check your email for the confirmation link.",
-    user: { id: userDb.id, email: userDb.email },
+    data: { user: publicUser.parse(userDb) },
   });
 };
 
@@ -28,7 +29,7 @@ const resendConfirmation = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   const accessToken = await authService.login(email, password);
-  res.json({ message: "Logged in successfully!", accessToken: accessToken });
+  res.json({ message: "Logged in successfully!", data: { accessToken: accessToken } });
 };
 
 const logout = (req, res) => {

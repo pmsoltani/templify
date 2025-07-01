@@ -6,7 +6,10 @@ import { publicTemplate, publicTemplates } from "../schemas/templateSchema.js";
 
 const getAllByUserId = async (req, res) => {
   const templatesDb = await templateService.getAllByUserId(req.user.userId);
-  res.json(publicTemplates.parse(templatesDb));
+  res.json({
+    message: "Templates retrieved successfully!",
+    data: { templates: publicTemplates.parse(templatesDb) },
+  });
 };
 
 const create = async (req, res, next) => {
@@ -24,7 +27,7 @@ const create = async (req, res, next) => {
 
     res.status(201).json({
       message: "Template created successfully!",
-      template: publicTemplate.parse(templateDb),
+      data: { template: publicTemplate.parse(templateDb) },
     });
   } catch (err) {
     if (req.file) fs.unlinkSync(req.file.path); // Clean up the temp file
@@ -37,7 +40,7 @@ const generatePdf = async (req, res) => {
   const userId = req.user.id;
   const jsonData = req.body;
   const pdfUrl = await pdfService.generatePdf(userId, templateId, jsonData);
-  res.json({ message: "PDF generated successfully!", url: pdfUrl });
+  res.json({ message: "PDF generated successfully!", data: { url: pdfUrl } });
 };
 
 const remove = async (req, res) => {
@@ -59,7 +62,7 @@ const update = async (req, res, next) => {
     );
     res.json({
       message: "Template update successful!",
-      template: publicTemplate.parse(templateDb),
+      data: { template: publicTemplate.parse(templateDb) },
     });
   } catch (err) {
     if (req.file) fs.unlinkSync(req.file.path); // Clean up the temp file
