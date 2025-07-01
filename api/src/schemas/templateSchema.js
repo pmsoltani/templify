@@ -40,8 +40,8 @@ const publicTemplate = publicTemplateDb.transform((dbData) => {
     name: dbData.name,
     htmlEntrypoint: dbData.html_entrypoint,
     description: dbData.description,
-    templateId: dbData.template_id,
     createdAt: dbData.created_at,
+    updatedAt: dbData.updated_at,
   };
 });
 
