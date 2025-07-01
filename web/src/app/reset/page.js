@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
+import { Suspense, useEffect, useReducer, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ResetSuccessCard from "./components/ResetSuccessCard";
 import ResetForm from "./components/ResetForm";
@@ -16,7 +16,7 @@ function formReducer(state, action) {
   }
 }
 
-export default function ResetPage() {
+function ResetStatus() {
   const searchParams = useSearchParams();
 
   const [formState, dispatch] = useReducer(formReducer, initialState);
@@ -75,5 +75,13 @@ export default function ResetPage() {
       error={error}
       onSubmit={handleResetPassword}
     />
+  );
+}
+
+export default function ResetPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetStatus />
+    </Suspense>
   );
 }
