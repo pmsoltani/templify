@@ -20,25 +20,20 @@ export function RemoveConfirmPopover({ templateId }) {
           <Trash2Icon />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <h4 className="leading-none font-medium">Are you sure?</h4>
-            <p className="text-muted-foreground text-sm">
-              This will permanently delete the template and all PDF files created using
-              it.
-            </p>
-          </div>
-          <div>
-            <Button
-              variant="destructive"
-              onClick={() => handleRemoveTemplate(templateId)}
-              disabled={itemIds.templates.has(templateId)}
-            >
-              {itemIds.templates.has(templateId) ? "Removing..." : "Remove"}
-            </Button>
-          </div>
-        </div>
+
+      <PopoverContent className="flex flex-col gap-2 w-80">
+        <h4 className="leading-none font-medium">Are you sure?</h4>
+        <p className="text-muted-foreground text-sm">
+          This will permanently delete the template and all PDF files created using it.
+        </p>
+        <Button
+          className="w-fit"
+          variant="destructive"
+          onClick={() => handleRemoveTemplate(templateId)}
+          disabled={itemIds.templates.has(templateId)}
+        >
+          {itemIds.templates.has(templateId) ? "Removing..." : "Remove"}
+        </Button>
       </PopoverContent>
     </Popover>
   );
