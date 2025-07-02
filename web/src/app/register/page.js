@@ -1,25 +1,15 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useState } from "react";
+import useFormReducer from "@/hooks/useFormReducer";
+import apiClient from "@/lib/apiClient";
 import ConfirmEmailCard from "./components/ConfirmEmailCard";
 import RegisterForm from "./components/RegisterForm";
 
 const initialState = { email: "", password: "", passwordConfirm: "" };
 
-function formReducer(state, action) {
-  switch (action.type) {
-    case "SET_FIELD":
-      return {
-        ...state, // Keep the old state values
-        [action.field]: action.payload, // Overwrite the specific field that changed
-      };
-    default:
-      return state;
-  }
-}
-
 export default function RegisterPage() {
-  const [formState, dispatch] = useReducer(formReducer, initialState);
+  const [formState, setField] = useFormReducer(initialState);
 
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +20,6 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     const { email, password, passwordConfirm } = formState;
-
     if (password !== passwordConfirm) {
       setError("Passwords do not match.");
       setIsLoading(false);
@@ -38,14 +27,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Something went wrong!");
+      await apiClient("/api/register", { method: "POST", body: { email, password } });
       setIsSubmitted(true);
     } catch (err) {
       setError(err.message);
@@ -58,12 +40,15 @@ export default function RegisterPage() {
     setError(null);
     setIsLoading(true);
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/resend-confirmation`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: formState.email }),
-    });
-    setIsLoading(false);
+    const { email } = formState;
+
+    try {
+      await apiClient("/api/resend-confirmation", { method: "POST", body: { email } });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return isSubmitted ? (
@@ -75,7 +60,7 @@ export default function RegisterPage() {
   ) : (
     <RegisterForm
       formState={formState}
-      dispatch={dispatch}
+      setField={setField}
       isLoading={isLoading}
       error={error}
       onSubmit={handleRegister}

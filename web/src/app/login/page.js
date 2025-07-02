@@ -14,31 +14,31 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import useFormReducer from "@/hooks/useFormReducer";
+import apiClient from "@/lib/apiClient";
+
+const initialState = { email: "", password: "" };
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null); // Stores error messages from the API
+  const [formState, setField] = useFormReducer(initialState);
+
+  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const router = useRouter(); // Used for redirection
+  const router = useRouter();
 
-  const handleSubmit = async (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    setError(null); // Clear previous errors
+    setError(null);
     setIsLoading(true);
 
+    const { email, password } = formState;
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+      const data = await apiClient("/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: { email, password },
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Something went wrong!");
       localStorage.setItem("authToken", data.data.accessToken);
-
       router.push("/dashboard");
     } catch (err) {
       setError(err.message);
@@ -54,16 +54,17 @@ export default function LoginPage() {
       </CardHeader>
 
       <CardContent>
-        <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-6" onSubmit={handleLogin}>
           <div className="grid gap-3">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              name="email"
               type="email"
               placeholder="m@example.com"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formState.email}
+              onChange={setField}
             />
           </div>
           <div className="grid gap-3">
@@ -78,10 +79,11 @@ export default function LoginPage() {
             </div>
             <Input
               id="password"
+              name="password"
               type="password"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formState.password}
+              onChange={setField}
             />
           </div>
           <div className="flex flex-col gap-3">

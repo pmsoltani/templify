@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 
 export default function RegisterForm({
   formState,
-  dispatch,
+  setField,
   isLoading,
   error,
   onSubmit,
@@ -15,10 +15,6 @@ export default function RegisterForm({
   const handleSubmit = async (event) => {
     event.preventDefault();
     onSubmit();
-  };
-
-  const handleFieldChange = (e) => {
-    dispatch({ type: "SET_FIELD", field: e.target.name, payload: e.target.value });
   };
 
   return (
@@ -37,7 +33,7 @@ export default function RegisterForm({
               type="password"
               required
               value={formState.password}
-              onChange={handleFieldChange}
+              onChange={setField}
             />
           </div>
           <div className="grid gap-3">
@@ -48,7 +44,7 @@ export default function RegisterForm({
               type="password"
               required
               value={formState.passwordConfirm}
-              onChange={handleFieldChange}
+              onChange={setField}
             />
           </div>
           <div className="flex flex-col gap-3">

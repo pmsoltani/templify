@@ -1,22 +1,15 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useState } from "react";
+import useFormReducer from "@/hooks/useFormReducer";
+import apiClient from "@/lib/apiClient";
 import ResetEmailSentCard from "./components/ResetEmailSentCard";
 import ForgotForm from "./components/ForgotForm";
 
 const initialState = { email: "" };
 
-function formReducer(state, action) {
-  switch (action.type) {
-    case "SET_FIELD":
-      return { ...state, [action.field]: action.payload };
-    default:
-      return state;
-  }
-}
-
 export default function ForgotPage() {
-  const [formState, dispatch] = useReducer(formReducer, initialState);
+  const [formState, setField] = useFormReducer(initialState);
 
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,16 +18,10 @@ export default function ForgotPage() {
   const handleRequestResetPassword = async () => {
     setError(null);
     setIsLoading(true);
+    const { email } = formState;
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/forgot`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formState.email }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Something went wrong!");
+      await apiClient("/api/forgot", { method: "POST", body: { email } });
       setIsSubmitted(true);
     } catch (err) {
       setError(err.message);
@@ -46,13 +33,15 @@ export default function ForgotPage() {
   const handleResend = async () => {
     setError(null);
     setIsLoading(true);
+    const { email } = formState;
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/forgot`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: formState.email }),
-    });
-    setIsLoading(false);
+    try {
+      await apiClient("/api/forgot", { method: "POST", body: { email } });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return isSubmitted ? (
@@ -64,7 +53,7 @@ export default function ForgotPage() {
   ) : (
     <ForgotForm
       formState={formState}
-      dispatch={dispatch}
+      setField={setField}
       isLoading={isLoading}
       error={error}
       onSubmit={handleRequestResetPassword}

@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 
 export default function ForgotForm({
   formState,
-  dispatch,
+  setField,
   isLoading,
   error,
   onSubmit,
@@ -23,10 +23,6 @@ export default function ForgotForm({
   const handleSubmit = async (event) => {
     event.preventDefault();
     onSubmit();
-  };
-
-  const handleFieldChange = (e) => {
-    dispatch({ type: "SET_FIELD", field: e.target.name, payload: e.target.value });
   };
 
   return (
@@ -47,7 +43,7 @@ export default function ForgotForm({
               placeholder="m@example.com"
               required
               value={formState.email}
-              onChange={handleFieldChange}
+              onChange={setField}
             />
           </div>
           <div className="flex flex-col gap-3">

@@ -1,25 +1,17 @@
 "use client";
 
-import { Suspense, useEffect, useReducer, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import useFormReducer from "@/hooks/useFormReducer";
+import apiClient from "@/lib/apiClient";
 import ResetSuccessCard from "./components/ResetSuccessCard";
 import ResetForm from "./components/ResetForm";
 
 const initialState = { password: "", passwordConfirm: "" };
 
-function formReducer(state, action) {
-  switch (action.type) {
-    case "SET_FIELD":
-      return { ...state, [action.field]: action.payload };
-    default:
-      return state;
-  }
-}
-
 function ResetStatus() {
   const searchParams = useSearchParams();
-
-  const [formState, dispatch] = useReducer(formReducer, initialState);
+  const [formState, setField] = useFormReducer(initialState);
 
   const [error, setError] = useState(null);
   const [token, setToken] = useState("");
@@ -28,10 +20,7 @@ function ResetStatus() {
 
   useEffect(() => {
     const token = searchParams.get("token");
-    if (!token) {
-      setError("No confirmation token found. Please check the link.");
-      return;
-    }
+    if (!token) return setError("No confirmation token found. Please check the link.");
 
     setToken(token);
   }, [searchParams]);
@@ -49,14 +38,7 @@ function ResetStatus() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reset`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Something went wrong!");
+      await apiClient("/api/reset", { method: "POST", body: { token, password } });
       setIsSubmitted(true);
     } catch (err) {
       setError(err.message);
@@ -70,7 +52,7 @@ function ResetStatus() {
   ) : (
     <ResetForm
       formState={formState}
-      dispatch={dispatch}
+      setField={setField}
       isLoading={isLoading}
       error={error}
       onSubmit={handleResetPassword}

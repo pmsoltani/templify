@@ -10,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import apiClient from "@/lib/apiClient";
+
+const statusData = {
+  verifying: { title: "Verifying...", className: "text-center text-2xl" },
+  success: { title: "Success!", className: "text-center text-2xl text-green-600" },
+  error: { title: "Error", className: "text-center text-2xl text-red-600" },
+};
 
 function ConfirmationStatus() {
   const router = useRouter();
@@ -29,15 +36,9 @@ function ConfirmationStatus() {
 
     const verifyToken = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/confirm?token=${token}`
-        );
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Something went wrong!");
-
+        await apiClient(`/api/confirm?token=${token}`);
         setStatus("success");
-        setMessage(data.message);
+        setMessage("");
       } catch (err) {
         setStatus("error");
         setMessage(err.message);
@@ -50,17 +51,9 @@ function ConfirmationStatus() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        {status === "verifying" && (
-          <CardTitle className="text-center text-2xl">Verifying...</CardTitle>
-        )}
-        {status === "success" && (
-          <CardTitle className="text-center text-2xl text-green-600">
-            Success!
-          </CardTitle>
-        )}
-        {status === "error" && (
-          <CardTitle className="text-center text-2xl text-red-600">Error</CardTitle>
-        )}
+        <CardTitle className={statusData[status].className}>
+          {statusData[status].title}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-center text-gray-700">{message}</p>
@@ -69,7 +62,7 @@ function ConfirmationStatus() {
         <CardFooter>
           <Button onClick={() => router.push("/login")} className="w-full">
             Login
-          </Button>{" "}
+          </Button>
         </CardFooter>
       )}
     </Card>
