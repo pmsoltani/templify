@@ -14,7 +14,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
 import { useDashboard } from "../context/DashboardContext";
@@ -73,68 +72,46 @@ export default function TemplateUploadDialog({ templateID = null }) {
         )}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-[360px]">
         <DialogHeader>
           <DialogTitle>Upload Template</DialogTitle>
           <DialogDescription>
             Upload a .zip file containing your template.html, style.css, and any other
-            assets.
+            assets (max 5MB).
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-          <div className="grid grid-cols-12 items-center gap-4">
-            <Label htmlFor="name" className="text-right col-span-4">
-              Name
-            </Label>
-            <Input
-              id="name"
-              name="name"
-              value={formState.name}
-              onChange={setField}
-              className="col-span-8"
-              required={!templateID}
-            />
-          </div>
-          <div className="grid grid-cols-12 items-center gap-4">
-            <Label htmlFor="description" className="text-right col-span-4">
-              Description
-            </Label>
-            <Input
-              id="description"
-              name="description"
-              value={formState.description}
-              onChange={setField}
-              className="col-span-8"
-            />
-          </div>
-          <div className="grid grid-cols-12 items-center gap-2">
-            <Label htmlFor="htmlEntrypoint" className="text-right col-span-4">
-              HTML Entrypoint
-            </Label>
-            <Input
-              id="htmlEntrypoint"
-              name="htmlEntrypoint"
-              value={formState.htmlEntrypoint}
-              placeholder="HTML file name (default: template.html)"
-              onChange={setField}
-              className="col-span-8"
-            />
-          </div>
-          <div className="grid grid-cols-12 items-center gap-4">
-            <Label htmlFor="zipfile" className="text-right col-span-4">
-              Zip File
-            </Label>
-            <Input
-              id="zipfile"
-              name="file"
-              type="file"
-              accept=".zip"
-              onChange={setField}
-              className="col-span-8"
-              required
-            />
-          </div>
+          <Input
+            id="name"
+            name="name"
+            placeholder="Name"
+            value={formState.name}
+            onChange={setField}
+            required={!templateID}
+          />
+          <Input
+            id="description"
+            name="description"
+            placeholder="Description"
+            value={formState.description}
+            onChange={setField}
+          />
+          <Input
+            id="htmlEntrypoint"
+            name="htmlEntrypoint"
+            placeholder="HTML entrypoint (default: template.html)"
+            value={formState.htmlEntrypoint}
+            onChange={setField}
+          />
+          <Input
+            id="zipfile"
+            name="file"
+            type="file"
+            accept=".zip"
+            onChange={setField}
+            required
+          />
           {error && (
             <p className="col-span-4 text-center text-sm text-red-500">{error}</p>
           )}
