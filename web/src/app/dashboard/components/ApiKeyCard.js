@@ -26,35 +26,33 @@ export default function ApiKeyCard() {
         <CardDescription>Use this key in your API requests.</CardDescription>
       </CardHeader>
 
-      <CardContent>
-        <div className="flex gap-1 items-center justify-end p-3 bg-gray-200 dark:bg-gray-800 rounded-md">
+      <CardContent className="flex gap-1 items-center justify-end mx-6 p-3 bg-gray-200 dark:bg-gray-800 rounded-md">
+        {isLoading.apiKey ? (
+          <Skeleton className="grow h-[30px] rounded" />
+        ) : (
+          <code className="grow text-sm break-all">{maskedKey}</code>
+        )}
+        <Button
+          onClick={handleCopyApiKey}
+          variant="outline"
+          size="sm"
+          disabled={!isKeyValid}
+        >
+          {copied ? <CheckIcon /> : <CopyIcon />}
+        </Button>
+        <Button
+          onClick={handleGenApiKey}
+          variant="outline"
+          size="sm"
+          title="Generate a new key"
+          disabled={isLoading.apiKey}
+        >
           {isLoading.apiKey ? (
-            <Skeleton className="grow h-[30px] rounded" />
+            <Loader2Icon className="animate-spin" />
           ) : (
-            <code className="grow text-sm break-all">{maskedKey}</code>
+            <RotateCcwKeyIcon />
           )}
-          <Button
-            onClick={handleCopyApiKey}
-            variant="outline"
-            size="sm"
-            disabled={!isKeyValid}
-          >
-            {copied ? <CheckIcon /> : <CopyIcon />}
-          </Button>
-          <Button
-            onClick={handleGenApiKey}
-            variant="outline"
-            size="sm"
-            title="Generate a new key"
-            disabled={isLoading.apiKey}
-          >
-            {isLoading.apiKey ? (
-              <Loader2Icon className="animate-spin" />
-            ) : (
-              <RotateCcwKeyIcon />
-            )}
-          </Button>
-        </div>
+        </Button>
       </CardContent>
     </Card>
   );
