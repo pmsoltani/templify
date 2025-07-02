@@ -26,7 +26,7 @@ export default function ForgotForm({
   };
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full min-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Forgot your passowrd?</CardTitle>
         <CardDescription>Enter your email address for a reset link.</CardDescription>
@@ -34,7 +34,7 @@ export default function ForgotForm({
 
       <CardContent>
         <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-          <div className="grid gap-3">
+          <div className="flex flex-col gap-3">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"

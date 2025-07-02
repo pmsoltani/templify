@@ -47,7 +47,7 @@ export default function LoginPage() {
     }
   };
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full min-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>Login to your Templify account</CardDescription>
@@ -55,7 +55,7 @@ export default function LoginPage() {
 
       <CardContent>
         <form className="flex flex-col gap-6" onSubmit={handleLogin}>
-          <div className="grid gap-3">
+          <div className="flex flex-col gap-3">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -67,7 +67,7 @@ export default function LoginPage() {
               onChange={setField}
             />
           </div>
-          <div className="grid gap-3">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center">
               <Label htmlFor="password">Password</Label>
               <Link
