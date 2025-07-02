@@ -19,6 +19,7 @@ const apiClient = async (endpoint, options = {}) => {
       headers,
       body,
     });
+    if (response.status === 204) return null; // No content response
 
     const data = await response.json();
     if (!response.ok) {
