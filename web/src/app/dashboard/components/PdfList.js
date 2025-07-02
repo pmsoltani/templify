@@ -28,7 +28,7 @@ export default function PdfList() {
 
   if (isLoading.pdfs) return <div className="p-8">Loading PDFs...</div>;
   return (
-    <Table>
+    <Table className="w-fit">
       <TableHeader>
         <TableRow>
           <TableHead className="w-[10px]">ID</TableHead>
