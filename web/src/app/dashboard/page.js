@@ -19,7 +19,7 @@ export default function DashboardPage() {
       <section className="container mx-auto">
         <h1 className="text-3xl font-bold mb-6">Your Dashboard</h1>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
+        <div className="flex gap-4 mb-6">
           <ApiKeyCard />
           <StatsCard />
         </div>
