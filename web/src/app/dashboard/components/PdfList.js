@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "lucide-react";
+import { Link, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Spinner } from "@/components/ui/spinner";
 import formatDate from "@/utils/formatDate";
 import { useDashboard } from "../context/DashboardContext";
 
@@ -53,7 +52,7 @@ export default function PdfList() {
                 disabled={itemIds.pdfs.has(pdf.id)}
               >
                 {itemIds.pdfs.has(pdf.id) ? (
-                  <Spinner className="size-4" />
+                  <Loader2Icon className="animate-spin" />
                 ) : (
                   <Link className="size-4" />
                 )}

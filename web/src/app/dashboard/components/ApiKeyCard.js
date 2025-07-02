@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, RotateCcwKey } from "lucide-react";
+import { Check, Copy, Loader2Icon, RotateCcwKey } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +10,6 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "@/components/ui/spinner";
 import { useDashboard } from "../context/DashboardContext";
 
 export default function ApiKeyCard() {
@@ -30,7 +29,7 @@ export default function ApiKeyCard() {
       <CardContent>
         <div className="flex gap-1 items-center justify-end p-3 bg-gray-200 dark:bg-gray-800 rounded-md">
           {isLoading.apiKey ? (
-            <Skeleton className="h-[30px] w-[200px] rounded" />
+            <Skeleton className="grow h-[30px] rounded" />
           ) : (
             <code className="grow text-sm break-all">{maskedKey}</code>
           )}
@@ -50,7 +49,7 @@ export default function ApiKeyCard() {
             disabled={isLoading.apiKey}
           >
             {isLoading.apiKey ? (
-              <Spinner className="size-4" />
+              <Loader2Icon className="animate-spin" />
             ) : (
               <RotateCcwKey className="size-4" />
             )}
