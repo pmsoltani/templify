@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Status from "@/components/Status";
 import formatDate from "@/utils/formatDate";
 import { RemoveConfirmPopover } from "./RemoveConfirmPopover";
 import TemplateUploadDialog from "./TemplateUploadDialog";
@@ -16,16 +17,47 @@ import { useDashboard } from "../context/DashboardContext";
 export default function TemplateList() {
   const { templates, isLoading } = useDashboard();
 
-  if (!templates || templates.length === 0) {
-    return (
-      <div className="text-center py-12 px-6 bg-gray-50 rounded-lg">
-        <h3 className="text-xl font-semibold">No Templates Yet</h3>
-        <p className="text-gray-500 mt-2">Upload a template to get started.</p>
-      </div>
-    );
-  }
+  const renderTableBody = () => {
+    if (isLoading.templates) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-12">
+            <Status type="loading" title="Loading templates..." />
+          </TableCell>
+        </TableRow>
+      );
+    }
 
-  if (isLoading.templates) return <div className="p-8">Loading templates...</div>;
+    if (templates.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-12">
+            <Status
+              type="empty"
+              title="No templates yet"
+              message="Upload a template to get started."
+            />
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return templates.map((template) => (
+      <TableRow key={template.id}>
+        <TableCell>{template.id}</TableCell>
+        <TableCell>{template.name}</TableCell>
+        <TableCell>{template.description || "No description."}</TableCell>
+        <TableCell>{template.htmlEntrypoint}</TableCell>
+        <TableCell>{formatDate(template.createdAt)}</TableCell>
+        <TableCell>{formatDate(template.updatedAt)}</TableCell>
+        <TableCell className="flex items-center justify-end gap-2">
+          <TemplateUploadDialog templateID={template.id} />
+          <RemoveConfirmPopover templateId={template.id} />
+        </TableCell>
+      </TableRow>
+    ));
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -40,22 +72,7 @@ export default function TemplateList() {
         </TableRow>
       </TableHeader>
 
-      <TableBody>
-        {templates.map((template) => (
-          <TableRow key={template.id}>
-            <TableCell>{template.id}</TableCell>
-            <TableCell>{template.name}</TableCell>
-            <TableCell>{template.description || "No description."}</TableCell>
-            <TableCell>{template.htmlEntrypoint}</TableCell>
-            <TableCell>{formatDate(template.createdAt)}</TableCell>
-            <TableCell>{formatDate(template.updatedAt)}</TableCell>
-            <TableCell className="flex items-center justify-end gap-2">
-              <TemplateUploadDialog templateID={template.id} />
-              <RemoveConfirmPopover templateId={template.id} />
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
+      <TableBody>{renderTableBody()}</TableBody>
     </Table>
   );
 }
