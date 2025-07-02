@@ -27,7 +27,8 @@ export default function useFormReducer(initialState) {
   const [state, dispatch] = useReducer(formReducer, initialState);
 
   const setField = (e) => {
-    dispatch({ type: "SET_FIELD", field: e.target.name, payload: e.target.value });
+    const payload = e.target.type === "file" ? e.target.files[0] : e.target.value;
+    dispatch({ type: "SET_FIELD", field: e.target.name, payload: payload });
   };
 
   const resetForm = () => {
