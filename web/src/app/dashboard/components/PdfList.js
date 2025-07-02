@@ -1,6 +1,6 @@
 "use client";
 
-import { Link, Loader2Icon } from "lucide-react";
+import { LinkIcon, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -54,7 +54,7 @@ export default function PdfList() {
                 {itemIds.pdfs.has(pdf.id) ? (
                   <Loader2Icon className="animate-spin" />
                 ) : (
-                  <Link className="size-4" />
+                  <LinkIcon />
                 )}
               </Button>
             </TableCell>

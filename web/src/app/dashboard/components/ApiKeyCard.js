@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Loader2Icon, RotateCcwKey } from "lucide-react";
+import { CheckIcon, CopyIcon, Loader2Icon, RotateCcwKeyIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,7 +39,7 @@ export default function ApiKeyCard() {
             size="sm"
             disabled={!isKeyValid}
           >
-            {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+            {copied ? <CheckIcon /> : <CopyIcon />}
           </Button>
           <Button
             onClick={handleGenApiKey}
@@ -51,7 +51,7 @@ export default function ApiKeyCard() {
             {isLoading.apiKey ? (
               <Loader2Icon className="animate-spin" />
             ) : (
-              <RotateCcwKey className="size-4" />
+              <RotateCcwKeyIcon />
             )}
           </Button>
         </div>

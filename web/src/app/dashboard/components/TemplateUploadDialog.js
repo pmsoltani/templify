@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CloudUpload } from "lucide-react";
+import { CloudUploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -66,7 +66,7 @@ export default function TemplateUploadDialog({ templateID = null }) {
       <DialogTrigger asChild>
         {templateID ? (
           <Button size="sm" title="Update template" variant="outline">
-            <CloudUpload className="size-4" />
+            <CloudUploadIcon />
           </Button>
         ) : (
           <Button>Upload New Template</Button>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useDashboard } from "../context/DashboardContext";
@@ -17,7 +17,7 @@ export function RemoveConfirmPopover({ templateId }) {
           title="Remove template"
           variant="outline"
         >
-          <Trash2 className="size-4" />
+          <Trash2Icon />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
