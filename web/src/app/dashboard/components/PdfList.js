@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,20 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Spinner } from "@/components/ui/spinner";
-import { Link } from "lucide-react";
+import formatDate from "@/utils/formatDate";
+import { useDashboard } from "../context/DashboardContext";
 
-export default function PdfList({ isLoadingPDFs, pdfs, getPdfLink, gettingPdfLinkId }) {
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+export default function PdfList() {
+  const { pdfs, isLoading, itemIds, handleGetPdfLink } = useDashboard();
 
   if (!pdfs || pdfs.length === 0) {
     return (
@@ -34,7 +26,7 @@ export default function PdfList({ isLoadingPDFs, pdfs, getPdfLink, gettingPdfLin
     );
   }
 
-  if (isLoadingPDFs) return <div className="p-8">Loading PDFs...</div>;
+  if (isLoading.pdfs) return <div className="p-8">Loading PDFs...</div>;
   return (
     <Table>
       <TableHeader>
@@ -54,14 +46,13 @@ export default function PdfList({ isLoadingPDFs, pdfs, getPdfLink, gettingPdfLin
             <TableCell>{formatDate(pdf.createdAt)}</TableCell>
             <TableCell>
               <Button
-                // className="text-red-600 hover:text-red-600 hover:bg-red-200"
                 size="sm"
                 title="Get download link"
                 variant="outline"
-                onClick={() => getPdfLink(pdf.id)}
-                disabled={gettingPdfLinkId === pdf.id}
+                onClick={() => handleGetPdfLink(pdf.id)}
+                disabled={itemIds.pdfs.has(pdf.id)}
               >
-                {gettingPdfLinkId === pdf.id ? (
+                {itemIds.pdfs.has(pdf.id) ? (
                   <Spinner className="size-4" />
                 ) : (
                   <Link className="size-4" />

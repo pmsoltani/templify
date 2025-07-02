@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Trash2 } from "lucide-react";
+import { useDashboard } from "../context/DashboardContext";
 
-export function RemoveConfirmPopover({ templateId, removingTemplateId, handleRemove }) {
+export function RemoveConfirmPopover({ templateId }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { itemIds, handleRemoveTemplate } = useDashboard();
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -27,17 +29,14 @@ export function RemoveConfirmPopover({ templateId, removingTemplateId, handleRem
               it.
             </p>
           </div>
-          <div className="grid gap-2">
-            <div className="grid grid-cols-3 items-center gap-4">
-              <Button onClick={() => setIsOpen(false)}>Cancel</Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleRemove(templateId)}
-                disabled={removingTemplateId === templateId}
-              >
-                {removingTemplateId === templateId ? "Removing..." : "Remove"}
-              </Button>
-            </div>
+          <div>
+            <Button
+              variant="destructive"
+              onClick={() => handleRemoveTemplate(templateId)}
+              disabled={itemIds.templates.has(templateId)}
+            >
+              {itemIds.templates.has(templateId) ? "Removing..." : "Remove"}
+            </Button>
           </div>
         </div>
       </PopoverContent>

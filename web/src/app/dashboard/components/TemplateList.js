@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -9,29 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2 } from "lucide-react";
-import TemplateUploadDialog from "./TemplateUploadDialog";
-import { Spinner } from "@/components/ui/spinner";
+import formatDate from "@/utils/formatDate";
 import { RemoveConfirmPopover } from "./RemoveConfirmPopover";
+import TemplateUploadDialog from "./TemplateUploadDialog";
+import { useDashboard } from "../context/DashboardContext";
 
-export default function TemplateList({
-  isLoadingTemplates,
-  removingTemplateId,
-  templates,
-  onUploadSuccess,
-  handleRemove,
-}) {
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+export default function TemplateList() {
+  const { templates, isLoading } = useDashboard();
 
   if (!templates || templates.length === 0) {
     return (
@@ -42,7 +25,7 @@ export default function TemplateList({
     );
   }
 
-  if (isLoadingTemplates) return <div className="p-8">Loading templates...</div>;
+  if (isLoading.templates) return <div className="p-8">Loading templates...</div>;
   return (
     <Table>
       <TableHeader>
@@ -67,15 +50,8 @@ export default function TemplateList({
             <TableCell>{formatDate(template.createdAt)}</TableCell>
             <TableCell>{formatDate(template.updatedAt)}</TableCell>
             <TableCell className="flex items-center justify-end gap-2">
-              <TemplateUploadDialog
-                onUploadSuccess={onUploadSuccess}
-                templateID={template.id}
-              />
-              <RemoveConfirmPopover
-                templateId={template.id}
-                removingTemplateId={removingTemplateId}
-                handleRemove={handleRemove}
-              />
+              <TemplateUploadDialog templateID={template.id} />
+              <RemoveConfirmPopover templateId={template.id} />
             </TableCell>
           </TableRow>
         ))}

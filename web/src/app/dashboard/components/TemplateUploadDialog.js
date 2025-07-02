@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CloudUpload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,55 +15,49 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
-import { CloudUpload } from "lucide-react";
+import { useDashboard } from "../context/DashboardContext";
 
-export default function TemplateUploadDialog({ onUploadSuccess, templateID = null }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [htmlEntrypoint, setHtmlEntrypoint] = useState("");
-  const [file, setFile] = useState(null);
+const initialState = { name: "", description: "", htmlEntrypoint: "", file: null };
+
+export default function TemplateUploadDialog({ templateID = null }) {
+  const { fetchData } = useDashboard();
+  const [formState, setField, resetForm] = useFormReducer(initialState);
+
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!file) {
-      setError("Please select a .zip file.");
-      return;
-    }
-
-    setIsLoading(true);
+    setIsSubmitting(true);
     setError(null);
+    if (!formState.file) return setError("Please select a .zip file.");
 
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("htmlEntrypoint", htmlEntrypoint);
-    formData.append("templateZip", file);
+    formData.append("name", formState.name);
+    formData.append("description", formState.description);
+    formData.append("htmlEntrypoint", formState.htmlEntrypoint);
+    formData.append("templateZip", formState.file);
 
     try {
       const endpoint = templateID ? `/api/templates/${templateID}` : "/api/templates";
       const method = templateID ? "PUT" : "POST";
-      const data = await apiClient(endpoint, { method: method, body: formData });
-
-      onUploadSuccess(data.data.template);
-      setIsOpen(false); // Close the dialog on success
+      await apiClient(endpoint, { method: method, body: formData });
+      setIsOpen(false);
       clearDialog();
+      await fetchData();
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const clearDialog = () => {
     setIsOpen(false);
-    setName("");
-    setDescription("");
-    setHtmlEntrypoint("");
-    setFile(null);
+    resetForm();
     setError(null);
   };
 
@@ -94,8 +89,9 @@ export default function TemplateUploadDialog({ onUploadSuccess, templateID = nul
             </Label>
             <Input
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="name"
+              value={formState.name}
+              onChange={setField}
               className="col-span-8"
               required={!templateID}
             />
@@ -106,8 +102,9 @@ export default function TemplateUploadDialog({ onUploadSuccess, templateID = nul
             </Label>
             <Input
               id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              name="description"
+              value={formState.description}
+              onChange={setField}
               className="col-span-8"
             />
           </div>
@@ -117,9 +114,10 @@ export default function TemplateUploadDialog({ onUploadSuccess, templateID = nul
             </Label>
             <Input
               id="htmlEntrypoint"
-              value={htmlEntrypoint}
+              name="htmlEntrypoint"
+              value={formState.htmlEntrypoint}
               placeholder="HTML file name (default: template.html)"
-              onChange={(e) => setHtmlEntrypoint(e.target.value)}
+              onChange={setField}
               className="col-span-8"
             />
           </div>
@@ -129,9 +127,10 @@ export default function TemplateUploadDialog({ onUploadSuccess, templateID = nul
             </Label>
             <Input
               id="zipfile"
+              name="file"
               type="file"
               accept=".zip"
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={setField}
               className="col-span-8"
               required
             />
@@ -146,8 +145,8 @@ export default function TemplateUploadDialog({ onUploadSuccess, templateID = nul
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Uploading..." : `Upload${templateID ? " & update" : ""}`}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Uploading..." : `Upload${templateID ? " & update" : ""}`}
             </Button>
           </DialogFooter>
         </form>

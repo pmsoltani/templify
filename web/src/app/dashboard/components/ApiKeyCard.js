@@ -11,14 +11,12 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { useDashboard } from "../context/DashboardContext";
 
-export default function ApiKeyCard({
-  apiKey,
-  isApiKeyLoading,
-  copied,
-  onCopy,
-  onGenerate,
-}) {
+export default function ApiKeyCard() {
+  const { user, isLoading, copied, handleCopyApiKey, handleGenApiKey } = useDashboard();
+
+  const apiKey = user?.apiKey;
   const isKeyValid = apiKey ? apiKey.length === 64 : false;
   const maskedKey = isKeyValid ? `${apiKey.slice(0, 6)} ... ${apiKey.slice(-6)}` : "";
 
@@ -31,22 +29,27 @@ export default function ApiKeyCard({
 
       <CardContent>
         <div className="flex gap-1 items-center justify-end p-3 bg-gray-200 dark:bg-gray-800 rounded-md">
-          {isApiKeyLoading ? (
+          {isLoading.apiKey ? (
             <Skeleton className="h-[30px] w-[200px] rounded" />
           ) : (
             <code className="grow text-sm break-all">{maskedKey}</code>
           )}
-          <Button onClick={onCopy} variant="outline" size="sm" disabled={!isKeyValid}>
+          <Button
+            onClick={handleCopyApiKey}
+            variant="outline"
+            size="sm"
+            disabled={!isKeyValid}
+          >
             {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
           </Button>
           <Button
-            onClick={onGenerate}
+            onClick={handleGenApiKey}
             variant="outline"
             size="sm"
             title="Generate a new key"
-            disabled={isApiKeyLoading}
+            disabled={isLoading.apiKey}
           >
-            {isApiKeyLoading ? (
+            {isLoading.apiKey ? (
               <Spinner className="size-4" />
             ) : (
               <RotateCcwKey className="size-4" />
