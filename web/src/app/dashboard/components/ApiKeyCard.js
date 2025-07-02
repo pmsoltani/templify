@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboard } from "../context/DashboardContext";
+import { ApiHelp } from "./ApiHelp";
 
 export default function ApiKeyCard() {
   const { user, isLoading, copied, handleCopyApiKey, handleGenApiKey } = useDashboard();
@@ -23,7 +24,9 @@ export default function ApiKeyCard() {
     <Card>
       <CardHeader>
         <CardTitle>Your API Key</CardTitle>
-        <CardDescription>Use this key in your API requests.</CardDescription>
+        <CardDescription>
+          Use this key in your API requests. <ApiHelp />
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="flex gap-1 items-center justify-end mx-6 p-3 bg-gray-200 dark:bg-gray-800 rounded-md">
