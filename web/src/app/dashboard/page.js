@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button.jsx";
+import Status from "@/components/Status.js";
 import ApiKeyCard from "./components/ApiKeyCard.js";
 import PdfList from "./components/PdfList.js";
 import TemplateList from "./components/TemplateList.js";
@@ -11,9 +12,8 @@ import StatsCard from "./components/StatsCard.js";
 export default function DashboardPage() {
   const { isLoading, error, handleRefreshPdfsList } = useDashboard();
 
-  if (isLoading.user) return <div className="p-8">Loading...</div>;
-  if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
-
+  if (isLoading.user) return <Status type="loading" title="Loading the dashboard..." />;
+  if (error) return <Status type="error" title="Error" message={error.message} />;
   return (
     <>
       <section className="container mx-auto">
