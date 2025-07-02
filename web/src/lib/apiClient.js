@@ -29,7 +29,7 @@ const apiClient = async (endpoint, options = {}) => {
       );
     }
     return data;
-  } catch (error) {
+  } catch (err) {
     if (err instanceof AppError) throw err;
     throw new AppError(err.message || "A network error occurred.", 500);
   }
