@@ -139,6 +139,7 @@ dist
 
 
 ### Misc ###
+playground/
 playground*.js
 playground*.http
 .DS_Store
