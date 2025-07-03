@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import * as userRepo from "../repositories/userRepository.js";
 import AppError from "../utils/AppError.js";
+import { publicUser } from "../schemas/userSchema.js";
 
 const authenticateToken = async (req, res, next) => {
   try {
@@ -23,7 +24,7 @@ const authenticateApiKey = async (req, res, next) => {
   if (!userDb || !userDb.is_confirmed) {
     throw new AppError("Invalid API key or user not confirmed.", 403);
   }
-  req.user = userDb;
+  req.user = publicUser.parse(userDb);
   next();
 };
 
