@@ -33,6 +33,24 @@ const getByPublicIdAndUserPublicID = async (publicId, userPublicId) => {
   return res.rows[0];
 };
 
+const getAllByTemplatePublicId = async (templatePublicId) => {
+  const res = await db.query(
+    `
+    SELECT
+      p.*,
+      u.public_id AS user_public_id,
+      t.public_id AS template_public_id
+    FROM pdfs p
+    JOIN users u ON p.user_id = u.id
+    JOIN templates t ON p.template_id = t.id
+    WHERE t.public_id = $1
+    ORDER BY p.created_at DESC;
+    `,
+    [templatePublicId]
+  );
+  return res.rows;
+};
+
 const getAllByUserPublicId = async (userPublicId) => {
   const res = await db.query(
     `
@@ -51,4 +69,9 @@ const getAllByUserPublicId = async (userPublicId) => {
   return res.rows;
 };
 
-export { create, getByPublicIdAndUserPublicID, getAllByUserPublicId };
+export {
+  create,
+  getByPublicIdAndUserPublicID,
+  getAllByTemplatePublicId,
+  getAllByUserPublicId,
+};
