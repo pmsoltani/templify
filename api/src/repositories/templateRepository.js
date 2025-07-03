@@ -1,51 +1,70 @@
 import db from "../config/database.js";
 
-const getByIdAndUserId = async (templateId, userId) => {
-  const res = await db.query("SELECT * FROM templates WHERE id = $1 AND user_id = $2", [
-    templateId,
-    userId,
-  ]);
+const getByPublicIdAndUserPublicId = async (publicId, userPublicId) => {
+  const res = await db.query(
+    `
+    SELECT
+      t.*,
+      u.public_id AS user_public_id
+    FROM templates t
+    JOIN users u ON t.user_id = u.id
+    WHERE public_id = $1 AND u.public_id = $2;
+    `,
+    [publicId, userPublicId]
+  );
   return res.rows[0];
 };
 
-const getAllByUserId = async (userId) => {
+const getAllByUserPublicId = async (userPublicId) => {
   const res = await db.query(
-    "SELECT * FROM templates WHERE user_id = $1 ORDER BY created_at DESC",
-    [userId]
+    `
+    SELECT
+      t.*,
+      u.public_id AS user_public_id
+    FROM templates t
+    JOIN users u ON t.user_id = u.id
+    WHERE u.public_id = $1
+    ORDER BY t.created_at DESC;
+    `,
+    [userPublicId]
   );
   return res.rows;
 };
 
-const create = async (userId, name, htmlEntrypoint, description) => {
+const create = async (userPublicId, name, htmlEntrypoint, description, publicId) => {
   const res = await db.query(
     `
-    INSERT INTO templates (user_id, name, html_entrypoint, description)
-    VALUES ($1, $2, $3, $4)
-    RETURNING *
+    INSERT INTO templates (user_id, name, html_entrypoint, description, public_id)
+    VALUES (
+      (SELECT id FROM users WHERE public_id = $1),
+      $2, $3, $4, $5
+    )
+    RETURNING *;
     `,
-    [userId, name, htmlEntrypoint, description]
+    [userPublicId, name, htmlEntrypoint, description, publicId]
   );
   return res.rows[0];
 };
 
-const remove = async (templateId) => {
-  const res = await db.query("DELETE FROM templates WHERE id = $1 RETURNING *", [
-    templateId,
-  ]);
+const remove = async (publicId) => {
+  const res = await db.query(
+    "DELETE FROM templates WHERE public_id = $1 RETURNING *;",
+    [publicId]
+  );
   return res.rows[0];
 };
 
-const update = async (userId, templateId, name, htmlEntrypoint, description) => {
+const update = async (publicId, name, htmlEntrypoint, description) => {
   const res = await db.query(
     `
     UPDATE templates
     SET name = $1, html_entrypoint = $2, description = $3
-    WHERE id = $4 AND user_id = $5
-    RETURNING *
+    WHERE public_id = $4
+    RETURNING *;
     `,
-    [name, htmlEntrypoint, description, templateId, userId]
+    [name, htmlEntrypoint, description, publicId]
   );
   return res.rows[0];
 };
 
-export { getAllByUserId, getByIdAndUserId, create, remove, update };
+export { getByPublicIdAndUserPublicId, getAllByUserPublicId, create, remove, update };

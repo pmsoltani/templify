@@ -1,7 +1,7 @@
 import db from "../config/database.js";
 
-const getById = async (id) => {
-  const res = await db.query("SELECT * FROM users WHERE id = $1", [id]);
+const getByPublicId = async (publicId) => {
+  const res = await db.query("SELECT * FROM users WHERE public_id = $1", [publicId]);
   return res.rows[0];
 };
 
@@ -40,19 +40,19 @@ const getByResetToken = async (token) => {
   return res.rows[0];
 };
 
-const create = async (email, passwordHash, confirmationToken) => {
+const create = async (email, passwordHash, confirmationToken, publicId) => {
   const res = await db.query(
     `
-    INSERT INTO users (email, password_hash, confirmation_token)
-    VALUES ($1, $2, $3)
+    INSERT INTO users (email, password_hash, confirmation_token, public_id)
+    VALUES ($1, $2, $3, $4)
     RETURNING *
     `,
-    [email, passwordHash, confirmationToken]
+    [email, passwordHash, confirmationToken, publicId]
   );
   return res.rows[0];
 };
 
-const update = async (userId, updateData) => {
+const update = async (publicId, updateData) => {
   const updateEntries = Object.entries(updateData); // Assume updateEntries isn't empty
   const setClause = updateEntries.map(([k], idx) => `"${k}" = $${idx + 1}`).join(", ");
   const values = updateEntries.map(([, v]) => v);
@@ -61,21 +61,21 @@ const update = async (userId, updateData) => {
     `
     UPDATE users
     SET ${setClause}
-    WHERE id = $${updateEntries.length + 1}
+    WHERE public_id = $${updateEntries.length + 1}
     RETURNING *
     `,
-    [...values, userId]
+    [...values, publicId]
   );
   return res.rows[0];
 };
 
-const remove = async (userId) => {
-  const res = await db.query("DELETE FROM users WHERE id = $1", [userId]);
+const remove = async (publicId) => {
+  const res = await db.query("DELETE FROM users WHERE public_id = $1", [publicId]);
   return res.rowCount > 0;
 };
 
 export {
-  getById,
+  getByPublicId,
   getByEmail,
   getByEmailOrNewEmail,
   getByApiKey,

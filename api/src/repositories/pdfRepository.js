@@ -1,31 +1,54 @@
 import db from "../config/database.js";
 
-const create = async (userId, templateId, storageObjectKey) => {
+const create = async (userPublicId, templatePublicId, storageObjectKey, publicId) => {
   const res = await db.query(
     `
-    INSERT INTO pdfs (user_id, template_id, storage_object_key)
-    VALUES ($1, $2, $3)
+    INSERT INTO pdfs (user_id, template_id, storage_object_key, public_id)
+    VALUES (
+      (SELECT id FROM users WHERE public_id = $1),
+      (SELECT id FROM templates WHERE public_id = $2),
+      $3, $4
+    )
     RETURNING *;
     `,
-    [userId, templateId, storageObjectKey]
+    [userPublicId, templatePublicId, storageObjectKey, publicId]
   );
   return res.rows[0];
 };
 
-const getByIdAndUser = async (id, userId) => {
-  const res = await db.query("SELECT * FROM pdfs WHERE id = $1 AND user_id = $2;", [
-    id,
-    userId,
-  ]);
+const getByPublicIdAndUserPublicID = async (publicId, userPublicId) => {
+  const res = await db.query(
+    `
+    SELECT
+      p.*,
+      u.public_id AS user_public_id,
+      t.public_id AS template_public_id
+    FROM pdfs p
+    JOIN users u ON p.user_id = u.id
+    JOIN templates t ON p.template_id = t.id
+    WHERE p.public_id = $1 AND u.public_id = $2;
+    `,
+    [publicId, userPublicId]
+  );
   return res.rows[0];
 };
 
-const getAllByUserId = async (userId) => {
+const getAllByUserPublicId = async (userPublicId) => {
   const res = await db.query(
-    "SELECT * FROM pdfs WHERE user_id = $1 ORDER BY created_at DESC;",
-    [userId]
+    `
+    SELECT
+      p.*,
+      u.public_id AS user_public_id,
+      t.public_id AS template_public_id
+    FROM pdfs p
+    JOIN users u ON p.user_id = u.id
+    JOIN templates t ON p.template_id = t.id
+    WHERE u.public_id = $1
+    ORDER BY p.created_at DESC;
+    `,
+    [userPublicId]
   );
   return res.rows;
 };
 
-export { create, getByIdAndUser, getAllByUserId };
+export { create, getByPublicIdAndUserPublicID, getAllByUserPublicId };
