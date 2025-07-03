@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "mustache": "^4.2.0",
+    "nanoid": "^5.1.5",
     "node-pg-migrate": "^8.0.3",
     "nodemailer": "^7.0.3",
     "pg": "^8.16.2",
