@@ -11,7 +11,7 @@ import {
 
 export default function ResetEmailSentCard({ email, onResend, isLoading }) {
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="min-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Check your inbox!</CardTitle>
       </CardHeader>

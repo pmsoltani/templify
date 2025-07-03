@@ -47,7 +47,7 @@ export default function LoginPage() {
     }
   };
   return (
-    <Card className="w-full min-w-sm">
+    <Card className="min-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>Login to your Templify account</CardDescription>

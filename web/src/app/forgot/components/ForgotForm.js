@@ -26,7 +26,7 @@ export default function ForgotForm({
   };
 
   return (
-    <Card className="w-full min-w-sm">
+    <Card className="min-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Forgot your passowrd?</CardTitle>
         <CardDescription>Enter your email address for a reset link.</CardDescription>

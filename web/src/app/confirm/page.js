@@ -49,7 +49,7 @@ function ConfirmationStatus() {
   }, [searchParams]);
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="min-w-sm">
       <CardHeader>
         <CardTitle className={statusData[status].className}>
           {statusData[status].title}

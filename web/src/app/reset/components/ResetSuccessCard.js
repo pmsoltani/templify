@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ResetSuccessCard() {
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="min-w-sm">
       <CardHeader>
         <CardTitle className="text-center text-2xl">Password reset!</CardTitle>
       </CardHeader>

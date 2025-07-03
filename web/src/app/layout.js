@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
           <Navbar />
         </header>
 
-        <main className="flex flex-grow flex-col gap-4 w-5xl max-w-5xl p-4">
+        <main className="flex flex-grow flex-col items-center gap-4 w-5xl max-w-5xl p-4">
           {children}
         </main>
 

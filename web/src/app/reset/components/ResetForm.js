@@ -18,7 +18,7 @@ export default function RegisterForm({
   };
 
   return (
-    <Card className="w-full min-w-sm">
+    <Card className="min-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Choose a new password</CardTitle>
       </CardHeader>
