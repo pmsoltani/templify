@@ -1,55 +1,74 @@
 import fs from "fs";
 import * as fileService from "./fileService.js";
+import * as secretService from "./secretService.js";
+import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
 
-const getAllByUserId = async (userId) => {
+const getAllByUserPublicId = async (userPublicId) => {
   // TODO: add logic for pagination, etc.
-  return await templateRepo.getAllByUserId(userId);
+  return await templateRepo.getAllByUserPublicId(userPublicId);
 };
 
 const create = async (
-  userId,
+  userPublicId,
   templateName,
   htmlEntrypoint,
   description,
   tempZipPath
 ) => {
+  const publicId = secretService.generatePublicId("template");
   const templateDb = await templateRepo.create(
-    userId,
+    userPublicId,
     templateName,
     htmlEntrypoint,
-    description
+    description,
+    publicId
   );
-  await fileService.unzipAndUpload(tempZipPath, `userFiles/${userId}/${templateDb.id}`);
+  const bucketPath = `userFiles/${userPublicId}/${publicId}`;
+  await fileService.unzipAndUpload(tempZipPath, bucketPath);
   fs.unlinkSync(tempZipPath); // Clean up the temp file
   return templateDb;
 };
 
-const remove = async (userId, templateId) => {
-  const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
+const remove = async (userPublicId, publicId) => {
+  const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+    publicId,
+    userPublicId
+  );
   if (!templateDb) throw new AppError("Template not found.", 404);
 
-  const bucketPath = `userFiles/${userId}/${templateId}/`;
+  // Remove all PDFs associated with this template
+  const pdfsDb = await pdfRepo.getAllByTemplatePublicId(publicId);
+  const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
+  await fileService.removePdfs(pdfKeys);
+
+  // Remove the template files from storage
+  const bucketPath = `userFiles/${userPublicId}/${publicId}/`;
   await fileService.removeTemplate(bucketPath);
-  await templateRepo.remove(templateId);
-  return { id: templateId };
+
+  // Remove the template record from the database
+  await templateRepo.remove(publicId);
+  return { id: publicId };
 };
 
-const update = async (userId, templateId, updateData, tempZipPath) => {
-  const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
+const update = async (userPublicId, publicId, updateData, tempZipPath) => {
+  const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+    publicId,
+    userPublicId
+  );
   if (!templateDb) throw new AppError("Template not found.", 404);
-  const bucketPath = `userFiles/${userId}/${templateId}/`;
+
+  const bucketPath = `userFiles/${userPublicId}/${publicId}/`;
   await fileService.removeTemplate(bucketPath);
   await fileService.unzipAndUpload(tempZipPath, bucketPath);
   fs.unlinkSync(tempZipPath); // Clean up the temp file
   return await templateRepo.update(
-    userId,
-    templateId,
+    publicId,
     updateData.name || templateDb.name,
     updateData.htmlEntrypoint || templateDb.html_entrypoint,
     updateData.description || templateDb.description
   );
 };
 
-export { getAllByUserId, create, remove, update };
+export { getAllByUserPublicId as getAllByUserId, create, remove, update };
