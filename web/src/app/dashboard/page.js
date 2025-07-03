@@ -34,7 +34,7 @@ export default function DashboardPage() {
         <TemplateList />
       </section>
 
-      <section className="w-fit">
+      <section className="w-fit self-start">
         <div className="flex justify-between items-center mb-4 w-full">
           <h2 className="text-2xl font-bold">Your PDFs</h2>
           <Button
