@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import CodeInline from "@/components/CodeInline";
 import Status from "@/components/Status";
 import formatDate from "@/utils/formatDate";
 import { RemoveConfirmPopover } from "./RemoveConfirmPopover";
@@ -44,7 +45,9 @@ export default function TemplateList() {
 
     return templates.map((template) => (
       <TableRow key={template.id}>
-        <TableCell>{template.id}</TableCell>
+        <TableCell>
+          <CodeInline>{template.id}</CodeInline>
+        </TableCell>
         <TableCell>{template.name}</TableCell>
         <TableCell>{template.description || "No description."}</TableCell>
         <TableCell>{template.htmlEntrypoint}</TableCell>
@@ -62,7 +65,7 @@ export default function TemplateList() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[10px]">ID</TableHead>
+          <TableHead>Template ID</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Description</TableHead>
           <TableHead className="w-[140px]">HTML Entrypoint</TableHead>

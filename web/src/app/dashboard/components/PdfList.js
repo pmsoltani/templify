@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import CodeInline from "@/components/CodeInline";
 import Status from "@/components/Status";
 import formatDate from "@/utils/formatDate";
 import { useDashboard } from "../context/DashboardContext";
@@ -44,8 +45,12 @@ export default function PdfList() {
 
     return pdfs.map((pdf) => (
       <TableRow key={pdf.id}>
-        <TableCell>{pdf.id}</TableCell>
-        <TableCell>{pdf.templateId}</TableCell>
+        <TableCell>
+          <CodeInline>{pdf.id}</CodeInline>
+        </TableCell>
+        <TableCell>
+          <CodeInline>{pdf.templateId}</CodeInline>
+        </TableCell>
         <TableCell>{formatDate(pdf.createdAt)}</TableCell>
         <TableCell>
           <Button
@@ -70,7 +75,7 @@ export default function PdfList() {
     <Table className="w-fit">
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[10px]">ID</TableHead>
+          <TableHead className="w-[10px]">PDF ID</TableHead>
           <TableHead>Template ID</TableHead>
           <TableHead className="w-[140px]">Created At</TableHead>
           <TableHead className="w-[100px]">Actions</TableHead>
