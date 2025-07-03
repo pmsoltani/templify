@@ -55,10 +55,8 @@ const downloadTemplate = async (bucketPath) => {
   return tempDir;
 };
 
-const uploadPdf = async (userId, pdfBuffer) => {
-  const pdfFileName = `generated-${userId}-${Date.now()}.pdf`;
-  const pdfKey = `generatedPdfs/${userId}/${pdfFileName}`;
-
+const uploadPdf = async (publicId, userPublicId, pdfBuffer) => {
+  const pdfKey = `generatedPdfs/${userPublicId}/${publicId}.pdf`;
   const uploadParams = {
     Bucket: process.env.R2_BUCKET_NAME,
     Key: pdfKey,
