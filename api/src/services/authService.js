@@ -6,7 +6,13 @@ import AppError from "../utils/AppError.js";
 const register = async (email, password) => {
   const passwordHash = await secretService.generatePasswordHash(password);
   const confirmationToken = secretService.generateSecureRandomToken();
-  const userDb = await userRepo.create(email, passwordHash, confirmationToken);
+  const publicId = secretService.generatePublicId("user");
+  const userDb = await userRepo.create(
+    email,
+    passwordHash,
+    confirmationToken,
+    publicId
+  );
 
   await mailer.sendConfirmationEmail(email, confirmationToken);
   return userDb;
@@ -30,7 +36,7 @@ const confirm = async (token) => {
     updateData.email = userDb.new_email;
     updateData.new_email = null;
   }
-  userDb = await userRepo.update(userDb.id, updateData);
+  userDb = await userRepo.update(userDb.public_id, updateData);
   return userDb;
 };
 
@@ -50,7 +56,7 @@ const sendResetEmail = async (email) => {
     const resetToken = secretService.generateSecureRandomToken();
 
     const expires = new Date(Date.now() + 3600000); // Expire in 1 hour
-    await userRepo.update(userDb.id, {
+    await userRepo.update(userDb.public_id, {
       password_reset_token: resetToken,
       password_reset_expires: expires,
     });
@@ -64,7 +70,7 @@ const reset = async (token, newPassword) => {
   if (!userDb) throw new AppError("Invalid or expired password reset token.", 401);
 
   const newPasswordHash = await secretService.generatePasswordHash(newPassword);
-  return userRepo.update(userDb.id, {
+  return userRepo.update(userDb.public_id, {
     password_hash: newPasswordHash,
     password_reset_token: null,
     password_reset_expires: null,

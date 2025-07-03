@@ -19,7 +19,7 @@ const updateEmail = async (userId, newEmail) => {
 };
 
 const updatePassword = async (userId, currentPassword, newPassword) => {
-  const userDb = await userRepo.getById(userId);
+  const userDb = await userRepo.getByPublicId(userId);
   const isValid = await secretService.verifyPassword(
     currentPassword,
     userDb.password_hash
@@ -36,7 +36,7 @@ const regenerateApiKey = async (userId) => {
 };
 
 const remove = async (userId, password) => {
-  const userDb = await userRepo.getById(userId);
+  const userDb = await userRepo.getByPublicId(userId);
   const isValid = await secretService.verifyPassword(password, userDb.password_hash);
   if (!isValid) throw new AppError("Invalid password.", 401);
 
