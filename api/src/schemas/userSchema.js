@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { id, email, password, token, dateTime } from "./sharedSchema.js";
+import { id, publicId, email, password, token, dateTime } from "./sharedSchema.js";
 
 const updateEmail = z.object({ body: z.object({ email }) });
 
@@ -11,6 +11,7 @@ const remove = z.object({ body: z.object({ password }) });
 
 const publicUserDb = z.object({
   id: id,
+  public_id: publicId,
   email: email,
   api_key: token.nullable(),
   created_at: dateTime,
@@ -19,7 +20,7 @@ const publicUserDb = z.object({
 
 const publicUser = publicUserDb.transform((dbData) => {
   return {
-    id: dbData.id,
+    id: dbData.public_id,
     email: dbData.email,
     apiKey: dbData.api_key,
     createdAt: dbData.created_at,

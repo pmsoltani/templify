@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   id,
+  publicId,
   dateTime,
   templateName,
   templateDescription,
@@ -25,7 +26,9 @@ const update = z.object({
 
 const publicTemplateDb = z.object({
   id: id,
+  public_id: publicId,
   user_id: id,
+  user_public_id: publicId.nullable(),
   name: templateName,
   html_entrypoint: templateHtmlEntrypoint,
   description: templateDescription.nullable(),
@@ -35,8 +38,8 @@ const publicTemplateDb = z.object({
 
 const publicTemplate = publicTemplateDb.transform((dbData) => {
   return {
-    id: dbData.id,
-    userId: dbData.user_id,
+    id: dbData.public_id,
+    userId: dbData.user_public_id,
     name: dbData.name,
     htmlEntrypoint: dbData.html_entrypoint,
     description: dbData.description,

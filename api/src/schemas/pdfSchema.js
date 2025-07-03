@@ -1,18 +1,21 @@
 import { z } from "zod";
-import { id, dateTime } from "./sharedSchema.js";
+import { id, publicId, dateTime } from "./sharedSchema.js";
 
 const publicPdfDb = z.object({
   id: id,
+  public_id: publicId,
   user_id: id,
+  user_public_id: publicId.nullable(),
   template_id: id,
+  template_public_id: publicId.nullable(),
   created_at: dateTime,
 });
 
 const publicPdf = publicPdfDb.transform((dbData) => {
   return {
-    id: dbData.id,
-    userId: dbData.user_id,
-    templateId: dbData.template_id,
+    id: dbData.public_id,
+    userId: dbData.user_public_id,
+    templateId: dbData.template_public_id,
     createdAt: dbData.created_at,
   };
 });
