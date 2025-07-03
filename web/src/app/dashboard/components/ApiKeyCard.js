@@ -33,7 +33,9 @@ export default function ApiKeyCard() {
         {isLoading.apiKey ? (
           <Skeleton className="grow h-[30px] rounded" />
         ) : (
-          <code className="grow text-sm break-all">{maskedKey}</code>
+          <code className="grow text-sm break-all">
+            {maskedKey ? maskedKey : "Generate a new key"}
+          </code>
         )}
         <Button
           onClick={handleCopyApiKey}
