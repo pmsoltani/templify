@@ -1,6 +1,9 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import nanoid from "../config/nanoid.js";
+import { ENTITIES } from "../config/constants.js";
+import AppError from "../utils/AppError.js";
 
 /**
  * Generates a JSON Web Token (JWT) for user authentication sessions.
@@ -13,6 +16,23 @@ const generateAuthToken = (user) => {
   const options = { expiresIn: "1d" };
 
   return jwt.sign(payload, secret, options);
+};
+
+/**
+ * Generates a unique public ID for a given entity type by prefixing a nanoid
+ * with the entity's prefix.
+ * @param {string} entityType - The type of entity for which to generate the ID.
+ * @returns {string} The generated unique ID.
+ * @throws {AppError} Throws an error if the entity type is unknown or has no prefix.
+ */
+const generateId = (entityType) => {
+  const prefix = ENTITIES[entityType].prefix;
+  if (!prefix) {
+    const error = new AppError(`Unknown entity type: ${entityType}`, 500);
+    error.isOperational = false;
+    throw error;
+  }
+  return `${prefix}${nanoid()}`;
 };
 
 /** * Generates a password hash using bcrypt.
