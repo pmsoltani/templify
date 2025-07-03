@@ -6,4 +6,19 @@ const allowedFileTypes = {
 const allowedExtensions = Object.keys(allowedFileTypes);
 const allowedMimeTypes = Object.values(allowedFileTypes).flat();
 
-export { MAX_FILE_SIZE, allowedFileTypes, allowedExtensions, allowedMimeTypes };
+const NANO_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+const ENTITIES = {
+  user: { prefix: "usr" },
+  template: { prefix: "tpl" },
+  pdf: { prefix: "pdf" },
+};
+
+export {
+  MAX_FILE_SIZE,
+  allowedFileTypes,
+  allowedExtensions,
+  allowedMimeTypes,
+  NANO_ALPHABET,
+  ENTITIES,
+};

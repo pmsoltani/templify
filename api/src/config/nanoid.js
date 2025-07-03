@@ -1,17 +1,16 @@
 import { customAlphabet } from "nanoid";
+import AppError from "../utils/AppError.js";
+import { NANO_ALPHABET, ENTITIES } from "./constants.js";
 
-const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-const nanoid = customAlphabet(alphabet, 14);
-
-const prefixes = {
-  user: "usr",
-  template: "tpl",
-  pdf: "pdf",
-};
+const nanoid = customAlphabet(NANO_ALPHABET, 14);
 
 const generateId = (entityType) => {
-  const prefix = prefixes[entityType];
-  if (!prefix) throw new Error(`Unknown entity type: ${entityType}`);
+  const prefix = ENTITIES[entityType].prefix;
+  if (!prefix) {
+    const error = new AppError(`Unknown entity type: ${entityType}`, 500);
+    error.isOperational = false;
+    throw error;
+  }
   return `${prefix}${nanoid()}`;
 };
 
