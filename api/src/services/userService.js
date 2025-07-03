@@ -1,3 +1,4 @@
+import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import * as userRepo from "../repositories/userRepository.js";
 import * as fileService from "./fileService.js";
@@ -39,6 +40,11 @@ const remove = async (publicId, password) => {
   const userDb = await userRepo.getByPublicId(publicId);
   const isValid = await secretService.verifyPassword(password, userDb.password_hash);
   if (!isValid) throw new AppError("Invalid password.", 401);
+
+  // Remove all user's PDFs
+  const pdfsDb = await pdfRepo.getAllByUserPublicId(publicId);
+  const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
+  await fileService.removePdfs(pdfKeys);
 
   // Remove all user's templates
   const templatesDb = await templateRepo.getAllByUserPublicId(publicId);
