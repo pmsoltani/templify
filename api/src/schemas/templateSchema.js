@@ -28,7 +28,7 @@ const publicTemplateDb = z.object({
   id: id,
   public_id: publicId,
   user_id: id,
-  user_public_id: publicId.nullable(),
+  user_public_id: publicId.optional().nullable(),
   name: templateName,
   html_entrypoint: templateHtmlEntrypoint,
   description: templateDescription.nullable(),

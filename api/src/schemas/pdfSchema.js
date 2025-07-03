@@ -5,9 +5,9 @@ const publicPdfDb = z.object({
   id: id,
   public_id: publicId,
   user_id: id,
-  user_public_id: publicId.nullable(),
+  user_public_id: publicId.optional().nullable(),
   template_id: id,
-  template_public_id: publicId.nullable(),
+  template_public_id: publicId.optional().nullable(),
   created_at: dateTime,
 });
 
