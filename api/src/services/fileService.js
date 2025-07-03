@@ -81,4 +81,19 @@ const removeTemplate = async (bucketPath) => {
   await Promise.all(removePromises);
 };
 
-export { getPresignedUrl, unzipAndUpload, downloadTemplate, uploadPdf, removeTemplate };
+const removePdfs = async (pdfKeys) => {
+  const removePromises = pdfKeys.map((key) => {
+    const removeParams = { Bucket: process.env.R2_BUCKET_NAME, Key: key };
+    return s3Client.send(new DeleteObjectCommand(removeParams));
+  });
+  await Promise.all(removePromises);
+};
+
+export {
+  getPresignedUrl,
+  unzipAndUpload,
+  downloadTemplate,
+  uploadPdf,
+  removeTemplate,
+  removePdfs,
+};
