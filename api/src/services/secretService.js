@@ -11,7 +11,7 @@ import AppError from "../utils/AppError.js";
  * @returns {string} The signed JWT.
  */
 const generateAuthToken = (user) => {
-  const payload = { userId: user.id, email: user.email };
+  const payload = { id: user.public_id, email: user.email };
   const secret = process.env.JWT_SECRET;
   const options = { expiresIn: "1d" };
 

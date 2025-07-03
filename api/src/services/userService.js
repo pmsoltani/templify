@@ -49,7 +49,7 @@ const remove = async (publicId, password) => {
   // Remove all user's templates
   const templatesDb = await templateRepo.getAllByUserPublicId(publicId);
   for (const template of templatesDb) {
-    const bucketPath = `userFiles/${publicId}/${template.id}/`;
+    const bucketPath = `userFiles/${publicId}/templates/${template.public_id}/`;
     await fileService.removeTemplate(bucketPath);
   }
 

@@ -25,7 +25,7 @@ const create = async (
     description,
     publicId
   );
-  const bucketPath = `userFiles/${userPublicId}/${publicId}`;
+  const bucketPath = `userFiles/${userPublicId}/templates/${publicId}`;
   await fileService.unzipAndUpload(tempZipPath, bucketPath);
   fs.unlinkSync(tempZipPath); // Clean up the temp file
   return templateDb;
@@ -44,7 +44,7 @@ const remove = async (userPublicId, publicId) => {
   await fileService.removePdfs(pdfKeys);
 
   // Remove the template files from storage
-  const bucketPath = `userFiles/${userPublicId}/${publicId}/`;
+  const bucketPath = `userFiles/${userPublicId}/templates/${publicId}/`;
   await fileService.removeTemplate(bucketPath);
 
   // Remove the template record from the database
@@ -59,7 +59,7 @@ const update = async (userPublicId, publicId, updateData, tempZipPath) => {
   );
   if (!templateDb) throw new AppError("Template not found.", 404);
 
-  const bucketPath = `userFiles/${userPublicId}/${publicId}/`;
+  const bucketPath = `userFiles/${userPublicId}/templates/${publicId}/`;
   await fileService.removeTemplate(bucketPath);
   await fileService.unzipAndUpload(tempZipPath, bucketPath);
   fs.unlinkSync(tempZipPath); // Clean up the temp file
@@ -71,4 +71,4 @@ const update = async (userPublicId, publicId, updateData, tempZipPath) => {
   );
 };
 
-export { getAllByUserPublicId as getAllByUserId, create, remove, update };
+export { getAllByUserPublicId, create, remove, update };

@@ -22,7 +22,7 @@ const generatePdf = async (userPublicId, templatePublicId, jsonData) => {
     if (!templateDb) throw new AppError("Template not found.", 404);
 
     // Fetch template files from storage
-    const bucketPath = `userFiles/${userPublicId}/${templatePublicId}/`;
+    const bucketPath = `userFiles/${userPublicId}/templates/${templatePublicId}/`;
     tempDir = await fileService.downloadTemplate(bucketPath);
 
     // Inject JSON data into HTML template
@@ -45,7 +45,7 @@ const generatePdf = async (userPublicId, templatePublicId, jsonData) => {
     const pdfKey = await fileService.uploadPdf(publicId, userPublicId, pdfBuffer);
 
     // Log the usage
-    await pdfRepo.create(userPublicId, templatePublicId, pdfKey);
+    await pdfRepo.create(userPublicId, templatePublicId, pdfKey, publicId);
 
     // Return a presigned URL for the PDF
     return await fileService.getPresignedUrl(pdfKey);
