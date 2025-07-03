@@ -7,18 +7,22 @@ import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
 import * as fileService from "./fileService.js";
+import * as secretService from "./secretService.js";
 
-const generatePdf = async (userId, templateId, jsonData) => {
+const generatePdf = async (userPublicId, templatePublicId, jsonData) => {
   let tempDir = null;
   let page = null;
 
   try {
     // Authenticate and fetch template record
-    const templateDb = await templateRepo.getByIdAndUserId(templateId, userId);
+    const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+      templatePublicId,
+      userPublicId
+    );
     if (!templateDb) throw new AppError("Template not found.", 404);
 
     // Fetch template files from storage
-    const bucketPath = `userFiles/${userId}/${templateId}/`;
+    const bucketPath = `userFiles/${userPublicId}/${templatePublicId}/`;
     tempDir = await fileService.downloadTemplate(bucketPath);
 
     // Inject JSON data into HTML template
@@ -37,13 +41,14 @@ const generatePdf = async (userId, templateId, jsonData) => {
     const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
     // Upload PDF to storage and return the public URL
-    const storageObjectKey = await fileService.uploadPdf(userId, pdfBuffer);
+    const publicId = secretService.generatePublicId("pdf");
+    const pdfKey = await fileService.uploadPdf(publicId, userPublicId, pdfBuffer);
 
     // Log the usage
-    await pdfRepo.create(userId, templateId, storageObjectKey);
+    await pdfRepo.create(userPublicId, templatePublicId, pdfKey);
 
     // Return a presigned URL for the PDF
-    return await fileService.getPresignedUrl(storageObjectKey);
+    return await fileService.getPresignedUrl(pdfKey);
   } finally {
     if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
     if (page) await page.close();
