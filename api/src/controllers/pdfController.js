@@ -4,7 +4,7 @@ import AppError from "../utils/AppError.js";
 import { publicPdfs } from "../schemas/pdfSchema.js";
 
 const getAll = async (req, res) => {
-  const pdfsDb = await pdfRepo.getAllByUserId(req.user.userId);
+  const pdfsDb = await pdfRepo.getAllByUserPublicId(req.user.id);
   res.json({
     message: "PDFs retrieved successfully!",
     data: { pdfs: publicPdfs.parse(pdfsDb) },
@@ -12,10 +12,10 @@ const getAll = async (req, res) => {
 };
 
 const getDownloadLink = async (req, res) => {
-  const pdfId = req.params.id;
-  const userId = req.user.userId;
+  const publicId = req.params.id;
+  const userPublicId = req.user.id;
 
-  const pdfDb = await pdfRepo.getByIdAndUser(pdfId, userId);
+  const pdfDb = await pdfRepo.getByPublicIdAndUserPublicID(publicId, userPublicId);
   if (!pdfDb) throw new AppError("PDF record not found.", 404);
 
   const newUrl = await fileService.getPresignedUrl(pdfDb.storage_object_key);

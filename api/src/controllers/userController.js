@@ -4,7 +4,7 @@ import AppError from "../utils/AppError.js";
 import { publicUser } from "../schemas/userSchema.js";
 
 const get = async (req, res) => {
-  const userDb = await userRepo.getById(req.user.userId);
+  const userDb = await userRepo.getByPublicId(req.user.id);
   if (!userDb) throw new AppError("User not found.", 404);
 
   res.json({
@@ -18,18 +18,18 @@ const updateEmail = async (req, res) => {
   if (req.user.email === newEmail) {
     throw new AppError("Cannot use the current email.", 400);
   }
-  await userService.updateEmail(req.user.userId, newEmail);
+  await userService.updateEmail(req.user.id, newEmail);
   res.json({ message: "Check your new email for the confirmation link." });
 };
 
 const updatePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  await userService.updatePassword(req.user.userId, currentPassword, newPassword);
+  await userService.updatePassword(req.user.id, currentPassword, newPassword);
   res.json({ message: "Password updated successfully." });
 };
 
 const regenerateApiKey = async (req, res) => {
-  const userDb = await userService.regenerateApiKey(req.user.userId);
+  const userDb = await userService.regenerateApiKey(req.user.id);
   res.json({
     message: "API Key regenerated successfully!",
     data: { user: publicUser.parse(userDb) },
@@ -37,7 +37,8 @@ const regenerateApiKey = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  await userService.remove(req.user.userId, req.body.password);
+  console.log("Removing user:", req.user);
+  await userService.remove(req.user.id, req.body.password);
   res.status(204).send();
 };
 
