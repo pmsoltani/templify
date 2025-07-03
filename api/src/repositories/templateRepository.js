@@ -8,7 +8,7 @@ const getByPublicIdAndUserPublicId = async (publicId, userPublicId) => {
       u.public_id AS user_public_id
     FROM templates t
     JOIN users u ON t.user_id = u.id
-    WHERE public_id = $1 AND u.public_id = $2;
+    WHERE t.public_id = $1 AND u.public_id = $2;
     `,
     [publicId, userPublicId]
   );
