@@ -12,6 +12,7 @@ const ENTITIES = {
   user: { prefix: "usr" },
   template: { prefix: "tpl" },
   pdf: { prefix: "pdf" },
+  event: { prefix: "evt" },
 };
 
 export {
