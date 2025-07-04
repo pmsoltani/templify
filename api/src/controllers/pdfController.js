@@ -1,5 +1,5 @@
 import { publicPdf, publicPdfs } from "../schemas/pdfSchema.js";
-import PdfService from "../services/pdfService.js";
+import PdfService from "../services/PdfService.js";
 import getContext from "../utils/getContext.js";
 
 const getAll = async (req, res) => {
