@@ -10,21 +10,22 @@ const up = async (pgm) => {
   console.log("Adding events table for tracking user actions.");
   pgm.sql(`
     CREATE TYPE action_type AS ENUM (
-      'AUTH_LOGIN',
-      'AUTH_LOGOUT',
-      'AUTH_REGISTER',
-      'AUTH_CONFIRMED_EMAIL',
-      'AUTH_PASSWORD_FORGOT',
-      'AUTH_PASSWORD_RESET',
-      'USER_EMAIL_UPDATED',
-      'USER_PASSWORD_UPDATED',
-      'USER_APIKEY_GENERATED',
-      'USER_ACCOUNT_DELETED',
-      'TEMPLATE_CREATED',
-      'TEMPLATE_UPDATED',
-      'TEMPLATE_DELETED',
-      'PDF_GENERATED',
-      'PDF_URL_GENERATED'
+      'USER_LOGIN',
+      'USER_LOGOUT',
+      'USER_REGISTER',
+      'USER_CONFIRM_EMAIL',
+      'USER_RESEND_CONFIRM_EMAIL',
+      'USER_PASSWORD_FORGOT',
+      'USER_PASSWORD_RESET',
+      'USER_EMAIL_UPDATE',
+      'USER_PASSWORD_UPDATE',
+      'USER_APIKEY_GENERATE',
+      'USER_ACCOUNT_REMOVE',
+      'TEMPLATE_CREATE',
+      'TEMPLATE_UPDATE',
+      'TEMPLATE_REMOVE',
+      'PDF_GENERATE',
+      'PDF_URL_GENERATE'
     );
     
     CREATE TYPE status_type AS ENUM ('SUCCESS', 'FAILURE', 'PENDING');
