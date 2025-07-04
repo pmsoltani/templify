@@ -19,7 +19,7 @@ const validate = (schema) => (req, res, next) => {
       const appError = new AppError("Invalid input data.", 400, {
         details: { validation: validationErrors },
         logData: {
-          action: "API_VALIDATION_FAILED",
+          action: "SCHEMA_VALIDATION",
           details: { route: req.originalUrl, errors: validationErrors },
         },
       });
