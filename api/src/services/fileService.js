@@ -12,6 +12,10 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3Client from "../config/s3Client.js";
 import AppError from "../utils/AppError.js";
 
+const getBucketPath = (userPublicId, templatePublicId) => {
+  `userFiles/${userPublicId}/templates/${templatePublicId}/`;
+};
+
 const getPresignedUrl = async (objectKey, expiresIn = 900) => {
   const params = { Bucket: process.env.R2_BUCKET_NAME, Key: objectKey };
   return getSignedUrl(s3Client, new GetObjectCommand(params), { expiresIn: expiresIn });
@@ -88,6 +92,7 @@ const removePdfs = async (pdfKeys) => {
 };
 
 export {
+  getBucketPath,
   getPresignedUrl,
   unzipAndUpload,
   downloadTemplate,
