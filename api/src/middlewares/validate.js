@@ -17,7 +17,11 @@ const validate = (schema) => (req, res, next) => {
     if (err instanceof z.ZodError) {
       const validationErrors = err.flatten().fieldErrors;
       const appError = new AppError("Invalid input data.", 400, {
-        validation: validationErrors,
+        details: { validation: validationErrors },
+        logData: {
+          action: "API_VALIDATION_FAILED",
+          details: { route: req.originalUrl, errors: validationErrors },
+        },
       });
       return next(appError);
     }
