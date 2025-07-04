@@ -29,7 +29,7 @@ const anonymizeByUserId = async (userId) => {
     "UPDATE events SET ip_address = NULL, user_agent = 'REDACTED' WHERE user_id = $1;",
     [userId]
   );
-  await pool.query(query, [userId]);
+  return res.rowCount;
 };
 
 export { create, anonymizeByUserId };
