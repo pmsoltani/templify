@@ -13,7 +13,7 @@ import s3Client from "../config/s3Client.js";
 import AppError from "../utils/AppError.js";
 
 const getBucketPath = (userPublicId, templatePublicId) => {
-  `userFiles/${userPublicId}/templates/${templatePublicId}/`;
+  return `userFiles/${userPublicId}/templates/${templatePublicId}/`;
 };
 
 const getPresignedUrl = async (objectKey, expiresIn = 900) => {
