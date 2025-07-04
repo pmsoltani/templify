@@ -58,7 +58,7 @@ export default class AuthService {
     }
     const publicId = userDb.public_id;
     userDb = await userRepo.update(publicId, updateData);
-    await log(publicId, "USER_CONFIRMED_EMAIL", "SUCCESS", this.context);
+    await log(publicId, "USER_CONFIRM_EMAIL", "SUCCESS", this.context);
     return userDb;
   }
 
