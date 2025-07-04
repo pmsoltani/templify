@@ -8,6 +8,8 @@ import errorHandler from "./src/middlewares/errorHandler.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set("trust proxy", 1); // To get the client's real IP when behind a reverse proxy.
+
 const runServer = async () => {
   try {
     console.log("Starting server...");
