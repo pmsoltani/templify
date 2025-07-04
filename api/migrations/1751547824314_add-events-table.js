@@ -10,6 +10,7 @@ const up = async (pgm) => {
   console.log("Adding events table for tracking user actions.");
   pgm.sql(`
     CREATE TYPE action_type AS ENUM (
+      'SCHEMA_VALIDATION',
       'USER_LOGIN',
       'USER_LOGOUT',
       'USER_REGISTER',
