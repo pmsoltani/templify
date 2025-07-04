@@ -3,6 +3,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import nanoid from "../config/nanoid.js";
 import { ENTITIES } from "../config/constants.js";
+import { publicUser } from "../schemas/userSchema.js";
 import AppError from "../utils/AppError.js";
 
 /**
@@ -11,7 +12,7 @@ import AppError from "../utils/AppError.js";
  * @returns {string} The signed JWT.
  */
 const generateAuthToken = (user) => {
-  const payload = { id: user.public_id, email: user.email };
+  const payload = publicUser.parse(user);
   const secret = process.env.JWT_SECRET;
   const options = { expiresIn: "1d" };
 
