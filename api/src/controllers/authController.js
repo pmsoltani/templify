@@ -1,15 +1,10 @@
-import * as userRepo from "../repositories/userRepository.js";
-import * as authService from "../services/authService.js";
-import AppError from "../utils/AppError.js";
 import { publicUser } from "../schemas/userSchema.js";
+import AuthService from "../services/AuthService.js";
+import getContext from "../utils/getContext.js";
 
 const register = async (req, res) => {
   const { email, password } = req.body;
-  if (await userRepo.getByEmailOrNewEmail(email)) {
-    throw new AppError("Email already in use.", 409);
-  }
-
-  const userDb = await authService.register(email, password);
+  const userDb = await new AuthService(getContext(req)).register(email, password);
   res.status(201).json({
     message: "User created successfully! Check your email for the confirmation link.",
     data: { user: publicUser.parse(userDb) },
@@ -17,33 +12,35 @@ const register = async (req, res) => {
 };
 
 const confirm = async (req, res) => {
-  await authService.confirm(req.query.token);
+  await new AuthService(getContext(req)).confirm(req.query.token);
   res.json({ message: "Email confirmed successfully!" });
 };
 
 const resendConfirmation = async (req, res) => {
-  await authService.resendConfirmation(req.body.email);
+  await new AuthService(getContext(req)).resendConfirmation(req.body.email);
   res.json({ message: "If an account exists, confirmation link will be sent." });
 };
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  const accessToken = await authService.login(email, password);
+  const accessToken = await new AuthService(getContext(req)).login(email, password);
   res.json({ message: "Logged in successfully!", data: { accessToken: accessToken } });
 };
 
-const logout = (req, res) => {
+const logout = async (req, res) => {
+  const user = req.user;
+  await new AuthService(getContext(req)).logout(user);
   res.json({ message: "Logged out successfully." });
 };
 
 const forgot = async (req, res) => {
-  await authService.sendResetEmail(req.body.email);
+  await new AuthService(getContext(req)).forgot(req.body.email);
   res.json({ message: "If an account exists, reset link will be sent." });
 };
 
 const reset = async (req, res) => {
   const { token, password } = req.body;
-  await authService.reset(token, password);
+  await new AuthService(getContext(req)).reset(token, password);
   res.json({ message: "Password has been reset successfully." });
 };
 
