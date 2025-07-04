@@ -2,11 +2,11 @@ import * as eventRepo from "../repositories/eventRepository.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import * as userRepo from "../repositories/userRepository.js";
+import AppError from "../utils/AppError.js";
+import { log } from "./eventService.js";
 import * as fileService from "./fileService.js";
 import * as mailer from "./mailerService.js";
 import * as secretService from "./secretService.js";
-import AppError from "../utils/AppError.js";
-import { log } from "./eventService.js";
 
 export default class AuthService {
   constructor(context = {}) {
@@ -14,11 +14,8 @@ export default class AuthService {
   }
 
   async get() {
-    const publicId = this.context.user.id;
-    const logData = { userPublicId: publicId, action: "USER_GET" };
-    const userDb = await userRepo.getByPublicId(publicId);
-    if (!userDb) throw new AppError("User not found.", 404, { logData });
-    await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+    const userDb = await userRepo.getByPublicId(this.context.user.id);
+    if (!userDb) throw new AppError("User not found.", 404);
     return userDb;
   }
 
@@ -80,7 +77,7 @@ export default class AuthService {
     // Remove all user's templates
     const templatesDb = await templateRepo.getAllByUserPublicId(publicId);
     for (const template of templatesDb) {
-      const bucketPath = `userFiles/${publicId}/templates/${template.public_id}/`;
+      const bucketPath = fileService.getBucketPath(publicId, template.public_id);
       await fileService.removeTemplate(bucketPath);
     }
 
