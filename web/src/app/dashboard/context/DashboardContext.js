@@ -78,7 +78,7 @@ function DashboardProvider({ children }) {
     setItemIds((p) => ({ ...p, pdfs: new Set(p.pdfs).add(pdfId) }));
     try {
       const data = await apiClient(`/api/pdfs/${pdfId}/download`);
-      window.open(data.data.url, "_blank");
+      window.open(data.data.pdf.tempUrl, "_blank");
     } finally {
       setItemIds((p) => {
         const newSet = new Set(p.pdfs);
