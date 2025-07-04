@@ -33,7 +33,7 @@ const up = async (pgm) => {
     CREATE TABLE events (
       id SERIAL PRIMARY KEY,
       public_id VARCHAR(17) NOT NULL UNIQUE,
-      user_id INTEGER NOT NULL,
+      user_id INTEGER,
       action action_type NOT NULL,
       status status_type NOT NULL DEFAULT 'SUCCESS',
       cost NUMERIC NOT NULL DEFAULT 0,
@@ -41,7 +41,7 @@ const up = async (pgm) => {
       ip_address INET,
       user_agent TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
     );
 
     CREATE INDEX idx_events_user_id_created_at ON events (user_id, created_at);
