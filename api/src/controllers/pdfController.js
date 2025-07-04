@@ -1,10 +1,9 @@
-import * as pdfRepo from "../repositories/pdfRepository.js";
-import * as fileService from "../services/fileService.js";
-import AppError from "../utils/AppError.js";
-import { publicPdfs } from "../schemas/pdfSchema.js";
+import { publicPdf, publicPdfs } from "../schemas/pdfSchema.js";
+import PdfService from "../services/pdfService.js";
+import getContext from "../utils/getContext.js";
 
 const getAll = async (req, res) => {
-  const pdfsDb = await pdfRepo.getAllByUserPublicId(req.user.id);
+  const pdfsDb = await new PdfService(getContext(req)).getAllByUserPublicId();
   res.json({
     message: "PDFs retrieved successfully!",
     data: { pdfs: publicPdfs.parse(pdfsDb) },
@@ -12,14 +11,11 @@ const getAll = async (req, res) => {
 };
 
 const getDownloadLink = async (req, res) => {
-  const publicId = req.params.id;
-  const userPublicId = req.user.id;
-
-  const pdfDb = await pdfRepo.getByPublicIdAndUserPublicID(publicId, userPublicId);
-  if (!pdfDb) throw new AppError("PDF record not found.", 404);
-
-  const newUrl = await fileService.getPresignedUrl(pdfDb.storage_object_key);
-  res.json({ message: "Download link generated successfully!", data: { url: newUrl } });
+  const pdfsDb = await new PdfService(getContext(req)).getDownloadLink(req.params.id);
+  res.json({
+    message: "Download link generated successfully!",
+    data: { pdf: publicPdf.parse(pdfsDb) },
+  });
 };
 
 export { getAll, getDownloadLink };

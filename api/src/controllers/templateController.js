@@ -1,5 +1,6 @@
+import { publicPdf } from "../schemas/pdfSchema.js";
 import { publicTemplate, publicTemplates } from "../schemas/templateSchema.js";
-import * as pdfService from "../services/pdfService.js";
+import PdfService from "../services/PdfService.js";
 import TemplateService from "../services/TemplateService.js";
 import getContext from "../utils/getContext.js";
 
@@ -25,8 +26,14 @@ const create = async (req, res) => {
 };
 
 const generatePdf = async (req, res) => {
-  const pdfUrl = await pdfService.generatePdf(req.user.id, req.params.id, req.body);
-  res.json({ message: "PDF generated successfully!", data: { url: pdfUrl } });
+  const pdfDb = await new PdfService(getContext(req)).generatePdf(
+    req.params.id,
+    req.body
+  );
+  res.json({
+    message: "PDF generated successfully!",
+    data: { pdf: publicPdf.parse(pdfDb) },
+  });
 };
 
 const remove = async (req, res) => {
