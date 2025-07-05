@@ -1,6 +1,6 @@
+import { ALLOWED_ACTIONS } from "../config/constants.js";
 import * as eventRepo from "../repositories/eventRepository.js";
 import * as secretService from "../services/secretService.js";
-import { ALLOWED_ACTIONS } from "../config/constants.js";
 import AppError from "../utils/AppError.js";
 
 const log = async (userPublicId, action, status, options = {}) => {

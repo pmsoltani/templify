@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { id, publicId, email, password, token, dateTime } from "./sharedSchema.js";
+import { dateTime, email, id, password, publicId, token } from "./sharedSchema.js";
 
 const updateEmail = z.object({ body: z.object({ email }) });
 
@@ -30,4 +30,4 @@ const publicUser = publicUserDb.transform((dbData) => {
 
 const publicUsers = z.array(publicUser);
 
-export { updateEmail, updatePassword, remove, publicUser, publicUsers, publicUserDb };
+export { publicUser, publicUserDb, publicUsers, remove, updateEmail, updatePassword };

@@ -35,4 +35,4 @@ const remove = async (req, res) => {
   res.status(204).send();
 };
 
-export { get, updateEmail, updatePassword, regenerateApiKey, remove };
+export { get, regenerateApiKey, remove, updateEmail, updatePassword };

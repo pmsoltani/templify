@@ -1,7 +1,7 @@
 import fs from "fs";
+import mustache from "mustache";
 import path from "path";
 import { pathToFileURL } from "url";
-import mustache from "mustache";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";

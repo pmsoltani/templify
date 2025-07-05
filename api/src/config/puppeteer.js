@@ -1,5 +1,5 @@
-import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 
 let browserInstance = null;
 
@@ -46,4 +46,4 @@ const closeBrowserInstance = async () => {
   }
 };
 
-export { initializeBrowser, getBrowserInstance, closeBrowserInstance };
+export { closeBrowserInstance, getBrowserInstance, initializeBrowser };

@@ -80,4 +80,4 @@ const down = async (pgm) => {
   `);
 };
 
-export { shorthands, up, down };
+export { down, shorthands, up };

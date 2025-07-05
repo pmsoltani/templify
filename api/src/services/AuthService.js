@@ -1,8 +1,8 @@
 import * as userRepo from "../repositories/userRepository.js";
+import AppError from "../utils/AppError.js";
+import { log } from "./eventService.js";
 import * as mailer from "./mailerService.js";
 import * as secretService from "./secretService.js";
-import { log } from "./eventService.js";
-import AppError from "../utils/AppError.js";
 
 export default class AuthService {
   constructor(context = {}) {

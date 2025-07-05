@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import nanoid from "../config/nanoid.js";
 import { ENTITIES } from "../config/constants.js";
+import nanoid from "../config/nanoid.js";
 import { publicUser } from "../schemas/userSchema.js";
 import AppError from "../utils/AppError.js";
 

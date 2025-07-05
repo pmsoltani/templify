@@ -1,7 +1,3 @@
-import fs from "fs";
-import path from "path";
-import os from "os";
-import AdmZip from "adm-zip";
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -9,6 +5,10 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import AdmZip from "adm-zip";
+import fs from "fs";
+import os from "os";
+import path from "path";
 import s3Client from "../config/s3Client.js";
 import AppError from "../utils/AppError.js";
 
@@ -92,11 +92,11 @@ const removePdfs = async (pdfKeys) => {
 };
 
 export {
+  downloadTemplate,
   getBucketPath,
   getPresignedUrl,
-  unzipAndUpload,
-  downloadTemplate,
-  uploadPdf,
-  removeTemplate,
   removePdfs,
+  removeTemplate,
+  unzipAndUpload,
+  uploadPdf,
 };

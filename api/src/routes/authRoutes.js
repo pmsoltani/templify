@@ -1,9 +1,9 @@
 import express from "express";
 import * as authController from "../controllers/authController.js";
 import { authenticateToken } from "../middlewares/authenticate.js";
-import registerRoute from "../utils/registerRoute.js";
 import validate from "../middlewares/validate.js";
 import * as authSchema from "../schemas/authSchema.js";
+import registerRoute from "../utils/registerRoute.js";
 
 const router = express.Router();
 
