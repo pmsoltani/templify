@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import formatDate from "@/utils/formatDate";
+import Link from "next/link";
 import { useDashboard } from "../context/DashboardContext";
 import { RemoveConfirmPopover } from "./RemoveConfirmPopover";
 import TemplateUploadDialog from "./TemplateUploadDialog";
@@ -48,7 +49,9 @@ export default function TemplateList() {
         <TableCell>
           <CodeInline>{template.id}</CodeInline>
         </TableCell>
-        <TableCell>{template.name}</TableCell>
+        <TableCell>
+          <Link href={`/templates/${template.id}/files`}>{template.name}</Link>
+        </TableCell>
         <TableCell>{template.description || "No description."}</TableCell>
         <TableCell>{template.htmlEntrypoint}</TableCell>
         <TableCell>{formatDate(template.createdAt)}</TableCell>
