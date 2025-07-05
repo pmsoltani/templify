@@ -4,9 +4,9 @@ import * as templateRepo from "../repositories/templateRepository.js";
 import * as userRepo from "../repositories/userRepository.js";
 import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
-import * as fileService from "./fileService.js";
 import * as mailer from "./mailerService.js";
 import * as secretService from "./secretService.js";
+import * as storageService from "./storageService.js";
 
 export default class AuthService {
   constructor(context = {}) {
@@ -72,13 +72,13 @@ export default class AuthService {
     // Remove all user's PDFs
     const pdfsDb = await pdfRepo.getAllByUserPublicId(publicId);
     const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
-    await fileService.removePdfs(pdfKeys);
+    await storageService.removePdfs(pdfKeys);
 
     // Remove all user's templates
     const templatesDb = await templateRepo.getAllByUserPublicId(publicId);
     for (const template of templatesDb) {
-      const bucketPath = fileService.getBucketPath(publicId, template.public_id);
-      await fileService.removeTemplate(bucketPath);
+      const bucketPath = storageService.getBucketPath(publicId, template.public_id);
+      await storageService.removeTemplate(bucketPath);
     }
 
     await userRepo.remove(publicId); // Postgres will cascade delete the related records

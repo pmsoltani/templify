@@ -1,14 +1,14 @@
 import fs from "fs";
+import mustache from "mustache";
 import path from "path";
 import { pathToFileURL } from "url";
-import mustache from "mustache";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
-import * as fileService from "./fileService.js";
 import * as secretService from "./secretService.js";
+import * as storageService from "./storageService.js";
 
 export default class AuthService {
   constructor(context = {}) {
@@ -26,7 +26,7 @@ export default class AuthService {
     const pdfDb = await pdfRepo.getByPublicIdAndUserPublicID(publicId, userPublicId);
     if (!pdfDb) throw new AppError("PDF record not found.", 404, { logData });
 
-    pdfDb.temp_url = await fileService.getPresignedUrl(pdfDb.storage_object_key);
+    pdfDb.temp_url = await storageService.getPresignedUrl(pdfDb.storage_object_key);
     await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
     return pdfDb;
   }
@@ -47,8 +47,8 @@ export default class AuthService {
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
 
       // Fetch template files from storage
-      const bucketPath = fileService.getBucketPath(userPublicId, templatePublicId);
-      tempDir = await fileService.downloadTemplate(bucketPath);
+      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
+      tempDir = await storageService.downloadTemplate(bucketPath);
 
       // Inject JSON data into HTML template
       const htmlPath = path.join(tempDir, templateDb.html_entrypoint);
@@ -67,11 +67,11 @@ export default class AuthService {
 
       // Upload PDF to storage and return the public URL
       publicId = secretService.generatePublicId("pdf");
-      const key = await fileService.uploadPdf(publicId, userPublicId, pdfBuffer);
+      const key = await storageService.uploadPdf(publicId, userPublicId, pdfBuffer);
 
       // Create the PDF record and log the event
       const pdfDb = await pdfRepo.create(userPublicId, templatePublicId, key, publicId);
-      pdfDb.temp_url = await fileService.getPresignedUrl(key);
+      pdfDb.temp_url = await storageService.getPresignedUrl(key);
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return pdfDb;
     } finally {

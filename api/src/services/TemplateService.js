@@ -3,8 +3,8 @@ import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
-import * as fileService from "./fileService.js";
 import * as secretService from "./secretService.js";
+import * as storageService from "./storageService.js";
 
 export default class TemplateService {
   constructor(context = {}) {
@@ -33,8 +33,8 @@ export default class TemplateService {
         description || null,
         publicId
       );
-      const bucketPath = fileService.getBucketPath(userPublicId, publicId);
-      await fileService.unzipAndUpload(tempZipPath, bucketPath);
+      const bucketPath = storageService.getBucketPath(userPublicId, publicId);
+      await storageService.unzipAndUpload(tempZipPath, bucketPath);
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       templateDb.user_public_id = templateDb.user_public_id || userPublicId;
@@ -59,11 +59,11 @@ export default class TemplateService {
     // Remove all PDFs associated with this template
     const pdfsDb = await pdfRepo.getAllByTemplatePublicId(publicId);
     const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
-    await fileService.removePdfs(pdfKeys);
+    await storageService.removePdfs(pdfKeys);
 
     // Remove the template files from storage
-    const bucketPath = fileService.getBucketPath(userPublicId, publicId);
-    await fileService.removeTemplate(bucketPath);
+    const bucketPath = storageService.getBucketPath(userPublicId, publicId);
+    await storageService.removeTemplate(bucketPath);
 
     // Remove the template record from the database
     await templateRepo.remove(publicId);
@@ -83,9 +83,9 @@ export default class TemplateService {
       );
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
 
-      const bucketPath = fileService.getBucketPath(userPublicId, publicId);
-      await fileService.removeTemplate(bucketPath);
-      await fileService.unzipAndUpload(tempZipPath, bucketPath);
+      const bucketPath = storageService.getBucketPath(userPublicId, publicId);
+      await storageService.removeTemplate(bucketPath);
+      await storageService.unzipAndUpload(tempZipPath, bucketPath);
 
       templateDb = await templateRepo.update(
         publicId,
