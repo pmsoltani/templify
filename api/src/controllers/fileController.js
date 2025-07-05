@@ -13,7 +13,6 @@ const getAllByTemplateId = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  console.log("------", req.params.templateId, "------");
   const fileDb = await new FileService(getContext(req)).create(
     req.params.templateId,
     req.body.name || req.file?.originalname,
