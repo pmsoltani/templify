@@ -19,9 +19,7 @@ const apiClient = async (endpoint, options = {}) => {
       headers,
       body,
     });
-    if (response.status === 204) return null; // No content response
 
-    const data = await response.json();
     if (!response.ok) {
       throw new AppError(
         data.message || "An API error occurred.",
@@ -29,7 +27,9 @@ const apiClient = async (endpoint, options = {}) => {
         data.details
       );
     }
-    return data;
+
+    if (response.status === 204) return null; // No content response
+    return await response.json();
   } catch (err) {
     if (err instanceof AppError) throw err;
     throw new AppError(err.message || "A network error occurred.", 500);
