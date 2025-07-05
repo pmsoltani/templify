@@ -47,6 +47,29 @@ export default class TemplateService {
     }
   }
 
+  async createSlim(templateName, description) {
+    let publicId = secretService.generatePublicId("template");
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "TEMPLATE_CREATE" };
+
+    try {
+      const templateDb = await templateRepo.create(
+        userPublicId,
+        templateName,
+        "template.html",
+        description || null,
+        publicId
+      );
+
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      templateDb.user_public_id = templateDb.user_public_id || userPublicId;
+      return templateDb;
+    } catch (err) {
+      if (publicId) await templateRepo.remove(publicId);
+      throw new AppError(`Failed to create template: ${err.message}`, 500, { logData });
+    }
+  }
+
   async remove(publicId) {
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "TEMPLATE_REMOVE" };
