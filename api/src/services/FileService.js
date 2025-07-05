@@ -23,6 +23,10 @@ export default class FileService {
     try {
       if (!tempPath) throw new AppError("Missing template file.", 400, { logData });
       const size = fs.statSync(tempPath).size;
+      const filesDb = await fileRepo.getAllByTemplatePublicId(templatePublicId);
+      if (filesDb.some((fileDb) => fileDb.name === name)) {
+        throw new AppError("File with this name already exists.", 409, { logData });
+      }
       if (size === 0) throw new AppError("Empty template file.", 400, { logData });
       const mime = ""; // TODO
 
