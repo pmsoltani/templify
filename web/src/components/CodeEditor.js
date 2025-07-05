@@ -1,7 +1,7 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import Editor from "@monaco-editor/react";
-import { Skeleton } from "./skeleton";
 
 export default function CodeEditor({ language, value, onChange }) {
   function handleEditorChange(value, event) {
