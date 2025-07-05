@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button.jsx";
 import Status from "@/components/Status.js";
+import { Button } from "@/components/ui/button.jsx";
 import ApiKeyCard from "./components/ApiKeyCard.js";
 import PdfList from "./components/PdfList.js";
+import StatsCard from "./components/StatsCard.js";
 import TemplateList from "./components/TemplateList.js";
 import TemplateUploadDialog from "./components/TemplateUploadDialog.js";
 import { useDashboard } from "./context/DashboardContext";
-import StatsCard from "./components/StatsCard.js";
 
 export default function DashboardPage() {
   const { isLoading, error, handleRefreshPdfsList } = useDashboard();

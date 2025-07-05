@@ -71,7 +71,7 @@ const getAllByUserPublicId = async (userPublicId) => {
 
 export {
   create,
-  getByPublicIdAndUserPublicID,
   getAllByTemplatePublicId,
   getAllByUserPublicId,
+  getByPublicIdAndUserPublicID,
 };

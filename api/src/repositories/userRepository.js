@@ -75,13 +75,13 @@ const remove = async (publicId) => {
 };
 
 export {
-  getByPublicId,
-  getByEmail,
-  getByEmailOrNewEmail,
+  create,
   getByApiKey,
   getByConfirmationToken,
+  getByEmail,
+  getByEmailOrNewEmail,
+  getByPublicId,
   getByResetToken,
-  create,
-  update,
   remove,
+  update,
 };

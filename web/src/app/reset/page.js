@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
-import ResetSuccessCard from "./components/ResetSuccessCard";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import ResetForm from "./components/ResetForm";
+import ResetSuccessCard from "./components/ResetSuccessCard";
 
 const initialState = { password: "", passwordConfirm: "" };
 

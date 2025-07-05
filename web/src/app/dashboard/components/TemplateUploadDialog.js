@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { CloudUploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
+import { CloudUploadIcon } from "lucide-react";
+import { useState } from "react";
 import { useDashboard } from "../context/DashboardContext";
 
 const initialState = { name: "", description: "", htmlEntrypoint: "", file: null };

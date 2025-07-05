@@ -13,4 +13,4 @@ const forgot = z.object({ body: z.object({ email }) });
 
 const reset = z.object({ body: z.object({ token, password }) });
 
-export { register, confirm, resendConfirmation, login, forgot, reset };
+export { confirm, forgot, login, register, resendConfirmation, reset };

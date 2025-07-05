@@ -67,4 +67,4 @@ const update = async (publicId, name, htmlEntrypoint, description) => {
   return res.rows[0];
 };
 
-export { getByPublicIdAndUserPublicId, getAllByUserPublicId, create, remove, update };
+export { create, getAllByUserPublicId, getByPublicIdAndUserPublicId, remove, update };

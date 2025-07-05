@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import * as userRepo from "../repositories/userRepository.js";
-import AppError from "../utils/AppError.js";
 import { publicUser } from "../schemas/userSchema.js";
+import AppError from "../utils/AppError.js";
 
 const authenticateToken = async (req, res, next) => {
   try {
@@ -39,4 +39,4 @@ const authenticateTokenOrApiKey = async (req, res, next) => {
   }
 };
 
-export { authenticateToken, authenticateApiKey, authenticateTokenOrApiKey };
+export { authenticateApiKey, authenticateToken, authenticateTokenOrApiKey };

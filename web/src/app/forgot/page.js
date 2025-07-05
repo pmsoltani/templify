@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
-import ResetEmailSentCard from "./components/ResetEmailSentCard";
+import { useState } from "react";
 import ForgotForm from "./components/ForgotForm";
+import ResetEmailSentCard from "./components/ResetEmailSentCard";
 
 const initialState = { email: "" };
 

@@ -1,5 +1,7 @@
 "use client";
 
+import CodeInline from "@/components/CodeInline";
+import Status from "@/components/Status";
 import {
   Table,
   TableBody,
@@ -8,12 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import CodeInline from "@/components/CodeInline";
-import Status from "@/components/Status";
 import formatDate from "@/utils/formatDate";
+import { useDashboard } from "../context/DashboardContext";
 import { RemoveConfirmPopover } from "./RemoveConfirmPopover";
 import TemplateUploadDialog from "./TemplateUploadDialog";
-import { useDashboard } from "../context/DashboardContext";
 
 export default function TemplateList() {
   const { templates, isLoading } = useDashboard();

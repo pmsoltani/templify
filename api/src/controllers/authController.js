@@ -44,4 +44,4 @@ const reset = async (req, res) => {
   res.json({ message: "Password has been reset successfully." });
 };
 
-export { register, confirm, resendConfirmation, login, logout, forgot, reset };
+export { confirm, forgot, login, logout, register, resendConfirmation, reset };

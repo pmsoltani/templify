@@ -28,13 +28,13 @@ const templateHtmlEntrypoint = z.string().optional().default("template.html");
 const templateDescription = z.string().optional();
 
 export {
-  id,
-  publicId,
-  email,
-  password,
-  token,
   dateTime,
-  templateName,
-  templateHtmlEntrypoint,
+  email,
+  id,
+  password,
+  publicId,
   templateDescription,
+  templateHtmlEntrypoint,
+  templateName,
+  token,
 };

@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
+  dateTime,
   id,
   publicId,
-  dateTime,
-  templateName,
   templateDescription,
   templateHtmlEntrypoint,
+  templateName,
 } from "./sharedSchema.js";
 
 const create = z.object({
@@ -50,4 +50,4 @@ const publicTemplate = publicTemplateDb.transform((dbData) => {
 
 const publicTemplates = z.array(publicTemplate);
 
-export { create, update, publicTemplate, publicTemplates };
+export { create, publicTemplate, publicTemplates, update };

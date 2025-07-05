@@ -32,4 +32,4 @@ const anonymizeByUserId = async (userId) => {
   return res.rowCount;
 };
 
-export { create, anonymizeByUserId };
+export { anonymizeByUserId, create };
