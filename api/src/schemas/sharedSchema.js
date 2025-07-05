@@ -21,6 +21,8 @@ const token = z
 
 const dateTime = z.date().or(z.string());
 
+const fileName = z.string("File name is required");
+
 const templateName = z.string("Template name is required");
 
 const templateHtmlEntrypoint = z.string().optional().default("template.html");
@@ -30,6 +32,7 @@ const templateDescription = z.string().optional();
 export {
   dateTime,
   email,
+  fileName,
   id,
   password,
   publicId,
