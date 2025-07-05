@@ -5,7 +5,6 @@ import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
 import * as fileService from "./fileService.js";
 import * as secretService from "./secretService.js";
-import { publicId } from "../schemas/sharedSchema.js";
 
 export default class TemplateService {
   constructor(context = {}) {
