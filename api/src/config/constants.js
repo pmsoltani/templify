@@ -2,6 +2,12 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const allowedFileTypes = {
   ".zip": ["application/zip", "application/x-zip-compressed"],
+  ".html": ["text/html"],
+  ".css": ["text/css"],
+  ".png": ["image/png"],
+  ".jpg": ["image/jpeg"],
+  ".jpeg": ["image/jpeg"],
+  ".svg": ["image/svg+xml"],
 };
 const allowedExtensions = Object.keys(allowedFileTypes);
 const allowedMimeTypes = Object.values(allowedFileTypes).flat();
@@ -17,6 +23,7 @@ const ENTITIES = {
 };
 
 const ALLOWED_ACTIONS = [
+  "SCHEMA_VALIDATION",
   "USER_LOGIN",
   "USER_LOGOUT",
   "USER_REGISTER",
@@ -29,12 +36,11 @@ const ALLOWED_ACTIONS = [
   "USER_APIKEY_GENERATE",
   "USER_ACCOUNT_REMOVE",
   "TEMPLATE_CREATE",
-  "TEMPLATE_CREATE_SLIM",
-  "TEMPLATE_ADD_FILE",
-  "TEMPLATE_UPDATE_FILE",
-  "TEMPLATE_REMOVE_FILE",
   "TEMPLATE_UPDATE",
   "TEMPLATE_REMOVE",
+  "FILE_CREATE",
+  "FILE_UPDATE",
+  "FILE_REMOVE",
   "PDF_GENERATE",
   "PDF_URL_GENERATE",
 ];
