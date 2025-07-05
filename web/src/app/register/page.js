@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
+import { useState } from "react";
 import ConfirmEmailCard from "./components/ConfirmEmailCard";
 import RegisterForm from "./components/RegisterForm";
 

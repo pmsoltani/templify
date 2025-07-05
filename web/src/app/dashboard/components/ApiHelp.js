@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { CircleQuestionMarkIcon } from "lucide-react";
+import CodeInline from "@/components/CodeInline";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +6,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import CodeInline from "@/components/CodeInline";
+import { CircleQuestionMarkIcon } from "lucide-react";
+import { useState } from "react";
 
 export function ApiHelp() {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,6 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import apiClient from "@/lib/apiClient";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 const statusData = {
   verifying: { title: "Verifying...", className: "text-center text-2xl" },
