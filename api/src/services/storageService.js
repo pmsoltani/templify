@@ -59,6 +59,19 @@ const downloadTemplate = async (bucketPath) => {
   return tempDir;
 };
 
+const uploadFile = async (name, tempPath, bucketPath) => {
+  const key = `${bucketPath}${name}`;
+  const uploadParams = {
+    Bucket: process.env.R2_BUCKET_NAME,
+    Key: key,
+    Body: fs.createReadStream(tempPath),
+    ContentType: "application/octet-stream",
+  };
+
+  await s3Client.send(new PutObjectCommand(uploadParams));
+  return key;
+};
+
 const uploadPdf = async (publicId, userPublicId, pdfBuffer) => {
   const pdfKey = `userFiles/${userPublicId}/pdfs/${publicId}.pdf`;
   const uploadParams = {
@@ -98,5 +111,6 @@ export {
   removeFiles,
   removeTemplate,
   unzipAndUpload,
+  uploadFile,
   uploadPdf,
 };
