@@ -59,7 +59,7 @@ export default class TemplateService {
     // Remove all PDFs associated with this template
     const pdfsDb = await pdfRepo.getAllByTemplatePublicId(publicId);
     const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
-    await storageService.removePdfs(pdfKeys);
+    await storageService.removeFiles(pdfKeys);
 
     // Remove the template files from storage
     const bucketPath = storageService.getBucketPath(userPublicId, publicId);

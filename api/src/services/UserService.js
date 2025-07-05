@@ -72,7 +72,7 @@ export default class AuthService {
     // Remove all user's PDFs
     const pdfsDb = await pdfRepo.getAllByUserPublicId(publicId);
     const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
-    await storageService.removePdfs(pdfKeys);
+    await storageService.removeFiles(pdfKeys);
 
     // Remove all user's templates
     const templatesDb = await templateRepo.getAllByUserPublicId(publicId);
