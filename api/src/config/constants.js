@@ -13,6 +13,7 @@ const ENTITIES = {
   template: { prefix: "tpl" },
   pdf: { prefix: "pdf" },
   event: { prefix: "evt" },
+  file: { prefix: "fil" },
 };
 
 const ALLOWED_ACTIONS = [
@@ -28,6 +29,10 @@ const ALLOWED_ACTIONS = [
   "USER_APIKEY_GENERATE",
   "USER_ACCOUNT_REMOVE",
   "TEMPLATE_CREATE",
+  "TEMPLATE_CREATE_SLIM",
+  "TEMPLATE_ADD_FILE",
+  "TEMPLATE_UPDATE_FILE",
+  "TEMPLATE_REMOVE_FILE",
   "TEMPLATE_UPDATE",
   "TEMPLATE_REMOVE",
   "PDF_GENERATE",
@@ -35,11 +40,11 @@ const ALLOWED_ACTIONS = [
 ];
 
 export {
-  MAX_FILE_SIZE,
-  allowedFileTypes,
-  allowedExtensions,
-  allowedMimeTypes,
-  NANO_ALPHABET,
-  ENTITIES,
   ALLOWED_ACTIONS,
+  allowedExtensions,
+  allowedFileTypes,
+  allowedMimeTypes,
+  ENTITIES,
+  MAX_FILE_SIZE,
+  NANO_ALPHABET,
 };
