@@ -16,6 +16,13 @@ const getBucketPath = (userPublicId, templatePublicId) => {
   return `userFiles/${userPublicId}/templates/${templatePublicId}/`;
 };
 
+const getFile = async (objectKey) => {
+  const params = { Bucket: process.env.R2_BUCKET_NAME, Key: objectKey };
+  const getObjectResult = await s3Client.send(new GetObjectCommand(params));
+  if (!getObjectResult.Body) throw new AppError("File not found.", 404);
+  return getObjectResult;
+};
+
 const getPresignedUrl = async (objectKey, expiresIn = 900) => {
   const params = { Bucket: process.env.R2_BUCKET_NAME, Key: objectKey };
   return getSignedUrl(s3Client, new GetObjectCommand(params), { expiresIn: expiresIn });
@@ -107,6 +114,7 @@ const removeFiles = async (fileKeys) => {
 export {
   downloadTemplate,
   getBucketPath,
+  getFile,
   getPresignedUrl,
   removeFiles,
   removeTemplate,
