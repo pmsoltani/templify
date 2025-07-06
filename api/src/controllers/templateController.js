@@ -38,7 +38,7 @@ const create = async (req, res) => {
 
 const generatePdf = async (req, res) => {
   const pdfDb = await new PdfService(getContext(req)).generatePdf(
-    req.params.id,
+    req.params.templateId,
     req.body
   );
   res.json({
@@ -48,13 +48,13 @@ const generatePdf = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  await new TemplateService(getContext(req)).remove(req.params.id);
+  await new TemplateService(getContext(req)).remove(req.params.templateId);
   res.status(204).send();
 };
 
 const update = async (req, res) => {
   const templateDb = await new TemplateService(getContext(req)).update(
-    req.params.id,
+    req.params.templateId,
     req.body,
     req.file?.path
   );
@@ -64,4 +64,4 @@ const update = async (req, res) => {
   });
 };
 
-export { create, createSlim, generatePdf, getAllByUserId, remove, update };
+export { create, createSlim, generatePdf, getAllByUserId, getPreview, remove, update };
