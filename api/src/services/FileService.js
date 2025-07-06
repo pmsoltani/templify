@@ -18,14 +18,22 @@ export default class FileService {
 
   async getContent(publicId, templatePublicId) {
     const userPublicId = this.context.user.id;
-    const fileDb = await fileRepo.getByPublicId(publicId);
-    if (!fileDb) throw new AppError("File not found.", 404);
+    const logData = { userPublicId: userPublicId, action: "FILE_GET_CONTENT" };
 
-    const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
-    const objectKey = `${bucketPath}${fileDb.name}`;
-    const fileContent = await storageService.getFile(objectKey);
+    try {
+      const fileDb = await fileRepo.getByPublicId(publicId);
+      if (!fileDb) throw new AppError("File not found.", 404, { logData });
 
-    return await fileContent.Body.transformToString();
+      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
+      const objectKey = `${bucketPath}${fileDb.name}`;
+      const fileContent = await storageService.getFile(objectKey);
+
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      return await fileContent.Body.transformToString();
+    } catch {
+      if (err instanceof AppError && err.logData) throw err;
+      throw new AppError("Failed to retrieve file content.", 500, { logData });
+    }
   }
 
   async create(templatePublicId, name, tempPath) {
