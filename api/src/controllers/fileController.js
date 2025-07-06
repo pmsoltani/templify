@@ -12,6 +12,17 @@ const getAllByTemplateId = async (req, res) => {
   });
 };
 
+const getContent = async (req, res) => {
+  const content = await new FileService(getContext(req)).getContent(
+    req.params.fileId,
+    req.params.templateId
+  );
+  res.json({
+    message: "File content retrieved successfully!",
+    data: { html: content },
+  });
+};
+
 const create = async (req, res) => {
   const fileDb = await new FileService(getContext(req)).create(
     req.params.templateId,
@@ -45,4 +56,4 @@ const update = async (req, res) => {
   });
 };
 
-export { create, getAllByTemplateId, remove, update };
+export { create, getAllByTemplateId, getContent, remove, update };
