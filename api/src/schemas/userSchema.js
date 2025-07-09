@@ -13,6 +13,7 @@ const publicUserDb = z.object({
   id: id,
   public_id: publicId,
   email: email,
+  is_confirmed: z.boolean(),
   api_key: token.nullable(),
   created_at: dateTime,
   updated_at: dateTime,
@@ -22,6 +23,7 @@ const publicUser = publicUserDb.transform((dbData) => {
   return {
     id: dbData.public_id,
     email: dbData.email,
+    isConfirmed: dbData.is_confirmed,
     apiKey: dbData.api_key,
     createdAt: dbData.created_at,
     updatedAt: dbData.updated_at,
