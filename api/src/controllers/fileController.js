@@ -19,7 +19,7 @@ const getContent = async (req, res) => {
   );
   res.json({
     message: "File content retrieved successfully!",
-    data: { html: content },
+    data: { content },
   });
 };
 
