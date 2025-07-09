@@ -15,7 +15,7 @@ import registerRoute from "../utils/registerRoute.js";
 const router = express.Router();
 
 // Route for generating a PDF (requires JWT or API Key)
-registerRoute(router, "post", "/:id/generate", authenticateTokenOrApiKey, templateController.generatePdf); // prettier-ignore
+registerRoute(router, "post", "/:templateId/generate", authenticateTokenOrApiKey, templateController.generatePdf); // prettier-ignore
 
 // Routes for managing templates (require JWT)
 router.use(catchAsync(authenticateToken));
