@@ -111,7 +111,7 @@ function AppProvider({ children }) {
       if (data.files) {
         Array.from(data.files).forEach((file) => formData.append("files", file));
       }
-      const newTemplate = await apiClient("/api/templates/", {
+      const newTemplate = await apiClient("/api/templates/slim", {
         method: "POST",
         body: formData,
       });
@@ -197,11 +197,10 @@ function AppProvider({ children }) {
   const updateFileContent = useCallback(async (templateId, fileId, content) => {
     setIsLoading(true);
     try {
-      await apiClient(`/api/templates/${templateId}/files/${fileId}`, {
-        method: "PUT",
+      await apiClient(`/api/templates/${templateId}/files/${fileId}/content`, {
+        method: "PATCH",
         body: { content },
       });
-
       setFileContent(content);
     } catch (error) {
       console.error("Failed to update file content:", error); // TODO: Handle errors appropriately
