@@ -51,7 +51,7 @@ export default function FileTable() {
       <TableBody>
         {currentFiles.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={4}>
+            <TableCell colSpan={6}>
               <Status
                 type="empty"
                 title="No files yet"
