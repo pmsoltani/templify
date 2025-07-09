@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
+import { setAuthToken } from "@/lib/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -38,8 +39,8 @@ export default function LoginPage() {
         method: "POST",
         body: { email, password },
       });
-      localStorage.setItem("authToken", data.data.accessToken);
-      router.push("/dashboard");
+      setAuthToken(data.data.accessToken);
+      router.replace("/app");
     } catch (err) {
       setError(err.message);
     } finally {
