@@ -5,9 +5,7 @@ import "../globals.css";
 export default function MainLayout({ children }) {
   return (
     <>
-      <header className="w-full">
-        <Navbar />
-      </header>
+      <Navbar />
 
       <main className="flex flex-grow flex-col items-center gap-4 w-5xl max-w-5xl p-4">
         {children}
