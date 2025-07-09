@@ -10,7 +10,7 @@ import { log } from "./eventService.js";
 import * as secretService from "./secretService.js";
 import * as storageService from "./storageService.js";
 
-export default class AuthService {
+export default class PdfService {
   constructor(context = {}) {
     this.context = context;
   }
