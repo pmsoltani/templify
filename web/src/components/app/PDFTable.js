@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { useAppContext } from "@/contexts/AppContext.js";
 import formatDate from "@/utils/formatDate";
-import { Calendar, CircleIcon, DownloadIcon, Hash } from "lucide-react";
+import { CalendarIcon, CircleIcon, DownloadIcon, HashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -45,19 +45,19 @@ export default function PDFTable() {
       <TableRow>
         <TableHead className="w-[160px]">
           <div className="flex items-center gap-2">
-            <Hash className="h-4 w-4" />
+            <HashIcon className="h-4 w-4" />
             PDF ID
           </div>
         </TableHead>
         <TableHead className="w-[160px]">
           <div className="flex items-center gap-2">
-            <Hash className="h-4 w-4" />
+            <HashIcon className="h-4 w-4" />
             Template ID
           </div>
         </TableHead>
         <TableHead>
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+            <CalendarIcon className="h-4 w-4" />
             Created At
           </div>
         </TableHead>

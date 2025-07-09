@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppContext } from "@/contexts/AppContext.js";
-import { Upload, X } from "lucide-react";
+import { UploadIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
 export default function UploadTemplateDialog({ open, onOpenChange }) {
@@ -133,7 +133,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
                   onDrop={handleDrop}
                   onClick={() => document.getElementById("fileInput").click()}
                 >
-                  <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                  <UploadIcon className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                   <p className="text-sm text-gray-600">
                     Drop files here or click to upload
                   </p>
@@ -161,7 +161,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
                       size="sm"
                       onClick={removeFiles}
                     >
-                      <X className="h-4 w-4" />
+                      <XIcon className="h-4 w-4" />
                     </Button>
                   </div>
                   <div className="space-y-1 max-h-18 overflow-y-auto">

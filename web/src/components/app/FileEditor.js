@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
-import { FileIcon, RotateCcw, Save } from "lucide-react";
+import { FileIcon, RotateCcwIcon, SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
@@ -145,7 +145,7 @@ export default function FileEditor({ templateId, fileId }) {
             onClick={handleRevert}
             disabled={!hasUnsavedChanges || isLoading}
           >
-            <RotateCcw className="h-4 w-4 mr-1" />
+            <RotateCcwIcon className="h-4 w-4 mr-1" />
             Revert
           </Button>
           <Button
@@ -156,7 +156,7 @@ export default function FileEditor({ templateId, fileId }) {
             {isLoading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white mr-1" />
             ) : (
-              <Save className="h-4 w-4 mr-1" />
+              <SaveIcon className="h-4 w-4 mr-1" />
             )}
             Save
           </Button>

@@ -1,4 +1,12 @@
-import { Code, File, FileCode, FileText, Image, Palette, Settings } from "lucide-react";
+import {
+  CodeIcon,
+  FileCodeIcon,
+  FileIcon,
+  FileTextIcon,
+  ImageIcon,
+  PaletteIcon,
+  SettingsIcon,
+} from "lucide-react";
 
 function getFileIcon(fileName) {
   const extension = fileName.split(".").pop()?.toLowerCase();
@@ -6,32 +14,32 @@ function getFileIcon(fileName) {
   switch (extension) {
     case "html":
     case "htm":
-      return FileText;
+      return FileTextIcon;
     case "css":
-      return Palette;
+      return PaletteIcon;
     case "js":
     case "jsx":
     case "ts":
     case "tsx":
-      return Code;
+      return CodeIcon;
     case "json":
-      return FileCode;
+      return FileCodeIcon;
     case "png":
     case "jpg":
     case "jpeg":
     case "gif":
     case "svg":
     case "webp":
-      return Image;
+      return ImageIcon;
     case "md":
     case "txt":
-      return FileText;
+      return FileTextIcon;
     case "xml":
     case "yml":
     case "yaml":
-      return Settings;
+      return SettingsIcon;
     default:
-      return File;
+      return FileIcon;
   }
 }
 
