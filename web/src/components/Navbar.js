@@ -1,53 +1,45 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { getAuthToken } from "@/lib/auth";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import AccountMenuDropdown from "./app/AccountMenuDropdown";
+import Logo from "./Logo";
+import { Button } from "./ui/button";
 
-export default function Navbar() {
+export default function Navbar({ breadcrumb }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const { templateId } = useParams();
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("authToken"));
-    setIsMounted(true);
+    setIsLoggedIn(!!getAuthToken());
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    setIsLoggedIn(false);
-    window.location.href = "/";
-  };
-
-  // During server render and initial client render, isMounted is false.
-  if (!isMounted) return null; // or return a loading skeleton
-
   return (
-    <nav className="flex items-center justify-between p-4 bg-white shadow-md">
-      <Link href="/" className="text-xl font-bold">
-        Templify
-      </Link>
-      <div>
-        {isLoggedIn ? (
-          <>
-            <Link href="/dashboard" className="mr-4 hover:text-blue-600">
-              Dashboard
-            </Link>
-            <Button onClick={handleLogout} variant="destructive">
-              Logout
-            </Button>
-          </>
-        ) : (
-          <>
-            <Link href="/login" className="mr-4 hover:text-blue-600">
-              Login
-            </Link>
-            <Link href="/register">
-              <Button>Register</Button>
-            </Link>
-          </>
-        )}
+    <header className="flex items-center justify-between w-full gap-4 h-10 px-4 bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      <div className="flex items-center justify-right gap-4">
+        <Link href={isLoggedIn ? "/app" : "/"} className="flex items-center space-x-2">
+          <Logo />
+          <span className="font-semibold text-lg hidden sm:block">Templify</span>
+        </Link>
+
+        {isLoggedIn && templateId && <span className="text-gray-400">|</span>}
+        <nav className="flex items-center">{breadcrumb}</nav>
       </div>
-    </nav>
+
+      {isLoggedIn ? (
+        <AccountMenuDropdown />
+      ) : (
+        <div className="flex items-center">
+          <Link href="/login" className="mr-4 hover:text-blue-600">
+            Login
+          </Link>
+          <Link href="/register">
+            <Button size="sm">Register</Button>
+          </Link>
+        </div>
+      )}
+    </header>
   );
 }
