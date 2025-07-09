@@ -60,7 +60,7 @@ function ConfirmationStatus() {
       </CardContent>
       {status === "success" && (
         <CardFooter>
-          <Button onClick={() => router.push("/login")} className="w-full">
+          <Button onClick={() => router.replace("/login")} className="w-full">
             Login
           </Button>
         </CardFooter>
@@ -69,7 +69,7 @@ function ConfirmationStatus() {
   );
 }
 
-export default function ConfirmEmailPage() {
+export default function ConfirmPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ConfirmationStatus />
