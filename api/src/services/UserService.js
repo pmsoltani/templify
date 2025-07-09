@@ -8,7 +8,7 @@ import * as mailer from "./mailerService.js";
 import * as secretService from "./secretService.js";
 import * as storageService from "./storageService.js";
 
-export default class AuthService {
+export default class UserService {
   constructor(context = {}) {
     this.context = context;
   }
