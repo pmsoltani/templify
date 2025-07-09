@@ -5,13 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function RegisterForm({
-  formState,
-  setField,
-  isLoading,
-  error,
-  onSubmit,
-}) {
+export default function ResetForm({ formState, setField, isLoading, error, onSubmit }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     onSubmit();
