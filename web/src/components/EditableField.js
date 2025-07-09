@@ -35,7 +35,7 @@ export default function EditableField({
           className="mt-1 text-sm text-gray-900 bg-gray-50 p-2 rounded cursor-pointer hover:bg-gray-100 flex items-center justify-between"
           onClick={() => onEdit(fieldName, fieldValue)}
         >
-          {fieldValue}
+          <span className="grow">{fieldValue}</span>
           <Edit3Icon className="h-4 w-4 text-gray-400" />
         </div>
       )}
