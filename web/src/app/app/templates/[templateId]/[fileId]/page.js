@@ -1,7 +1,7 @@
 "use client";
 
-import { FileEditor } from "@/components/app/FileEditor";
-import { TemplatePreview } from "@/components/app/TemplatePreview";
+import FileEditor from "@/components/app/FileEditor";
+import TemplatePreview from "@/components/app/TemplatePreview";
 import { useAppContext } from "@/contexts/AppContext.js";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
