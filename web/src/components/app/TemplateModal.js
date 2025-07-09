@@ -170,7 +170,7 @@ export default function TemplateModal({ open, onOpenChange }) {
                   <h4 className="font-medium">Delete Template</h4>
                   <p className="text-sm text-gray-600">
                     This action cannot be undone. This will permanently delete the
-                    template and all its files.
+                    template, all its files, and any PDFs generated using it.
                   </p>
                 </div>
                 <div className="flex gap-2">
