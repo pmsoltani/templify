@@ -105,7 +105,6 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
                 placeholder="A brief description of what this template is for..."
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
-                required
               />
             </div>
 
@@ -165,7 +164,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 max-h-18 overflow-y-auto">
                     {Array.from(formData.files).map((file, index) => (
                       <div
                         key={index}
