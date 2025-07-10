@@ -1,9 +1,9 @@
-import express from "express";
 import cors from "cors";
-import apiRoutes from "./src/routes/api.js";
+import express from "express";
 import db from "./src/config/database.js";
-import { initializeBrowser, closeBrowserInstance } from "./src/config/puppeteer.js";
+import { closeBrowserInstance, initializeBrowser } from "./src/config/puppeteer.js";
 import errorHandler from "./src/middlewares/errorHandler.js";
+import apiRoutes from "./src/routes/api.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
