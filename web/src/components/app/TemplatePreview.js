@@ -14,32 +14,72 @@ export default function TemplatePreview({ templateId }) {
   const [error, setError] = useState(null);
   const [isVariablesModalOpen, setIsVariablesModalOpen] = useState(false);
 
-  // Generate preview on component mount
+  // Variables state moved here
+  const [variables, setVariables] = useState([]);
+  const [variableValues, setVariableValues] = useState({});
+  const [isLoadingVariables, setIsLoadingVariables] = useState(false);
+  const [variablesError, setVariablesError] = useState(null);
+
+  // Load variables when template changes
   useEffect(() => {
-    if (currentTemplate && templateId) generatePreview();
+    if (currentTemplate && templateId) loadVariables();
   }, [currentTemplate, templateId]);
 
-  const generatePreview = async (variables = null) => {
+  const loadVariables = async () => {
+    setIsLoadingVariables(true);
+    setVariablesError(null);
+
+    try {
+      const data = await apiClient(`/api/templates/${templateId}/variables`);
+      setVariables(data.data.variables);
+
+      // Initialize variable values with defaults
+      const initialValues = {};
+      data.data.variables.forEach((variable) => {
+        initialValues[variable.name] = variable.defaultValue || "";
+      });
+      setVariableValues(initialValues);
+    } catch (err) {
+      console.error("Failed to load variables:", err);
+      setVariablesError("Failed to load template variables");
+      setVariables([]); // Still generate preview with empty variables
+      setVariableValues({});
+    } finally {
+      setIsLoadingVariables(false);
+    }
+  };
+
+  const generatePreview = async (customVariables = null) => {
     setIsGenerating(true);
     setError(null);
 
     try {
       const data = await apiClient(`/api/templates/${templateId}/preview`, {
         method: "POST",
-        body: variables || { name: "John Doe" },
+        body: customVariables || variableValues || {},
       });
 
       setPdfUrl(data.data.tempUrl);
       if (isVariablesModalOpen) setIsVariablesModalOpen(false);
-    } catch (error) {
-      console.error("Failed to generate PDF preview:", error);
+    } catch (err) {
+      console.error("Failed to generate PDF preview:", err);
       setError("Failed to generate PDF preview. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleVariablesGenerate = (variableValues) => generatePreview(variableValues);
+  const handleVariablesUpdate = (newVariableValues) => {
+    setVariableValues(newVariableValues);
+    generatePreview(newVariableValues);
+    setIsVariablesModalOpen(false);
+  };
+
+  const handleRefreshPreview = () => generatePreview();
+  const handleOpenVariablesModal = async () => {
+    setIsVariablesModalOpen(true);
+    await loadVariables(); // Reload variables to capture any recent changes
+  };
 
   const downloadPdf = async () => {
     if (!pdfUrl) return await generatePreview();
@@ -69,8 +109,8 @@ export default function TemplatePreview({ templateId }) {
       if (downloadUrl !== pdfUrl) {
         URL.revokeObjectURL(downloadUrl);
       }
-    } catch (error) {
-      console.error("Failed to download PDF:", error);
+    } catch (err) {
+      console.error("Failed to download PDF:", err);
       setError("Failed to download PDF. Please try again.");
     }
   };
@@ -80,9 +120,7 @@ export default function TemplatePreview({ templateId }) {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault();
-        if (!isGenerating) {
-          generatePreview();
-        }
+        if (!isGenerating) handleRefreshPreview();
       }
     };
 
@@ -112,23 +150,33 @@ export default function TemplatePreview({ templateId }) {
                 {error}
               </span>
             )}
+            {variablesError && (
+              <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
+                {variablesError}
+              </span>
+            )}
           </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsVariablesModalOpen(true)}
-              disabled={isGenerating}
+              onClick={handleOpenVariablesModal}
+              disabled={isGenerating || isLoadingVariables}
               className="flex items-center gap-2"
             >
               <VariableIcon className="h-4 w-4" />
               Variables
+              {variables.length > 0 && (
+                <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">
+                  {variables.length}
+                </span>
+              )}
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={generatePreview}
-              disabled={isGenerating}
+              onClick={handleRefreshPreview}
+              disabled={isGenerating || isLoadingVariables}
               className="flex items-center gap-2"
             >
               {isGenerating ? (
@@ -142,7 +190,7 @@ export default function TemplatePreview({ templateId }) {
               variant="outline"
               size="sm"
               onClick={downloadPdf}
-              disabled={isGenerating}
+              disabled={isGenerating || isLoadingVariables}
               className="flex items-center gap-2"
             >
               <DownloadIcon className="h-4 w-4" />
@@ -160,11 +208,15 @@ export default function TemplatePreview({ templateId }) {
               title="PDF Preview"
               style={{ display: "block" }}
             />
-          ) : isGenerating ? (
+          ) : isGenerating || isLoadingVariables ? (
             <div className="flex items-center justify-center h-full text-gray-500">
               <div className="text-center">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900 mx-auto mb-4" />
-                <p>Generating PDF preview...</p>
+                <p>
+                  {isLoadingVariables
+                    ? "Loading variables..."
+                    : "Generating PDF preview..."}
+                </p>
               </div>
             </div>
           ) : (
@@ -181,11 +233,13 @@ export default function TemplatePreview({ templateId }) {
 
       {/* Variables Modal */}
       <VariablesModal
-        templateId={templateId}
+        variables={variables}
+        variableValues={variableValues}
         isOpen={isVariablesModalOpen}
         onClose={() => setIsVariablesModalOpen(false)}
-        onGenerate={handleVariablesGenerate}
+        onUpdate={handleVariablesUpdate}
         isGenerating={isGenerating}
+        isLoadingVariables={isLoadingVariables}
       />
     </>
   );
