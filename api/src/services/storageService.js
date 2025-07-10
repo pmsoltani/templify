@@ -28,21 +28,22 @@ const getPresignedUrl = async (objectKey, expiresIn = 900) => {
   return getSignedUrl(s3Client, new GetObjectCommand(params), { expiresIn: expiresIn });
 };
 
-const unzipAndUpload = async (zipFilePath, bucketPathPrefix) => {
-  const zip = new AdmZip(zipFilePath);
-  const zipEntries = zip.getEntries();
+const unzip = async (zipFilePath) => {
+  return new AdmZip(zipFilePath)
+    .getEntries()
+    .filter((e) => !e.isDirectory)
+    .map((e) => ({ name: e.name, size: e.header.size, data: e.getData() }));
+};
 
-  const uploadPromises = zipEntries.map((entry) => {
-    if (entry.isDirectory) return null; // Skip directories
-
-    const key = `${bucketPathPrefix}/${entry.entryName}`;
-    const params = {
+const uploadFiles = async (files, bucketPath) => {
+  const uploadPromises = files.map((file) => {
+    const uploadParams = {
       Bucket: process.env.R2_BUCKET_NAME,
-      Key: key,
-      Body: entry.getData(), // Get file content directly from zip entry
-      ContentType: entry.mimeType,
+      Key: `${bucketPath}${file.name}`,
+      Body: file.data,
+      ContentType: "application/octet-stream",
     };
-    return s3Client.send(new PutObjectCommand(params));
+    return s3Client.send(new PutObjectCommand(uploadParams));
   });
   await Promise.all(uploadPromises);
 };
@@ -66,17 +67,36 @@ const downloadTemplate = async (bucketPath) => {
   return tempDir;
 };
 
-const uploadFile = async (name, tempPath, bucketPath) => {
+const uploadFile = async (bucketPath, name, tempPath, fileData) => {
   const key = `${bucketPath}${name}`;
   const uploadParams = {
     Bucket: process.env.R2_BUCKET_NAME,
     Key: key,
-    Body: fs.createReadStream(tempPath),
+    Body: tempPath ? fs.createReadStream(tempPath) : fileData,
     ContentType: "application/octet-stream",
   };
 
   await s3Client.send(new PutObjectCommand(uploadParams));
   return key;
+};
+
+const uploadBuffer = async (bucketPath, name, buffer) => {
+  return await uploadFile(bucketPath, name, null, buffer);
+};
+
+const uploadPreviewPdf = async (templatePublicId, pdfBuffer) => {
+  const timestamp = Date.now();
+  const previewKey = `previews/${templatePublicId}/${timestamp}.pdf`;
+
+  const uploadParams = {
+    Bucket: process.env.R2_BUCKET_NAME,
+    Key: previewKey,
+    Body: pdfBuffer,
+    ContentType: "application/pdf",
+  };
+
+  await s3Client.send(new PutObjectCommand(uploadParams));
+  return previewKey;
 };
 
 const uploadPdf = async (publicId, userPublicId, pdfBuffer) => {
@@ -118,7 +138,10 @@ export {
   getPresignedUrl,
   removeFiles,
   removeTemplate,
-  unzipAndUpload,
+  unzip,
+  uploadBuffer,
   uploadFile,
+  uploadFiles,
   uploadPdf,
+  uploadPreviewPdf,
 };

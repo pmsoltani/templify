@@ -1,8 +1,10 @@
 import fs from "fs";
+import * as fileRepo from "../repositories/fileRepository.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
+import FileService from "./FileService.js";
 import * as secretService from "./secretService.js";
 import * as storageService from "./storageService.js";
 
@@ -33,8 +35,10 @@ export default class TemplateService {
         description || null,
         publicId
       );
-      const bucketPath = storageService.getBucketPath(userPublicId, publicId);
-      await storageService.unzipAndUpload(tempZipPath, bucketPath);
+      const unzippedFiles = await storageService.unzip(tempZipPath);
+      unzippedFiles.forEach(async (fileObj) => {
+        await new FileService(this.context).create(publicId, fileObj.name, "", fileObj);
+      });
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       templateDb.user_public_id = templateDb.user_public_id || userPublicId;
@@ -47,7 +51,12 @@ export default class TemplateService {
     }
   }
 
-  async createSlim(templateName, description) {
+  async createSlim(
+    templateName,
+    description = null,
+    htmlEntrypoint = "template.html",
+    files = []
+  ) {
     let publicId = secretService.generatePublicId("template");
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "TEMPLATE_CREATE" };
@@ -56,10 +65,15 @@ export default class TemplateService {
       const templateDb = await templateRepo.create(
         userPublicId,
         templateName,
-        "template.html",
-        description || null,
+        htmlEntrypoint,
+        description,
         publicId
       );
+
+      if (files.length > 0) {
+        const fileService = new FileService(this.context);
+        files.forEach(async (file) => await fileService.create(publicId, file));
+      }
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       templateDb.user_public_id = templateDb.user_public_id || userPublicId;
@@ -124,5 +138,113 @@ export default class TemplateService {
     } finally {
       fs.unlinkSync(tempZipPath); // Clean up the temp file
     }
+  }
+
+  async updateInfo(publicId, updateData) {
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "TEMPLATE_UPDATE" };
+    try {
+      let templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+        publicId,
+        userPublicId
+      );
+      if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+
+      templateDb = await templateRepo.update(
+        publicId,
+        updateData.name || templateDb.name,
+        updateData.htmlEntrypoint || templateDb.html_entrypoint,
+        updateData.description || templateDb.description
+      );
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      templateDb.user_public_id = templateDb.user_public_id || userPublicId;
+      return templateDb;
+    } catch (err) {
+      throw new AppError(`Failed to update template: ${err.message}`, 500, { logData });
+    }
+  }
+
+  async getVariables(publicId) {
+    // function to get all mustache variables from a template
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "TEMPLATE_GET_VARIABLES" };
+    const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+      publicId,
+      userPublicId
+    );
+    if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+  }
+
+  async getVariables(publicId) {
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "TEMPLATE_GET_VARIABLES" };
+
+    try {
+      const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+        publicId,
+        userPublicId
+      );
+      if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+
+      // Get all HTML files for this template
+      const filesDb = await fileRepo.getAllByTemplatePublicId(publicId);
+      const htmlFiles = filesDb.filter((f) => f.name.toLowerCase().endsWith(".html"));
+
+      if (htmlFiles.length === 0) {
+        throw new AppError("No HTML files found in template.", 404, { logData });
+      }
+
+      const bucketPath = storageService.getBucketPath(userPublicId, publicId);
+      const allVariables = new Set();
+
+      // Process each HTML file
+      for (const file of htmlFiles) {
+        const objectKey = `${bucketPath}${file.name}`;
+        const fileContent = await storageService.getFile(objectKey);
+        const htmlContent = await fileContent.Body.transformToString();
+
+        // Extract variables using regex (mustache format: {{variable}})
+        const variables = this.extractMustacheVariables(htmlContent);
+        variables.forEach((variable) => allVariables.add(variable));
+      }
+
+      // Convert Set to Array and create variable objects
+      const variableList = Array.from(allVariables).map((variable) => ({
+        name: variable,
+        required: true, // Default to required
+        defaultValue: null,
+      }));
+
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      return variableList;
+    } catch (err) {
+      if (err instanceof AppError && err.logData) throw err;
+      throw new AppError(`Failed to get template variables: ${err.message}`, 500, {
+        logData,
+      });
+    }
+  }
+
+  /**
+   * Extract mustache variables from HTML content
+   * Supports: {{variable}}, {{user.name}}, {{#section}}{{/section}}
+   * @param {String} htmlContent
+   */
+  extractMustacheVariables(htmlContent) {
+    const variables = new Set();
+
+    // Regex to match mustache variables: {{variable}} or {{user.name}}
+    // Excludes sections/partials: {{#section}}, {{/section}}, {{>partial}}
+    const mustacheRegex = /\{\{(?!\#|\/|\>)\s*([^}]+?)\s*\}\}/g;
+
+    for (const match of htmlContent.matchAll(mustacheRegex)) {
+      const variable = match[1].trim();
+
+      // Skip mustache helpers/conditionals
+      if (!variable.includes("&") && !variable.includes("{")) variables.add(variable);
+      // For nested objects like 'user.name', we might want just 'user'
+      // or keep the full path - let's keep the full path for now
+    }
+    return Array.from(variables);
   }
 }

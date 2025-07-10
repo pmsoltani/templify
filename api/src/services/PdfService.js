@@ -22,7 +22,7 @@ export default class PdfService {
 
   async getDownloadLink(publicId) {
     const userPublicId = this.context.user.id;
-    const logData = { userPublicId: userPublicId, action: "PDF_URL_GENERATE" };
+    const logData = { userPublicId: userPublicId, action: "PDF_GENERATE_URL" };
     const pdfDb = await pdfRepo.getByPublicIdAndUserPublicID(publicId, userPublicId);
     if (!pdfDb) throw new AppError("PDF record not found.", 404, { logData });
 
@@ -31,7 +31,7 @@ export default class PdfService {
     return pdfDb;
   }
 
-  async generatePdf(templatePublicId, jsonData) {
+  async generatePdf(templatePublicId, jsonData = {}) {
     let publicId;
     let tempDir = null;
     let page = null;
@@ -74,6 +74,59 @@ export default class PdfService {
       pdfDb.temp_url = await storageService.getPresignedUrl(key);
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return pdfDb;
+    } catch (err) {
+      if (err instanceof AppError && err.logData) throw err;
+      throw new AppError(`Failed to generate pdf: ${err.message}`, 500, { logData });
+    } finally {
+      if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
+      if (page) await page.close();
+    }
+  }
+
+  async generatePdfPreview(templatePublicId, jsonData = {}) {
+    let tempDir = null;
+    let page = null;
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "PDF_GENERATE_PREVIEW" };
+
+    try {
+      // Authenticate and fetch template record
+      const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+        templatePublicId,
+        userPublicId
+      );
+      if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+
+      // Fetch template files from storage
+      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
+      tempDir = await storageService.downloadTemplate(bucketPath);
+
+      // Inject JSON data into HTML template
+      const htmlPath = path.join(tempDir, templateDb.html_entrypoint);
+      const htmlContent = fs.readFileSync(htmlPath, "utf-8");
+      const finalHtml = mustache.render(htmlContent, jsonData);
+
+      // Generate PDF preview with Puppeteer
+      const browser = await getBrowserInstance();
+      const page = await browser.newPage();
+
+      // Tell puppeteer to treat the temp dir as the base for linked assets (CSS, images)
+      const fileUrl = pathToFileURL(htmlPath).href;
+      await page.goto(fileUrl, { waitUntil: "networkidle0" });
+      await page.setContent(finalHtml, { waitUntil: "networkidle0" }); // Final HTML file
+      const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
+
+      // Upload PDF to storage and return the public URL
+      const key = await storageService.uploadPreviewPdf(templatePublicId, pdfBuffer);
+
+      const tempUrl = await storageService.getPresignedUrl(key);
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      return tempUrl;
+    } catch (err) {
+      if (err instanceof AppError && err.logData) throw err;
+      throw new AppError(`Failed to generate pdf preview: ${err.message}`, 500, {
+        logData,
+      });
     } finally {
       if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
       if (page) await page.close();

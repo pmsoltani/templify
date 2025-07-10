@@ -30,49 +30,59 @@ export default class FileService {
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return await fileContent.Body.transformToString();
-    } catch {
+    } catch (err) {
       if (err instanceof AppError && err.logData) throw err;
       throw new AppError("Failed to retrieve file content.", 500, { logData });
     }
   }
 
-  async create(templatePublicId, name, tempPath) {
+  async create(templatePublicId, file) {
     let publicId;
+    let isUploaded = false;
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "FILE_CREATE" };
 
     try {
-      if (!tempPath) throw new AppError("Missing template file.", 400, { logData });
-      const size = fs.statSync(tempPath).size;
+      if (!file || !file.path) throw new AppError("Missing file.", 400, { logData });
+      const size = file.size ? file.size : fs.statSync(file.path).size;
+      if (size === 0) throw new AppError("Empty template file.", 400, { logData });
       const filesDb = await fileRepo.getAllByTemplatePublicId(templatePublicId);
-      if (filesDb.some((fileDb) => fileDb.name === name)) {
+      if (filesDb.some((fileDb) => fileDb.name === file.originalname)) {
         throw new AppError("File with this name already exists.", 409, { logData });
       }
-      if (size === 0) throw new AppError("Empty template file.", 400, { logData });
-      const mime = ""; // TODO
 
       publicId = secretService.generatePublicId("file");
 
       const fileDb = await fileRepo.create(
         publicId,
         templatePublicId,
-        name,
-        size,
-        mime
+        file.originalname,
+        file.size,
+        file.mime || ""
       );
       fileDb.template_public_id = fileDb.template_public_id || templatePublicId;
 
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
-      await storageService.uploadFile(name, tempPath, bucketPath);
+      await storageService.uploadFile(
+        bucketPath,
+        file.originalname,
+        file.path,
+        file?.data
+      );
+      isUploaded = true;
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return fileDb;
     } catch (err) {
+      if (isUploaded) {
+        const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
+        await storageService.removeFiles([`${bucketPath}${file.originalname}`]);
+      }
       if (publicId) await fileRepo.remove(publicId);
       if (err instanceof AppError && err.logData) throw err;
       throw new AppError(`Failed to create file: ${err.message}`, 500, { logData });
     } finally {
-      fs.unlinkSync(tempPath); // Clean up the temp file
+      if (file.path) fs.unlinkSync(file.path); // Clean up the temp file
     }
   }
 
@@ -142,9 +152,33 @@ export default class FileService {
       return fileDb;
     } catch (err) {
       if (err instanceof AppError && err.logData) throw err;
-      throw new AppError(`Failed to update template: ${err.message}`, 500, { logData });
+      throw new AppError(`Failed to update file: ${err.message}`, 500, { logData });
     } finally {
       fs.unlinkSync(tempPath); // Clean up the temp file
+    }
+  }
+
+  async updateContent(publicId, templatePublicId, content) {
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "FILE_UPDATE_CONTENT" };
+
+    try {
+      let fileDb = await fileRepo.getByPublicId(publicId);
+      if (!fileDb) throw new AppError("File not found.", 404, { logData });
+
+      // Upload new content to storage
+      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
+      const buffer = Buffer.from(content, "utf8");
+      await storageService.uploadBuffer(bucketPath, fileDb.name, buffer);
+
+      // Update file size in database
+      fileDb = await fileRepo.update(publicId, fileDb.name, buffer.length, fileDb.mime);
+
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      return fileDb;
+    } catch (err) {
+      if (err instanceof AppError && err.logData) throw err;
+      throw new AppError(`Failed to update content: ${err.message}`, 500, { logData });
     }
   }
 }

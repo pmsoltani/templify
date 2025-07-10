@@ -15,7 +15,9 @@ const getAllByUserId = async (req, res) => {
 const createSlim = async (req, res) => {
   const templateDb = await new TemplateService(getContext(req)).createSlim(
     req.body.name,
-    req.body.description
+    req.body.description,
+    req.body.htmlEntrypoint,
+    req.files
   );
   res.status(201).json({
     message: "Slim template created successfully!",
@@ -47,6 +49,14 @@ const generatePdf = async (req, res) => {
   });
 };
 
+const generatePdfPreview = async (req, res) => {
+  const tempUrl = await new PdfService(getContext(req)).generatePdfPreview(
+    req.params.templateId,
+    req.body
+  );
+  res.json({ message: "PDF preview generated successfully!", data: { tempUrl } });
+};
+
 const remove = async (req, res) => {
   await new TemplateService(getContext(req)).remove(req.params.templateId);
   res.status(204).send();
@@ -64,4 +74,35 @@ const update = async (req, res) => {
   });
 };
 
-export { create, createSlim, generatePdf, getAllByUserId, getPreview, remove, update };
+const updateInfo = async (req, res) => {
+  const templateDb = await new TemplateService(getContext(req)).updateInfo(
+    req.params.templateId,
+    req.body
+  );
+  res.json({
+    message: "Template info update successful!",
+    data: { template: publicTemplate.parse(templateDb) },
+  });
+};
+
+const getVariables = async (req, res) => {
+  const variables = await new TemplateService(getContext(req)).getVariables(
+    req.params.templateId
+  );
+  res.status(200).json({
+    message: "Template variables retrieved successfully!",
+    data: { variables },
+  });
+};
+
+export {
+  create,
+  createSlim,
+  generatePdf,
+  generatePdfPreview,
+  getAllByUserId,
+  getVariables,
+  remove,
+  update,
+  updateInfo,
+};

@@ -56,4 +56,16 @@ const update = async (req, res) => {
   });
 };
 
-export { create, getAllByTemplateId, getContent, remove, update };
+const updateContent = async (req, res) => {
+  const fileDb = await new FileService(getContext(req)).updateContent(
+    req.params.fileId,
+    req.params.templateId,
+    req.body.content
+  );
+  res.json({
+    message: "File content update successful!",
+    data: { file: publicFile.parse(fileDb) },
+  });
+};
+
+export { create, getAllByTemplateId, getContent, remove, update, updateContent };
