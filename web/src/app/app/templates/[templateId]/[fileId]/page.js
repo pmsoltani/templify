@@ -17,13 +17,14 @@ export default function FileEditorPage() {
   }, [templateId, loadTemplateFiles]);
 
   return (
-    <>
-      <div className="flex">
+    <div className="h-[calc(100vh-2.5rem)] flex overflow-hidden">
+      <div className="w-1/2 flex flex-col border-r border-gray-200">
         <FileEditor templateId={templateId} fileId={fileId} />
+      </div>
 
-        {/* Preview Panel */}
+      <div className="w-1/2 flex flex-col">
         <TemplatePreview templateId={templateId} />
       </div>
-    </>
+    </div>
   );
 }
