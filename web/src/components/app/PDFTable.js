@@ -29,8 +29,8 @@ export default function PDFTable() {
     try {
       const tempUrl = await downloadPdf(pdfId);
       window.open(tempUrl, "_blank"); // Open the PDF in a new tab
-    } catch (error) {
-      console.error("Failed to download PDF:", error);
+    } catch (err) {
+      console.error("Failed to download PDF:", err);
     } finally {
       setDownloadingIds((prev) => {
         const newSet = new Set(prev);

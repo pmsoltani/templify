@@ -52,8 +52,8 @@ export default function TemplateModal({ open, onOpenChange }) {
       const updatedTemplate = await updateTemplate(editingTemplate.id, updateData);
       setEditingTemplate(updatedTemplate);
       setEditingFields((prev) => ({ ...prev, [field]: false }));
-    } catch (error) {
-      console.error(`Failed to update ${field}:`, error);
+    } catch (err) {
+      console.error(`Failed to update ${field}:`, err);
     }
   };
 

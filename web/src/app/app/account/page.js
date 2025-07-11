@@ -51,8 +51,8 @@ export default function AccountPage() {
         const data = await apiClient("/api/me");
         setUser(data.data.user);
         setEmailForm({ ...emailForm, email: data.email });
-      } catch (error) {
-        console.error("Failed to load user data:", error);
+      } catch (err) {
+        console.error("Failed to load user data:", err);
       } finally {
         setIsLoading(false);
       }
@@ -93,8 +93,8 @@ export default function AccountPage() {
       await apiClient("/api/me", { method: "PATCH", body: updateData });
       removeAuthToken();
       window.location.href = "/";
-    } catch (error) {
-      console.error(`Failed to update ${field}:`, error);
+    } catch (err) {
+      console.error(`Failed to update ${field}:`, err);
     } finally {
       setEditingEmail(false);
     }
@@ -131,8 +131,8 @@ export default function AccountPage() {
     try {
       const data = await apiClient("/api/me/regenerate-key", { method: "POST" });
       setUser(data.data.user);
-    } catch (error) {
-      console.error("Failed to regenerate API key:", error);
+    } catch (err) {
+      console.error("Failed to regenerate API key:", err);
     } finally {
       setIsRegenerating(false);
     }

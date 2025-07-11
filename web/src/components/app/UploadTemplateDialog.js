@@ -66,8 +66,8 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
         files: null,
       });
       onOpenChange(false);
-    } catch (error) {
-      console.error("Failed to create template:", error); // TODO: Handle error properly
+    } catch (err) {
+      console.error("Failed to create template:", err); // TODO: Handle error properly
     }
   };
 

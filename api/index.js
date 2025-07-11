@@ -46,8 +46,8 @@ const runServer = async () => {
 
     process.on("SIGTERM", gracefulShutdown); // Ctrl+C in the terminal (dev)
     process.on("SIGINT", gracefulShutdown); // Graceful shutdown
-  } catch (error) {
-    console.error("Failed to start server:", error);
+  } catch (err) {
+    console.error("Failed to start server:", err);
     process.exit(1); // Exit with an error code
   }
 };

@@ -25,8 +25,8 @@ export default function ApiKeyCard({ user, isRegenerating, handleRegenerateApiKe
       await navigator.clipboard.writeText(user.apiKey);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
-    } catch (error) {
-      console.error("Failed to copy API key:", error);
+    } catch (err) {
+      console.error("Failed to copy API key:", err);
     }
   };
 
