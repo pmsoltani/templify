@@ -67,7 +67,9 @@ const uploadFiles = async (bucketPath, files) => {
       Bucket: process.env.R2_BUCKET_NAME,
       Key: `${bucketPath}${file.originalname}`,
       Body: file.path ? fs.createReadStream(file.path) : file.buffer,
-      ContentType: "application/octet-stream",
+      ContentType: file.originalname.endsWith(".pdf")
+        ? "application/pdf"
+        : "application/octet-stream",
     };
     return s3Client.send(new PutObjectCommand(uploadParams));
   });
