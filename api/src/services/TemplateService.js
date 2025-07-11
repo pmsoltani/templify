@@ -18,39 +18,6 @@ export default class TemplateService {
     return await templateRepo.getAllByUserPublicId(this.context.user.id);
   }
 
-  async create(templateName, htmlEntrypoint, description, tempZipPath) {
-    let publicId;
-    const userPublicId = this.context.user.id;
-    const logData = { userPublicId: userPublicId, action: "TEMPLATE_CREATE" };
-
-    try {
-      if (!tempZipPath) throw new AppError("Missing template file.", 400, { logData });
-
-      publicId = secretService.generatePublicId("template");
-
-      const templateDb = await templateRepo.create(
-        userPublicId,
-        templateName,
-        htmlEntrypoint || "template.html",
-        description || null,
-        publicId
-      );
-      const unzippedFiles = await storageService.unzip(tempZipPath);
-      unzippedFiles.forEach(async (fileObj) => {
-        await new FileService(this.context).create(publicId, fileObj.name, "", fileObj);
-      });
-
-      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
-      templateDb.user_public_id = templateDb.user_public_id || userPublicId;
-      return templateDb;
-    } catch (err) {
-      if (publicId) await templateRepo.remove(publicId);
-      throw new AppError(`Failed to create template: ${err.message}`, 500, { logData });
-    } finally {
-      fs.unlinkSync(tempZipPath); // Clean up the temp file
-    }
-  }
-
   async createSlim(
     templateName,
     description = null,
