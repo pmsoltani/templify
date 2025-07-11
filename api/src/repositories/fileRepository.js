@@ -40,15 +40,19 @@ const remove = async (publicId) => {
   return res.rows[0];
 };
 
-const update = async (publicId, name, size, mime) => {
+const update = async (publicId, updateData) => {
+  const updateEntries = Object.entries(updateData); // Assume updateEntries isn't empty
+  const setClause = updateEntries.map(([k], idx) => `"${k}" = $${idx + 1}`).join(", ");
+  const values = updateEntries.map(([, v]) => v);
+
   const res = await db.query(
     `
     UPDATE files
-    SET name = $2, size = $3, mime = $4
-    WHERE public_id = $1
-    RETURNING *;
+    SET ${setClause}
+    WHERE public_id = $${updateEntries.length + 1}
+    RETURNING *
     `,
-    [publicId, name, size, mime]
+    [...values, publicId]
   );
   return res.rows[0];
 };
