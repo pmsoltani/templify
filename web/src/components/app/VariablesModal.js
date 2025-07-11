@@ -71,13 +71,11 @@ export default function VariablesModal({
               <div className="max-h-60 overflow-y-auto space-y-4 p-2 h-full">
                 {variables.map((variable) => (
                   <Input
-                    key={variable.name}
-                    id={variable.name}
-                    value={localVariableValues[variable.name] || ""}
-                    onChange={(e) =>
-                      handleVariableChange(variable.name, e.target.value)
-                    }
-                    placeholder={`Enter ${variable.name}`}
+                    key={variable}
+                    id={variable}
+                    value={localVariableValues[variable] || ""}
+                    onChange={(e) => handleVariableChange(variable, e.target.value)}
+                    placeholder={`Enter ${variable}`}
                     required={variable.required}
                   />
                 ))}

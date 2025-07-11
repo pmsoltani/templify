@@ -35,9 +35,7 @@ export default function TemplatePreview({ templateId }) {
 
       // Initialize variable values with defaults
       const initialValues = {};
-      data.data.variables.forEach((variable) => {
-        initialValues[variable.name] = variable.defaultValue || "";
-      });
+      data.data.variables.forEach((variable) => (initialValues[variable] = ""));
       setVariableValues(initialValues);
     } catch (err) {
       console.error("Failed to load variables:", err);
