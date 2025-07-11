@@ -31,12 +31,13 @@ export default class PdfService {
     return pdfDb;
   }
 
-  async generatePdf(templatePublicId, jsonData = {}) {
+  async generatePdf(templatePublicId, jsonData = {}, preview = false) {
     let publicId;
     let tempDir = null;
     let page = null;
     const userPublicId = this.context.user.id;
-    const logData = { userPublicId: userPublicId, action: "PDF_GENERATE" };
+    const action = preview ? "PDF_GENERATE_PREVIEW" : "PDF_GENERATE";
+    const logData = { userPublicId: userPublicId, action: action };
 
     try {
       // Authenticate and fetch template record
@@ -50,22 +51,25 @@ export default class PdfService {
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
       tempDir = await storageService.downloadTemplate(bucketPath);
 
-      // Inject JSON data into HTML template
-      const htmlPath = path.join(tempDir, templateDb.html_entrypoint);
-      const htmlContent = fs.readFileSync(htmlPath, "utf-8");
-      const finalHtml = mustache.render(htmlContent, jsonData);
+      await this.applyMustache(tempDir, jsonData);
 
       // Generate PDF with Puppeteer
       const browser = await getBrowserInstance();
-      const page = await browser.newPage();
+      page = await browser.newPage();
 
       // Tell puppeteer to treat the temp dir as the base for linked assets (CSS, images)
+      const htmlPath = path.join(tempDir, templateDb.html_entrypoint);
       const fileUrl = pathToFileURL(htmlPath).href;
       await page.goto(fileUrl, { waitUntil: "networkidle0" });
-      await page.setContent(finalHtml, { waitUntil: "networkidle0" }); // Final HTML file
       const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
       // Upload PDF to storage and return the public URL
+      if (preview) {
+        const key = await storageService.uploadPreviewPdf(templatePublicId, pdfBuffer);
+        const tempUrl = await storageService.getPresignedUrl(key);
+        await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+        return tempUrl;
+      }
       publicId = secretService.generatePublicId("pdf");
       const key = await storageService.uploadPdf(publicId, userPublicId, pdfBuffer);
 
@@ -83,53 +87,21 @@ export default class PdfService {
     }
   }
 
-  async generatePdfPreview(templatePublicId, jsonData = {}) {
-    let tempDir = null;
-    let page = null;
-    const userPublicId = this.context.user.id;
-    const logData = { userPublicId: userPublicId, action: "PDF_GENERATE_PREVIEW" };
-
-    try {
-      // Authenticate and fetch template record
-      const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
-        templatePublicId,
-        userPublicId
-      );
-      if (!templateDb) throw new AppError("Template not found.", 404, { logData });
-
-      // Fetch template files from storage
-      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
-      tempDir = await storageService.downloadTemplate(bucketPath);
-
-      // Inject JSON data into HTML template
-      const htmlPath = path.join(tempDir, templateDb.html_entrypoint);
-      const htmlContent = fs.readFileSync(htmlPath, "utf-8");
-      const finalHtml = mustache.render(htmlContent, jsonData);
-
-      // Generate PDF preview with Puppeteer
-      const browser = await getBrowserInstance();
-      const page = await browser.newPage();
-
-      // Tell puppeteer to treat the temp dir as the base for linked assets (CSS, images)
-      const fileUrl = pathToFileURL(htmlPath).href;
-      await page.goto(fileUrl, { waitUntil: "networkidle0" });
-      await page.setContent(finalHtml, { waitUntil: "networkidle0" }); // Final HTML file
-      const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
-
-      // Upload PDF to storage and return the public URL
-      const key = await storageService.uploadPreviewPdf(templatePublicId, pdfBuffer);
-
-      const tempUrl = await storageService.getPresignedUrl(key);
-      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
-      return tempUrl;
-    } catch (err) {
-      if (err instanceof AppError && err.logData) throw err;
-      throw new AppError(`Failed to generate pdf preview: ${err.message}`, 500, {
-        logData,
+  async applyMustache(tempDir, jsonData) {
+    if (!jsonData || Object.keys(jsonData).length === 0) return;
+    const textExtensions = [".html", ".htm", ".css"];
+    const files = await fs.promises.readdir(tempDir);
+    files
+      .filter((file) => textExtensions.includes(path.extname(file).toLowerCase()))
+      .forEach(async (file) => {
+        const filePath = path.join(tempDir, file);
+        try {
+          const content = await fs.promises.readFile(filePath, "utf-8");
+          const processedContent = mustache.render(content, jsonData);
+          await fs.promises.writeFile(filePath, processedContent, "utf-8");
+        } catch (err) {
+          console.warn(`Skipping file ${filePath}: ${err.message}`);
+        }
       });
-    } finally {
-      if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
-      if (page) await page.close();
-    }
   }
 }
