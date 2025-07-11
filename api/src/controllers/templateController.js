@@ -50,9 +50,10 @@ const generatePdf = async (req, res) => {
 };
 
 const generatePdfPreview = async (req, res) => {
-  const tempUrl = await new PdfService(getContext(req)).generatePdfPreview(
+  const tempUrl = await new PdfService(getContext(req)).generatePdf(
     req.params.templateId,
-    req.body
+    req.body,
+    true
   );
   res.json({ message: "PDF preview generated successfully!", data: { tempUrl } });
 };
