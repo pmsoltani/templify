@@ -1,6 +1,5 @@
 import fs from "fs";
 import * as fileRepo from "../repositories/fileRepository.js";
-import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
 import * as secretService from "./secretService.js";
@@ -105,56 +104,6 @@ export default class FileService {
     } catch (err) {
       if (err instanceof AppError && err.logData) throw err;
       throw new AppError(`Failed to remove file: ${err.message}`, 500, { logData });
-    }
-  }
-
-  async update(publicId, templatePublicId, name, tempPath) {
-    const userPublicId = this.context.user.id;
-    const logData = { userPublicId: userPublicId, action: "FILE_UPDATE" };
-    try {
-      if (!tempPath) throw new AppError("Missing template file.", 400, { logData });
-      const size = fs.statSync(tempPath).size;
-      if (size === 0) throw new AppError("Empty template file.", 400, { logData });
-      const mime = ""; // TODO
-
-      let fileDb = await fileRepo.getByPublicId(publicId);
-      if (!fileDb) throw new AppError("File not found.", 404, { logData });
-      const previousName = fileDb.name;
-
-      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
-      await storageService.removeFiles([`${bucketPath}${fileDb.name}`]);
-
-      // Upload the new file
-      await storageService.uploadFile(name || fileDb.name, tempPath, bucketPath);
-
-      fileDb = await fileRepo.update(publicId, name || fileDb.name, size, mime);
-      fileDb.template_public_id = fileDb.template_public_id || templatePublicId;
-
-      if (name.endsWith(".html")) {
-        const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
-          templatePublicId,
-          userPublicId
-        );
-        if (!templateDb) throw new AppError("Template not found.", 404, { logData });
-
-        // Update the template entrypoint if it matches the file name
-        if (templateDb.html_entrypoint === previousName) {
-          await templateRepo.update(
-            templatePublicId,
-            templateDb.name,
-            name,
-            templateDb.description
-          );
-        }
-      }
-
-      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
-      return fileDb;
-    } catch (err) {
-      if (err instanceof AppError && err.logData) throw err;
-      throw new AppError(`Failed to update file: ${err.message}`, 500, { logData });
-    } finally {
-      fs.unlinkSync(tempPath); // Clean up the temp file
     }
   }
 
