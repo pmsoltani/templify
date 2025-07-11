@@ -7,7 +7,6 @@ import {
   authenticateTokenOrApiKey,
 } from "../middlewares/authenticate.js";
 import validate from "../middlewares/validate.js";
-import * as fileSchema from "../schemas/fileSchema.js";
 import * as templateSchema from "../schemas/templateSchema.js";
 import catchAsync from "../utils/catchAsync.js";
 import registerRoute from "../utils/registerRoute.js";
@@ -29,7 +28,7 @@ registerRoute(router, "get", "/:templateId/variables", templateController.getVar
 
 // File sub-routes
 registerRoute(router, "get", "/:templateId/files", fileController.getAllByTemplateId);
-registerRoute(router, "post", "/:templateId/files", upload.single("templateFile"), validate(fileSchema.create), fileController.create); // prettier-ignore
+registerRoute(router, "post", "/:templateId/files", upload.single("file"), fileController.create); // prettier-ignore
 registerRoute(router, "get", "/:templateId/files/:fileId/content", fileController.getContent); // prettier-ignore
 registerRoute(router, "patch", "/:templateId/files/:fileId/content", fileController.updateContent); // prettier-ignore
 registerRoute(router, "delete", "/:templateId/files/:fileId", fileController.remove);
