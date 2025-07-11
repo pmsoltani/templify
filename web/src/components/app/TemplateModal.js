@@ -11,8 +11,14 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAppContext } from "@/contexts/AppContext.js";
 import formatDate from "@/utils/formatDate";
-import { CalendarIcon, FolderOpenIcon, HashIcon, Trash2Icon } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  CalendarIcon,
+  FolderOpenIcon,
+  HashIcon,
+  PlusIcon,
+  Trash2Icon,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import EditableField from "../EditableField";
 import FileTable from "./FileTable";
 
@@ -23,12 +29,14 @@ export default function TemplateModal({ open, onOpenChange }) {
     loadTemplateFiles,
     updateTemplate,
     deleteTemplate,
+    createFile,
     isLoading,
   } = useAppContext();
 
   const [editingFields, setEditingFields] = useState({});
   const [editValues, setEditValues] = useState({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (editingTemplate && open) {
@@ -55,6 +63,20 @@ export default function TemplateModal({ open, onOpenChange }) {
       setEditingFields((prev) => ({ ...prev, [field]: false }));
     } catch (error) {
       console.error(`Failed to update ${field}:`, error);
+    }
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file || !editingTemplate) return;
+
+    try {
+      await createFile(editingTemplate.id, file);
+      await loadTemplateFiles(editingTemplate.id);
+    } catch (err) {
+      console.error("Error uploading file:", err);
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = ""; // Clear the file input
     }
   };
 
@@ -147,10 +169,30 @@ export default function TemplateModal({ open, onOpenChange }) {
 
           {/* Files Section */}
           <div>
-            <h3 className="text-lg font-medium flex items-center gap-2 mb-4">
-              <FolderOpenIcon className="h-5 w-5" />
-              Template Files
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium flex items-center gap-2">
+                <FolderOpenIcon className="h-5 w-5" />
+                Template Files
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                Add File
+              </Button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+                accept=".html,.css,.js,.txt,.json,.md"
+              />
+            </div>
+
             <FileTable />
           </div>
         </div>

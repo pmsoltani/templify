@@ -176,12 +176,15 @@ function AppProvider({ children }) {
     [currentTemplate]
   );
 
-  const createFile = useCallback(async (templateId, data) => {
+  const createFile = useCallback(async (templateId, file) => {
     setIsLoading(true);
     try {
+      const formData = new FormData();
+      formData.append("file", file);
+
       const newFile = await apiClient(`/api/templates/${templateId}/files`, {
         method: "POST",
-        body: data,
+        body: formData,
       });
 
       setCurrentFiles((prev) => [...prev, newFile.data.file]);
