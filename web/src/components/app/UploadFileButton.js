@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
-import { PlusIcon } from "lucide-react";
+import { UploadIcon } from "lucide-react";
 import { useRef } from "react";
 
-export default function AddFileButton({
+export default function UploadFileButton({
   templateId,
   onFileAdded,
   variant = "outline",
@@ -43,7 +43,7 @@ export default function AddFileButton({
         disabled={disabled}
         className={`flex items-center gap-2 ${className}`}
       >
-        {showIcon && <PlusIcon className="h-4 w-4" />}
+        {showIcon && <UploadIcon className="h-4 w-4" />}
         {text}
       </Button>
 
