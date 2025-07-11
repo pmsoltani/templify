@@ -124,12 +124,7 @@ export default class TemplateService {
       await storageService.removeTemplate(bucketPath);
       await storageService.unzipAndUpload(tempZipPath, bucketPath);
 
-      templateDb = await templateRepo.update(
-        publicId,
-        updateData.name || templateDb.name,
-        updateData.htmlEntrypoint || templateDb.html_entrypoint,
-        updateData.description || templateDb.description
-      );
+      templateDb = await templateRepo.update(publicId, updateData);
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       templateDb.user_public_id = templateDb.user_public_id || userPublicId;
       return templateDb;
@@ -150,12 +145,7 @@ export default class TemplateService {
       );
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
 
-      templateDb = await templateRepo.update(
-        publicId,
-        updateData.name || templateDb.name,
-        updateData.htmlEntrypoint || templateDb.html_entrypoint,
-        updateData.description || templateDb.description
-      );
+      templateDb = await templateRepo.update(publicId, updateData);
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       templateDb.user_public_id = templateDb.user_public_id || userPublicId;
       return templateDb;
