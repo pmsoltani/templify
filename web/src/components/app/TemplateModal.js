@@ -1,5 +1,6 @@
 "use client";
 
+import ConfirmRemovePopover from "@/components/app/ConfirmRemovePopover";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,16 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAppContext } from "@/contexts/AppContext.js";
 import formatDate from "@/utils/formatDate";
-import {
-  CalendarIcon,
-  FolderOpenIcon,
-  HashIcon,
-  PlusIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { CalendarIcon, FolderOpenIcon, HashIcon, PlusIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import EditableField from "../EditableField";
 import FileTable from "./FileTable";
@@ -28,14 +22,13 @@ export default function TemplateModal({ open, onOpenChange }) {
     setEditingTemplate,
     loadTemplateFiles,
     updateTemplate,
-    deleteTemplate,
+    removeTemplate,
     createFile,
     isLoading,
   } = useAppContext();
 
   const [editingFields, setEditingFields] = useState({});
   const [editValues, setEditValues] = useState({});
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -80,14 +73,9 @@ export default function TemplateModal({ open, onOpenChange }) {
     }
   };
 
-  const handleDeleteTemplate = async () => {
-    try {
-      await deleteTemplate(editingTemplate.id);
-      setShowDeleteConfirm(false);
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Failed to delete template:", error);
-    }
+  const handleRemoveTemplate = async () => {
+    await removeTemplate(editingTemplate.id);
+    onOpenChange(false);
   };
 
   if (!editingTemplate) return null;
@@ -199,42 +187,14 @@ export default function TemplateModal({ open, onOpenChange }) {
 
         {/* Footer Actions */}
         <div className="flex justify-between pt-4 border-t">
-          <Popover open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-            <PopoverTrigger asChild>
-              <Button variant="destructive" size="sm">
-                <Trash2Icon className="h-4 w-4 mr-2" />
-                Delete Template
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium">Delete Template</h4>
-                  <p className="text-sm text-gray-600">
-                    This action cannot be undone. This will permanently delete the
-                    template, all its files, and any PDFs generated using it.
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleDeleteTemplate}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Deleting..." : "Delete"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowDeleteConfirm(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <ConfirmRemovePopover
+            title="Remove Template"
+            message="This action cannot be undone. This will permanently remove the template, all its files, and any PDFs generated using it."
+            onConfirm={handleRemoveTemplate}
+            isLoading={isLoading}
+            triggerText="Remove Template"
+            confirmText="Remove"
+          />
 
           <Button onClick={() => onOpenChange(false)}>Close</Button>
         </div>
