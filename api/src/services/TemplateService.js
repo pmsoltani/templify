@@ -1,4 +1,4 @@
-import fs from "fs";
+import path from "path";
 import * as fileRepo from "../repositories/fileRepository.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
@@ -75,34 +75,7 @@ export default class TemplateService {
     return { id: publicId };
   }
 
-  async update(publicId, updateData, tempZipPath) {
-    const userPublicId = this.context.user.id;
-    const logData = { userPublicId: userPublicId, action: "TEMPLATE_UPDATE" };
-    try {
-      if (!tempZipPath) throw new AppError("Missing template file.", 400, { logData });
-
-      let templateDb = await templateRepo.getByPublicIdAndUserPublicId(
-        publicId,
-        userPublicId
-      );
-      if (!templateDb) throw new AppError("Template not found.", 404, { logData });
-
-      const bucketPath = storageService.getBucketPath(userPublicId, publicId);
-      await storageService.removeTemplate(bucketPath);
-      await storageService.unzipAndUpload(tempZipPath, bucketPath);
-
-      templateDb = await templateRepo.update(publicId, updateData);
-      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
-      templateDb.user_public_id = templateDb.user_public_id || userPublicId;
-      return templateDb;
-    } catch (err) {
-      throw new AppError(`Failed to update template: ${err.message}`, 500, { logData });
-    } finally {
-      fs.unlinkSync(tempZipPath); // Clean up the temp file
-    }
-  }
-
-  async updateInfo(publicId, updateData) {
+  async updateInfo(publicId, updateData, files = []) {
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "TEMPLATE_UPDATE" };
     try {
@@ -111,6 +84,11 @@ export default class TemplateService {
         userPublicId
       );
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+
+      if (files.length > 0) {
+        const fileService = new FileService(this.context);
+        files.forEach(async (file) => await fileService.create(publicId, file));
+      }
 
       templateDb = await templateRepo.update(publicId, updateData);
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
@@ -122,19 +100,9 @@ export default class TemplateService {
   }
 
   async getVariables(publicId) {
-    // function to get all mustache variables from a template
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "TEMPLATE_GET_VARIABLES" };
-    const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
-      publicId,
-      userPublicId
-    );
-    if (!templateDb) throw new AppError("Template not found.", 404, { logData });
-  }
-
-  async getVariables(publicId) {
-    const userPublicId = this.context.user.id;
-    const logData = { userPublicId: userPublicId, action: "TEMPLATE_GET_VARIABLES" };
+    const bucketPath = storageService.getBucketPath(userPublicId, publicId);
 
     try {
       const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
@@ -143,37 +111,24 @@ export default class TemplateService {
       );
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
 
-      // Get all HTML files for this template
       const filesDb = await fileRepo.getAllByTemplatePublicId(publicId);
-      const htmlFiles = filesDb.filter((f) => f.name.toLowerCase().endsWith(".html"));
-
-      if (htmlFiles.length === 0) {
+      if (filesDb.length === 0) {
         throw new AppError("No HTML files found in template.", 404, { logData });
       }
 
-      const bucketPath = storageService.getBucketPath(userPublicId, publicId);
+      const textExtensions = [".html", ".htm", ".css"];
       const allVariables = new Set();
+      for (const file of filesDb) {
+        if (!textExtensions.includes(path.extname(file.name).toLowerCase())) continue;
+        const fileObj = await storageService.getFileObject(`${bucketPath}${file.name}`);
+        const fileContent = await fileObj.Body.transformToString();
 
-      // Process each HTML file
-      for (const file of htmlFiles) {
-        const objectKey = `${bucketPath}${file.name}`;
-        const fileContent = await storageService.getFile(objectKey);
-        const htmlContent = await fileContent.Body.transformToString();
-
-        // Extract variables using regex (mustache format: {{variable}})
-        const variables = this.extractMustacheVariables(htmlContent);
+        const variables = this.extractMustacheVariables(fileContent);
         variables.forEach((variable) => allVariables.add(variable));
       }
 
-      // Convert Set to Array and create variable objects
-      const variableList = Array.from(allVariables).map((variable) => ({
-        name: variable,
-        required: true, // Default to required
-        defaultValue: null,
-      }));
-
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
-      return variableList;
+      return Array.from(allVariables);
     } catch (err) {
       if (err instanceof AppError && err.logData) throw err;
       throw new AppError(`Failed to get template variables: ${err.message}`, 500, {
