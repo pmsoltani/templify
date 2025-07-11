@@ -34,20 +34,20 @@ export default class FileService {
       throw new AppError("Failed to retrieve file content.", 500, { logData });
     }
   }
-
   async create(templatePublicId, file) {
     let publicId;
     let isUploaded = false;
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "FILE_CREATE" };
+    const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
 
     try {
       if (!file || !file.path) throw new AppError("Missing file.", 400, { logData });
       const size = file.size ? file.size : fs.statSync(file.path).size;
-      if (size === 0) throw new AppError("Empty template file.", 400, { logData });
+      // if (size === 0) throw new AppError("Empty template file.", 400, { logData });
       const filesDb = await fileRepo.getAllByTemplatePublicId(templatePublicId);
       if (filesDb.some((fileDb) => fileDb.name === file.originalname)) {
-        throw new AppError("File with this name already exists.", 409, { logData });
+        throw new AppError("Template already has this file.", 409, { logData });
       }
 
       publicId = secretService.generatePublicId("file");
@@ -56,25 +56,18 @@ export default class FileService {
         publicId,
         templatePublicId,
         file.originalname,
-        file.size,
-        file.mime || ""
+        size,
+        file.mimetype || ""
       );
       fileDb.template_public_id = fileDb.template_public_id || templatePublicId;
 
-      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
-      await storageService.uploadFile(
-        bucketPath,
-        file.originalname,
-        file.path,
-        file?.data
-      );
+      await storageService.uploadFiles(bucketPath, [file]);
       isUploaded = true;
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return fileDb;
     } catch (err) {
       if (isUploaded) {
-        const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
         await storageService.removeFiles([`${bucketPath}${file.originalname}`]);
       }
       if (publicId) await fileRepo.remove(publicId);
@@ -88,13 +81,13 @@ export default class FileService {
   async remove(publicId, templatePublicId) {
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "FILE_REMOVE" };
+    const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
 
     try {
       const fileDb = await fileRepo.getByPublicId(publicId);
       if (!fileDb) throw new AppError("File not found.", 404, { logData });
 
-      // Remove all PDFs associated with this template
-      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
+      // Remove the file from the storage
       await storageService.removeFiles([`${bucketPath}${fileDb.name}`]);
 
       // Remove the file record from the database
@@ -121,7 +114,8 @@ export default class FileService {
       await storageService.uploadBuffer(bucketPath, fileDb.name, buffer);
 
       // Update file size in database
-      fileDb = await fileRepo.update(publicId, fileDb.name, buffer.length, fileDb.mime);
+      const updateData = { name: file.originalname, size: buffer.length };
+      fileDb = await fileRepo.update(publicId, updateData);
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return fileDb;
