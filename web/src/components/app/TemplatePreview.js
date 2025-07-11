@@ -23,7 +23,7 @@ export default function TemplatePreview({ templateId }) {
   // Load variables when template changes
   useEffect(() => {
     if (currentTemplate && templateId) loadVariables();
-  }, [currentTemplate, templateId]);
+  }, [templateId]);
 
   const loadVariables = async () => {
     setIsLoadingVariables(true);
