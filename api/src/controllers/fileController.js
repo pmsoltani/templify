@@ -13,10 +13,8 @@ const getAllByTemplateId = async (req, res) => {
 };
 
 const getContent = async (req, res) => {
-  const content = await new FileService(getContext(req)).getContent(
-    req.params.fileId,
-    req.params.templateId
-  );
+  const { fileId, templateId } = req.params;
+  const content = await new FileService(getContext(req)).getContent(fileId, templateId);
   res.json({
     message: "File content retrieved successfully!",
     data: { content },
@@ -24,11 +22,8 @@ const getContent = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const fileDb = await new FileService(getContext(req)).create(
-    req.params.templateId,
-    req.body.name || req.file?.originalname,
-    req.file?.path
-  );
+  const { templateId } = req.params;
+  const fileDb = await new FileService(getContext(req)).create(templateId, req.file);
   res.status(201).json({
     message: "File created successfully!",
     data: { file: publicFile.parse(fileDb) },
@@ -36,10 +31,8 @@ const create = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  await new FileService(getContext(req)).remove(
-    req.params.fileId,
-    req.params.templateId
-  );
+  const { fileId, templateId } = req.params;
+  await new FileService(getContext(req)).remove(fileId, templateId);
   res.status(204).send();
 };
 
