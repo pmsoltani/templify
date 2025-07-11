@@ -65,13 +65,18 @@ export default class PdfService {
 
       // Upload PDF to storage and return the public URL
       if (preview) {
-        const key = await storageService.uploadPreviewPdf(templatePublicId, pdfBuffer);
-        const tempUrl = await storageService.getPresignedUrl(key);
+        const pdfBucketPath = `previews/${templatePublicId}/`;
+        const name = `${Date.now()}.pdf`;
+        await storageService.uploadBuffer(pdfBucketPath, name, pdfBuffer);
+        const tempUrl = await storageService.getPresignedUrl(`${pdfBucketPath}${name}`);
         await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
         return tempUrl;
       }
       publicId = secretService.generatePublicId("pdf");
-      const key = await storageService.uploadPdf(publicId, userPublicId, pdfBuffer);
+      const pdfBucketPath = `userFiles/${userPublicId}/pdfs/`;
+      const name = `${publicId}.pdf`;
+      const key = `${pdfBucketPath}${name}`;
+      await storageService.uploadBuffer(pdfBucketPath, name, pdfBuffer);
 
       // Create the PDF record and log the event
       const pdfDb = await pdfRepo.create(userPublicId, templatePublicId, key, publicId);
