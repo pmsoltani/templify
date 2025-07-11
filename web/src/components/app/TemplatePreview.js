@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
 import apiClient from "@/lib/apiClient";
-import { DownloadIcon, FileIcon, RefreshCwIcon, VariableIcon } from "lucide-react";
+import { FileIcon, RefreshCwIcon, VariableIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import VariablesModal from "./VariablesModal";
 
@@ -82,40 +82,6 @@ export default function TemplatePreview({ templateId }) {
     await loadVariables(); // Reload variables to capture any recent changes
   };
 
-  const downloadPdf = async () => {
-    if (!pdfUrl) return await generatePreview();
-    try {
-      let downloadUrl = pdfUrl;
-
-      // If pdfUrl is a blob URL, use it directly
-      // If it's a pre-signed URL, fetch it first for proper download naming
-      if (pdfUrl.startsWith("blob:")) {
-        downloadUrl = pdfUrl;
-      } else {
-        // Fetch from pre-signed URL and create blob for proper filename
-        const response = await fetch(pdfUrl);
-        const blob = await response.blob();
-        downloadUrl = URL.createObjectURL(blob);
-      }
-
-      // Create download link
-      const a = document.createElement("a");
-      a.href = downloadUrl;
-      a.download = `${currentTemplate?.name || "template"}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      // Clean up if we created a new blob URL
-      if (downloadUrl !== pdfUrl) {
-        URL.revokeObjectURL(downloadUrl);
-      }
-    } catch (err) {
-      console.error("Failed to download PDF:", err);
-      setError("Failed to download PDF. Please try again.");
-    }
-  };
-
   // Subscribe to file save events to auto-regenerate preview
   useEffect(() => {
     const handleFileSaved = (savedTemplateId, fileId, content) => {
@@ -129,11 +95,7 @@ export default function TemplatePreview({ templateId }) {
 
   // Cleanup blob URL on unmount
   useEffect(() => {
-    return () => {
-      if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl);
-      }
-    };
+    return () => pdfUrl && URL.revokeObjectURL(pdfUrl);
   }, [pdfUrl]);
 
   return (
@@ -184,16 +146,6 @@ export default function TemplatePreview({ templateId }) {
                 <RefreshCwIcon className="h-4 w-4" />
               )}
               Refresh
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={downloadPdf}
-              disabled={isGenerating || isLoadingVariables}
-              className="flex items-center gap-2"
-            >
-              <DownloadIcon className="h-4 w-4" />
-              Download
             </Button>
           </div>
         </div>
