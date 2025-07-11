@@ -5,6 +5,7 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import { FileIcon, RotateCcwIcon, SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import AddFileButton from "./AddFileButton";
 
 // Dynamically import Monaco Editor to avoid SSR issues
 const Editor = dynamic(() => import("@monaco-editor/react"), {
@@ -52,7 +53,6 @@ export default function FileEditor({ templateId, fileId }) {
     setEditorContent(value || "");
     setHasUnsavedChanges(value !== fileContent);
 
-    // Auto-save after 2 seconds of inactivity
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -61,7 +61,7 @@ export default function FileEditor({ templateId, fileId }) {
       if (value !== fileContent) {
         handleSave(value);
       }
-    }, 2000);
+    }, 10000); // Auto-save after 10 seconds of inactivity
   };
 
   const handleSave = async (content = editorContent) => {
@@ -139,6 +139,7 @@ export default function FileEditor({ templateId, fileId }) {
           )}
         </div>
         <div className="flex gap-2">
+          <AddFileButton templateId={templateId} />
           <Button
             variant="outline"
             size="sm"

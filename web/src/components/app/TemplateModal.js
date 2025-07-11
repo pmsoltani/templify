@@ -1,5 +1,6 @@
 "use client";
 
+import AddFileButton from "@/components/app/AddFileButton";
 import ConfirmRemovePopover from "@/components/app/ConfirmRemovePopover";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,8 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { useAppContext } from "@/contexts/AppContext.js";
 import formatDate from "@/utils/formatDate";
-import { CalendarIcon, FolderOpenIcon, HashIcon, PlusIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { CalendarIcon, FolderOpenIcon, HashIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import EditableField from "../EditableField";
 import FileTable from "./FileTable";
 
@@ -23,13 +24,11 @@ export default function TemplateModal({ open, onOpenChange }) {
     loadTemplateFiles,
     updateTemplate,
     removeTemplate,
-    createFile,
     isLoading,
   } = useAppContext();
 
   const [editingFields, setEditingFields] = useState({});
   const [editValues, setEditValues] = useState({});
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (editingTemplate && open) {
@@ -55,20 +54,6 @@ export default function TemplateModal({ open, onOpenChange }) {
       setEditingFields((prev) => ({ ...prev, [field]: false }));
     } catch (error) {
       console.error(`Failed to update ${field}:`, error);
-    }
-  };
-
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file || !editingTemplate) return;
-
-    try {
-      await createFile(editingTemplate.id, file);
-      await loadTemplateFiles(editingTemplate.id);
-    } catch (err) {
-      console.error("Error uploading file:", err);
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = ""; // Clear the file input
     }
   };
 
@@ -161,23 +146,7 @@ export default function TemplateModal({ open, onOpenChange }) {
                 <FolderOpenIcon className="h-5 w-5" />
                 Template Files
               </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2"
-              >
-                <PlusIcon className="h-4 w-4" />
-                Add File
-              </Button>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
-                accept=".html,.css,.js,.txt,.json,.md"
-              />
+              <AddFileButton templateId={editingTemplate.id} text="Add File" />
             </div>
 
             <FileTable />
