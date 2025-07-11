@@ -153,7 +153,7 @@ function AppProvider({ children }) {
     [currentTemplate]
   );
 
-  const deleteTemplate = useCallback(
+  const removeTemplate = useCallback(
     async (templateId) => {
       setIsLoading(true);
       try {
@@ -167,7 +167,7 @@ function AppProvider({ children }) {
           setFileContent("");
         }
       } catch (error) {
-        console.error("Failed to delete template:", error); // TODO: Handle errors appropriately
+        console.error("Failed to remove template:", error); // TODO: Handle errors appropriately
         throw error;
       } finally {
         setIsLoading(false);
@@ -213,7 +213,7 @@ function AppProvider({ children }) {
     }
   }, []);
 
-  const deleteFile = useCallback(
+  const removeeFile = useCallback(
     async (templateId, fileId) => {
       setIsLoading(true);
       try {
@@ -227,7 +227,7 @@ function AppProvider({ children }) {
           setFileContent("");
         }
       } catch (error) {
-        console.error("Failed to delete file:", error); // TODO: Handle errors appropriately
+        console.error("Failed to remove file:", error); // TODO: Handle errors appropriately
         throw error;
       } finally {
         setIsLoading(false);
@@ -269,10 +269,10 @@ function AppProvider({ children }) {
     loadFileContent,
     createTemplate,
     updateTemplate,
-    deleteTemplate,
+    removeTemplate,
     createFile,
     updateFileContent,
-    deleteFile,
+    removeeFile,
     downloadPdf,
 
     // UI State
