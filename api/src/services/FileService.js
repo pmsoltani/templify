@@ -44,7 +44,6 @@ export default class FileService {
     try {
       if (!file || !file.path) throw new AppError("Missing file.", 400, { logData });
       const size = file.size ? file.size : fs.statSync(file.path).size;
-      // if (size === 0) throw new AppError("Empty template file.", 400, { logData });
       const filesDb = await fileRepo.getAllByTemplatePublicId(templatePublicId);
       if (filesDb.some((fileDb) => fileDb.name === file.originalname)) {
         throw new AppError("Template already has this file.", 409, { logData });
@@ -114,7 +113,7 @@ export default class FileService {
       await storageService.uploadBuffer(bucketPath, fileDb.name, buffer);
 
       // Update file size in database
-      const updateData = { name: file.originalname, size: buffer.length };
+      const updateData = { size: buffer.length };
       fileDb = await fileRepo.update(publicId, updateData);
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
