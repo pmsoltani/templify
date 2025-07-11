@@ -55,6 +55,10 @@ const remove = async (publicId) => {
 };
 
 const update = async (publicId, updateData) => {
+  if (updateData.hasOwnProperty("htmlEntrypoint")) {
+    updateData["html_entrypoint"] = updateData["htmlEntrypoint"];
+    delete updateData["htmlEntrypoint"];
+  }
   const updateEntries = Object.entries(updateData); // Assume updateEntries isn't empty
   const setClause = updateEntries.map(([k], idx) => `"${k}" = $${idx + 1}`).join(", ");
   const values = updateEntries.map(([, v]) => v);
