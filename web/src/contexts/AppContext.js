@@ -33,6 +33,16 @@ function AppProvider({ children }) {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
 
+  // Callback subscriptions for file save events
+  const [fileSaveCallbacks, setFileSaveCallbacks] = useState([]);
+
+  // Subscription system for file save events
+  const subscribeToFileSaves = useCallback((callback) => {
+    setFileSaveCallbacks((prev) => [...prev, callback]);
+    // Return unsubscribe function
+    return () => setFileSaveCallbacks((prev) => prev.filter((cb) => cb !== callback));
+  }, []);
+
   // API Actions
   const loadTemplates = useCallback(async () => {
     setIsTemplatesLoading(true);
@@ -197,28 +207,33 @@ function AppProvider({ children }) {
     }
   }, []);
 
-  const updateFileContent = useCallback(async (templateId, fileId, content) => {
-    setIsLoading(true);
-    try {
-      await apiClient(`/api/templates/${templateId}/files/${fileId}/content`, {
-        method: "PATCH",
-        body: { content },
-      });
-      setFileContent(content);
+  const updateFileContent = useCallback(
+    async (templateId, fileId, content) => {
+      setIsLoading(true);
+      try {
+        await apiClient(`/api/templates/${templateId}/files/${fileId}/content`, {
+          method: "PATCH",
+          body: { content },
+        });
+        setFileContent(content);
 
-      // Emit custom event to notify other components that file was saved
-      window.dispatchEvent(
-        new CustomEvent("fileSaved", {
-          detail: { templateId, fileId, content },
-        })
-      );
-    } catch (err) {
-      console.error("Failed to update file content:", err); // TODO: Handle errors appropriately
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        // Notify all subscribers that file was saved
+        fileSaveCallbacks.forEach((callback) => {
+          try {
+            callback(templateId, fileId, content);
+          } catch (err) {
+            console.error("Error in file save callback:", err);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to update file content:", err); // TODO: Handle errors appropriately
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fileSaveCallbacks]
+  );
 
   const removeFile = useCallback(
     async (templateId, fileId) => {
@@ -281,6 +296,9 @@ function AppProvider({ children }) {
     updateFileContent,
     removeFile,
     downloadPdf,
+
+    // Event subscriptions
+    subscribeToFileSaves,
 
     // UI State
     selectedTemplateId,

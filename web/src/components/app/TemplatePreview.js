@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import VariablesModal from "./VariablesModal";
 
 export default function TemplatePreview({ templateId }) {
-  const { currentTemplate } = useAppContext();
+  const { currentTemplate, subscribeToFileSaves } = useAppContext();
   const [pdfUrl, setPdfUrl] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
@@ -116,16 +116,16 @@ export default function TemplatePreview({ templateId }) {
     }
   };
 
-  // Listen for file save events to auto-regenerate preview
+  // Subscribe to file save events to auto-regenerate preview
   useEffect(() => {
-    const handleFileSaved = (event) => {
+    const handleFileSaved = (savedTemplateId, fileId, content) => {
       // Only regenerate if it's for the current template and we're not already generating
-      if (event.detail.templateId === templateId && !isGenerating) generatePreview();
+      if (savedTemplateId === templateId && !isGenerating) generatePreview();
     };
 
-    window.addEventListener("fileSaved", handleFileSaved);
-    return () => window.removeEventListener("fileSaved", handleFileSaved);
-  }, [templateId, isGenerating, generatePreview]);
+    const unsubscribe = subscribeToFileSaves(handleFileSaved);
+    return unsubscribe;
+  }, [templateId, isGenerating, generatePreview, subscribeToFileSaves]);
 
   // Cleanup blob URL on unmount
   useEffect(() => {
