@@ -73,10 +73,23 @@ export default function FileEditor({ templateId, fileId }) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
-    } catch (error) {
-      console.error("Failed to save file:", error);
+    } catch (err) {
+      console.error("Failed to save file:", err);
     }
   };
+
+  // Handle Ctrl+S for explicit save
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        if (hasUnsavedChanges && !isLoading) handleSave();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [hasUnsavedChanges, isLoading, editorContent]);
 
   const handleRevert = () => {
     setEditorContent(fileContent);

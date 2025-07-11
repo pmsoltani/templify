@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
 import apiClient from "@/lib/apiClient";
 import { DownloadIcon, FileIcon, RefreshCwIcon, VariableIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import VariablesModal from "./VariablesModal";
 
 export default function TemplatePreview({ templateId }) {
@@ -47,25 +47,28 @@ export default function TemplatePreview({ templateId }) {
     }
   };
 
-  const generatePreview = async (customVariables = null) => {
-    setIsGenerating(true);
-    setError(null);
+  const generatePreview = useCallback(
+    async (customVariables = null) => {
+      setIsGenerating(true);
+      setError(null);
 
-    try {
-      const data = await apiClient(`/api/templates/${templateId}/preview`, {
-        method: "POST",
-        body: customVariables || variableValues || {},
-      });
+      try {
+        const data = await apiClient(`/api/templates/${templateId}/preview`, {
+          method: "POST",
+          body: customVariables || variableValues || {},
+        });
 
-      setPdfUrl(data.data.tempUrl);
-      if (isVariablesModalOpen) setIsVariablesModalOpen(false);
-    } catch (err) {
-      console.error("Failed to generate PDF preview:", err);
-      setError("Failed to generate PDF preview. Please try again.");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+        setPdfUrl(data.data.tempUrl);
+        if (isVariablesModalOpen) setIsVariablesModalOpen(false);
+      } catch (err) {
+        console.error("Failed to generate PDF preview:", err);
+        setError("Failed to generate PDF preview. Please try again.");
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [templateId, variableValues, isVariablesModalOpen]
+  );
 
   const handleVariablesUpdate = (newVariableValues) => {
     setVariableValues(newVariableValues);
@@ -113,18 +116,16 @@ export default function TemplatePreview({ templateId }) {
     }
   };
 
-  // Handle Ctrl+S for refresh
+  // Listen for file save events to auto-regenerate preview
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-        if (!isGenerating) handleRefreshPreview();
-      }
+    const handleFileSaved = (event) => {
+      // Only regenerate if it's for the current template and we're not already generating
+      if (event.detail.templateId === templateId && !isGenerating) generatePreview();
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isGenerating]);
+    window.addEventListener("fileSaved", handleFileSaved);
+    return () => window.removeEventListener("fileSaved", handleFileSaved);
+  }, [templateId, isGenerating, generatePreview]);
 
   // Cleanup blob URL on unmount
   useEffect(() => {
@@ -221,8 +222,10 @@ export default function TemplatePreview({ templateId }) {
             <div className="flex items-center justify-center h-full text-gray-500">
               <div className="text-center">
                 <FileIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Click "Refresh Preview" to generate PDF preview</p>
-                <p className="text-xs mt-2">Or press Ctrl+S</p>
+                <p>Click "Refresh" to generate PDF preview</p>
+                <p className="text-xs mt-2">
+                  Preview will auto-update when you save files (Ctrl+S)
+                </p>
               </div>
             </div>
           )}

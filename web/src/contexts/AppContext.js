@@ -39,8 +39,8 @@ function AppProvider({ children }) {
     try {
       const data = await apiClient("/api/templates/");
       setTemplates(data.data.templates);
-    } catch (error) {
-      console.error("Failed to load templates:", error); // TODO: Handle errors appropriately
+    } catch (err) {
+      console.error("Failed to load templates:", err); // TODO: Handle errors appropriately
     } finally {
       setIsTemplatesLoading(false);
     }
@@ -55,8 +55,8 @@ function AppProvider({ children }) {
     try {
       const data = await apiClient("/api/pdfs/");
       setPdfs(data.data.pdfs);
-    } catch (error) {
-      console.error("Failed to load PDFs:", error); // TODO: Handle errors appropriately
+    } catch (err) {
+      console.error("Failed to load PDFs:", err); // TODO: Handle errors appropriately
     } finally {
       setIsPdfsLoading(false);
     }
@@ -71,8 +71,8 @@ function AppProvider({ children }) {
 
         const template = templates.find((t) => t.id === templateId);
         if (template) setCurrentTemplate(template);
-      } catch (error) {
-        console.error("Failed to load template files:", error); // TODO: Handle errors appropriately
+      } catch (err) {
+        console.error("Failed to load template files:", err); // TODO: Handle errors appropriately
       } finally {
         setIsFilesLoading(false);
       }
@@ -92,8 +92,8 @@ function AppProvider({ children }) {
         // Update current file
         const file = currentFiles.find((f) => f.id === fileId);
         if (file) setCurrentFile(file);
-      } catch (error) {
-        console.error("Failed to load file content:", error); // TODO: Handle errors appropriately
+      } catch (err) {
+        console.error("Failed to load file content:", err); // TODO: Handle errors appropriately
       } finally {
         setIsFileContentLoading(false);
       }
@@ -118,9 +118,9 @@ function AppProvider({ children }) {
 
       setTemplates((prev) => [...prev, newTemplate.data.template]);
       return newTemplate.data.template;
-    } catch (error) {
-      console.error("Failed to create template:", error); // TODO: Handle errors appropriately
-      throw error;
+    } catch (err) {
+      console.error("Failed to create template:", err); // TODO: Handle errors appropriately
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -143,9 +143,9 @@ function AppProvider({ children }) {
         }
 
         return updatedTemplate.data.template;
-      } catch (error) {
-        console.error("Failed to update template:", error); // TODO: Handle errors appropriately
-        throw error;
+      } catch (err) {
+        console.error("Failed to update template:", err); // TODO: Handle errors appropriately
+        throw err;
       } finally {
         setIsLoading(false);
       }
@@ -166,9 +166,9 @@ function AppProvider({ children }) {
           setCurrentFile(null);
           setFileContent("");
         }
-      } catch (error) {
-        console.error("Failed to remove template:", error); // TODO: Handle errors appropriately
-        throw error;
+      } catch (err) {
+        console.error("Failed to remove template:", err); // TODO: Handle errors appropriately
+        throw err;
       } finally {
         setIsLoading(false);
       }
@@ -189,9 +189,9 @@ function AppProvider({ children }) {
 
       setCurrentFiles((prev) => [...prev, newFile.data.file]);
       return newFile.data.file;
-    } catch (error) {
-      console.error("Failed to create file:", error); // TODO: Handle errors appropriately
-      throw error;
+    } catch (err) {
+      console.error("Failed to create file:", err); // TODO: Handle errors appropriately
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -205,15 +205,22 @@ function AppProvider({ children }) {
         body: { content },
       });
       setFileContent(content);
-    } catch (error) {
-      console.error("Failed to update file content:", error); // TODO: Handle errors appropriately
-      throw error;
+
+      // Emit custom event to notify other components that file was saved
+      window.dispatchEvent(
+        new CustomEvent("fileSaved", {
+          detail: { templateId, fileId, content },
+        })
+      );
+    } catch (err) {
+      console.error("Failed to update file content:", err); // TODO: Handle errors appropriately
+      throw err;
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const removeeFile = useCallback(
+  const removeFile = useCallback(
     async (templateId, fileId) => {
       setIsLoading(true);
       try {
@@ -226,9 +233,9 @@ function AppProvider({ children }) {
           setCurrentFile(null);
           setFileContent("");
         }
-      } catch (error) {
-        console.error("Failed to remove file:", error); // TODO: Handle errors appropriately
-        throw error;
+      } catch (err) {
+        console.error("Failed to remove file:", err); // TODO: Handle errors appropriately
+        throw err;
       } finally {
         setIsLoading(false);
       }
@@ -240,9 +247,9 @@ function AppProvider({ children }) {
     try {
       const data = await apiClient(`/api/pdfs/${pdfId}/download`);
       return data.data.pdf.tempUrl;
-    } catch (error) {
-      console.error("Failed to get PDF download URL:", error);
-      throw error;
+    } catch (err) {
+      console.error("Failed to get PDF download URL:", err);
+      throw err;
     }
   }, []);
 
@@ -272,7 +279,7 @@ function AppProvider({ children }) {
     removeTemplate,
     createFile,
     updateFileContent,
-    removeeFile,
+    removeFile,
     downloadPdf,
 
     // UI State
