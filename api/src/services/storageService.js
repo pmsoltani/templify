@@ -99,24 +99,19 @@ const uploadPdf = async (publicId, userPublicId, pdfBuffer) => {
   return pdfKey;
 };
 
-const removeTemplate = async (bucketPath) => {
-  const listParams = { Bucket: process.env.R2_BUCKET_NAME, Prefix: bucketPath };
-  const listObjectsResult = await s3Client.send(new ListObjectsV2Command(listParams));
-  if (!listObjectsResult.Contents || listObjectsResult.Contents.length === 0) return;
-
-  const removePromises = listObjectsResult.Contents.map((object) => {
-    const removeParams = { Bucket: process.env.R2_BUCKET_NAME, Key: object.Key };
-    return s3Client.send(new DeleteObjectCommand(removeParams));
-  });
-  await Promise.all(removePromises);
-};
-
 const removeFiles = async (fileKeys) => {
   const removePromises = fileKeys.map((key) => {
     const removeParams = { Bucket: process.env.R2_BUCKET_NAME, Key: key };
     return s3Client.send(new DeleteObjectCommand(removeParams));
   });
   await Promise.all(removePromises);
+};
+
+const removeTemplate = async (bucketPath) => {
+  const listParams = { Bucket: process.env.R2_BUCKET_NAME, Prefix: bucketPath };
+  const listObjectsResult = await s3Client.send(new ListObjectsV2Command(listParams));
+  listObjectsResult.Contents = listObjectsResult.Contents || [];
+  await removeFiles(listObjectsResult.Contents.map((object) => object.Key));
 };
 
 export {
