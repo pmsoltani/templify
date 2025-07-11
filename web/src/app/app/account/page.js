@@ -90,7 +90,6 @@ export default function AccountPage() {
   const saveField = async (field) => {
     try {
       const updateData = { [field]: editValues[field] };
-      console.log("22222", updateData);
       await apiClient("/api/me", { method: "PATCH", body: updateData });
       removeAuthToken();
       window.location.href = "/";

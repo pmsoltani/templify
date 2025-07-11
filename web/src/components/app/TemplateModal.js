@@ -50,7 +50,6 @@ export default function TemplateModal({ open, onOpenChange }) {
   const saveField = async (field) => {
     try {
       const updateData = { [field]: editValues[field] };
-      console.log("Saving", field, updateData);
       const updatedTemplate = await updateTemplate(editingTemplate.id, updateData);
       setEditingTemplate(updatedTemplate);
       setEditingFields((prev) => ({ ...prev, [field]: false }));
