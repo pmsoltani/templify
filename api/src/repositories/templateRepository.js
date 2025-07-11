@@ -54,15 +54,19 @@ const remove = async (publicId) => {
   return res.rows[0];
 };
 
-const update = async (publicId, name, htmlEntrypoint, description) => {
+const update = async (publicId, updateData) => {
+  const updateEntries = Object.entries(updateData); // Assume updateEntries isn't empty
+  const setClause = updateEntries.map(([k], idx) => `"${k}" = $${idx + 1}`).join(", ");
+  const values = updateEntries.map(([, v]) => v);
+
   const res = await db.query(
     `
     UPDATE templates
-    SET name = $1, html_entrypoint = $2, description = $3
-    WHERE public_id = $4
-    RETURNING *;
+    SET ${setClause}
+    WHERE public_id = $${updateEntries.length + 1}
+    RETURNING *
     `,
-    [name, htmlEntrypoint, description, publicId]
+    [...values, publicId]
   );
   return res.rows[0];
 };
