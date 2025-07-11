@@ -35,17 +35,22 @@ const unzip = async (zipFilePath) => {
     .map((e) => ({ name: e.name, size: e.header.size, data: e.getData() }));
 };
 
-const uploadFiles = async (files, bucketPath) => {
+const uploadFiles = async (bucketPath, files) => {
   const uploadPromises = files.map((file) => {
     const uploadParams = {
       Bucket: process.env.R2_BUCKET_NAME,
-      Key: `${bucketPath}${file.name}`,
-      Body: file.data,
+      Key: `${bucketPath}${file.originalname}`,
+      Body: file.path ? fs.createReadStream(file.path) : file.buffer,
       ContentType: "application/octet-stream",
     };
     return s3Client.send(new PutObjectCommand(uploadParams));
   });
   await Promise.all(uploadPromises);
+};
+
+const uploadBuffer = async (bucketPath, name, buffer) => {
+  const file = { originalname: name, buffer: buffer, path: null };
+  await uploadFiles(bucketPath, [file]);
 };
 
 const downloadTemplate = async (bucketPath) => {
@@ -65,23 +70,6 @@ const downloadTemplate = async (bucketPath) => {
     fs.writeFileSync(localPath, await getObjectResult.Body.transformToByteArray());
   }
   return tempDir;
-};
-
-const uploadFile = async (bucketPath, name, tempPath, fileData) => {
-  const key = `${bucketPath}${name}`;
-  const uploadParams = {
-    Bucket: process.env.R2_BUCKET_NAME,
-    Key: key,
-    Body: tempPath ? fs.createReadStream(tempPath) : fileData,
-    ContentType: "application/octet-stream",
-  };
-
-  await s3Client.send(new PutObjectCommand(uploadParams));
-  return key;
-};
-
-const uploadBuffer = async (bucketPath, name, buffer) => {
-  return await uploadFile(bucketPath, name, null, buffer);
 };
 
 const uploadPreviewPdf = async (templatePublicId, pdfBuffer) => {
@@ -140,7 +128,6 @@ export {
   removeTemplate,
   unzip,
   uploadBuffer,
-  uploadFile,
   uploadFiles,
   uploadPdf,
   uploadPreviewPdf,
