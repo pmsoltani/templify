@@ -43,19 +43,6 @@ const remove = async (req, res) => {
   res.status(204).send();
 };
 
-const update = async (req, res) => {
-  const fileDb = await new FileService(getContext(req)).update(
-    req.params.fileId,
-    req.params.templateId,
-    req.body.name,
-    req.file?.path
-  );
-  res.json({
-    message: "File update successful!",
-    data: { file: publicFile.parse(fileDb) },
-  });
-};
-
 const updateContent = async (req, res) => {
   const fileDb = await new FileService(getContext(req)).updateContent(
     req.params.fileId,
@@ -68,4 +55,4 @@ const updateContent = async (req, res) => {
   });
 };
 
-export { create, getAllByTemplateId, getContent, remove, update, updateContent };
+export { create, getAllByTemplateId, getContent, remove, updateContent };
