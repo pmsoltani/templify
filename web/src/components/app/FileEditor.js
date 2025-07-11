@@ -5,7 +5,7 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import { FileIcon, RotateCcwIcon, SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import AddFileButton from "./AddFileButton";
+import UploadFileButton from "./UploadFileButton";
 
 // Dynamically import Monaco Editor to avoid SSR issues
 const Editor = dynamic(() => import("@monaco-editor/react"), {
@@ -152,7 +152,7 @@ export default function FileEditor({ templateId, fileId }) {
           )}
         </div>
         <div className="flex gap-2">
-          <AddFileButton templateId={templateId} />
+          <UploadFileButton templateId={templateId} />
           <Button
             variant="outline"
             size="sm"

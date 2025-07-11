@@ -10,7 +10,7 @@ export default function UploadFileButton({
   onFileAdded,
   variant = "outline",
   size = "sm",
-  text = "Add File",
+  text = "Upload File",
   showIcon = true,
   accept = ".html,.css,.js,.txt,.json,.md",
   disabled = false,

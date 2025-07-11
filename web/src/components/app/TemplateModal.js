@@ -1,7 +1,7 @@
 "use client";
 
-import AddFileButton from "@/components/app/AddFileButton";
 import ConfirmRemovePopover from "@/components/app/ConfirmRemovePopover";
+import UploadFileButton from "@/components/app/UploadFileButton";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -146,7 +146,7 @@ export default function TemplateModal({ open, onOpenChange }) {
                 <FolderOpenIcon className="h-5 w-5" />
                 Template Files
               </h3>
-              <AddFileButton templateId={editingTemplate.id} text="Add File" />
+              <UploadFileButton templateId={editingTemplate.id} text="Add File" />
             </div>
 
             <FileTable />
