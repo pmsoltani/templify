@@ -25,10 +25,10 @@ export default class FileService {
 
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
       const objectKey = `${bucketPath}${fileDb.name}`;
-      const fileContent = await storageService.getFile(objectKey);
+      const fileObj = await storageService.getFileObject(objectKey);
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
-      return await fileContent.Body.transformToString();
+      return await fileObj.Body.transformToString();
     } catch (err) {
       if (err instanceof AppError && err.logData) throw err;
       throw new AppError("Failed to retrieve file content.", 500, { logData });
