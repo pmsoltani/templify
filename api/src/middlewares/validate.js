@@ -13,14 +13,14 @@ const validate = (schema) => (req, res, next) => {
       params: req.params,
     });
 
-    req.body = parsed.body;
-    Object.assign(req.query, parsed.query);
-    req.params = parsed.params;
+    req.body = parsed.body || req.body;
+    if (parsed.query) Object.assign(req.query, parsed.query);
+    req.params = parsed.params || req.params;
 
     next();
   } catch (err) {
     if (err instanceof z.ZodError) {
-      const validationErrors = err.flatten().fieldErrors;
+      const validationErrors = z.flattenError(err).fieldErrors;
       const appError = new AppError("Invalid input data.", 400, {
         details: { validation: validationErrors },
         logData: {
