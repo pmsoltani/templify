@@ -20,7 +20,7 @@ registerRoute(router, "post", "/:templateId/generate", authenticateTokenOrApiKey
 router.use(catchAsync(authenticateToken));
 
 registerRoute(router, "get", "/", templateController.getAllByUserId);
-registerRoute(router, "post", "/slim", upload.array("files"), templateController.createSlim); // prettier-ignore
+registerRoute(router, "post", "/", upload.array("files"), templateController.create); // prettier-ignore
 registerRoute(router, "get", "/:templateId", templateController.get); // prettier-ignore
 registerRoute(router, "patch", "/:templateId", validate(templateSchema.update), templateController.updateInfo); // prettier-ignore
 registerRoute(router, "delete", "/:templateId", templateController.remove);

@@ -21,15 +21,15 @@ const getAllByUserId = async (req, res) => {
   });
 };
 
-const createSlim = async (req, res) => {
-  const templateDb = await new TemplateService(getContext(req)).createSlim(
+const create = async (req, res) => {
+  const templateDb = await new TemplateService(getContext(req)).create(
     req.body.name,
     req.body.description,
     req.body.htmlEntrypoint,
     req.files
   );
   res.status(201).json({
-    message: "Slim template created successfully!",
+    message: "Template created successfully!",
     data: { template: publicTemplate.parse(templateDb) },
   });
 };
@@ -84,7 +84,7 @@ const getVariables = async (req, res) => {
 };
 
 export {
-  createSlim,
+  create,
   generatePdf,
   generatePdfPreview,
   get,

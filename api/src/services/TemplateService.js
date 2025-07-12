@@ -36,7 +36,7 @@ export default class TemplateService {
     return await templateRepo.getAllByUserPublicId(this.context.user.id);
   }
 
-  async createSlim(
+  async create(
     templateName,
     description = null,
     htmlEntrypoint = "template.html",

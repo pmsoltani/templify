@@ -121,7 +121,7 @@ function AppProvider({ children }) {
       if (data.files) {
         Array.from(data.files).forEach((file) => formData.append("files", file));
       }
-      const newTemplate = await apiClient("/api/templates/slim", {
+      const newTemplate = await apiClient("/api/templates", {
         method: "POST",
         body: formData,
       });
