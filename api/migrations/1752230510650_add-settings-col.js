@@ -11,7 +11,7 @@ const up = (pgm) => {
   console.log("Adding settings column to the templates table...");
 
   pgm.sql(`
-    ALTER TABLE templates ADD COLUMN settings JSONB DEFAULT '{}';
+    ALTER TABLE templates ADD COLUMN settings JSONB NOT NULL DEFAULT '{}';
     
     CREATE INDEX idx_templates_settings ON templates USING GIN (settings);
   `);
