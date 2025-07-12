@@ -4,6 +4,15 @@ import PdfService from "../services/PdfService.js";
 import TemplateService from "../services/TemplateService.js";
 import getContext from "../utils/getContext.js";
 
+const get = async (req, res) => {
+  const { templateId } = req.params;
+  const templateDb = await new TemplateService(getContext(req)).get(templateId);
+  res.json({
+    message: "Template retrieved successfully!",
+    data: { template: publicTemplate.parse(templateDb) },
+  });
+};
+
 const getAllByUserId = async (req, res) => {
   const templatesDb = await new TemplateService(getContext(req)).getAllByUserPublicId();
   res.json({
@@ -59,7 +68,7 @@ const updateInfo = async (req, res) => {
     req.body
   );
   res.json({
-    message: "Template info update successful!",
+    message: "Template info updated successfully!",
     data: { template: publicTemplate.parse(templateDb) },
   });
 };
@@ -78,6 +87,7 @@ export {
   createSlim,
   generatePdf,
   generatePdfPreview,
+  get,
   getAllByUserId,
   getVariables,
   remove,
