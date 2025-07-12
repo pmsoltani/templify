@@ -21,9 +21,11 @@ router.use(catchAsync(authenticateToken));
 
 registerRoute(router, "get", "/", templateController.getAllByUserId);
 registerRoute(router, "post", "/slim", upload.array("files"), templateController.createSlim); // prettier-ignore
+registerRoute(router, "get", "/:templateId", templateController.get); // prettier-ignore
 registerRoute(router, "patch", "/:templateId", validate(templateSchema.update), templateController.updateInfo); // prettier-ignore
 registerRoute(router, "delete", "/:templateId", templateController.remove);
 registerRoute(router, "post", "/:templateId/preview", templateController.generatePdfPreview); // prettier-ignore
+registerRoute(router, "patch", "/:templateId/settings", validate(templateSchema.updateSettings), templateController.updateInfo); // prettier-ignore
 registerRoute(router, "get", "/:templateId/variables", templateController.getVariables); // prettier-ignore
 
 // File sub-routes
