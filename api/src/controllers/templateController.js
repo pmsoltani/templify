@@ -62,13 +62,13 @@ const remove = async (req, res) => {
   res.status(204).send();
 };
 
-const updateInfo = async (req, res) => {
-  const templateDb = await new TemplateService(getContext(req)).updateInfo(
+const update = async (req, res) => {
+  const templateDb = await new TemplateService(getContext(req)).update(
     req.params.templateId,
     req.body
   );
   res.json({
-    message: "Template info updated successfully!",
+    message: "Template updated successfully!",
     data: { template: publicTemplate.parse(templateDb) },
   });
 };
@@ -91,5 +91,5 @@ export {
   getAllByUserId,
   getVariables,
   remove,
-  updateInfo,
+  update,
 };

@@ -64,7 +64,7 @@ export default function TemplateSettings({ templateId, onSettingsChange }) {
       setIsSaving(true);
       try {
         const data = await apiClient(`/api/templates/${templateId}/settings`, {
-          method: "PATCH",
+          method: "PUT",
           body: { settings: newSettings },
         });
         setSettings(data.data.template.settings);

@@ -50,7 +50,7 @@ export default class TemplateService {
       const templateDb = await templateRepo.create(
         userPublicId,
         templateName,
-        htmlEntrypoint,
+        htmlEntrypoint || "template.html",
         description,
         publicId
       );
@@ -93,7 +93,7 @@ export default class TemplateService {
     return { id: publicId };
   }
 
-  async updateInfo(publicId, updateData, files = []) {
+  async update(publicId, updateData, files = []) {
     const userPublicId = this.context.user.id;
     const logData = { userPublicId: userPublicId, action: "TEMPLATE_UPDATE" };
     try {
