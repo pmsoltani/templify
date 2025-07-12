@@ -68,19 +68,19 @@ export default function FileEditor({ templateId, fileId }) {
     }, 10000); // Auto-save after 10 seconds of inactivity
   };
 
-  const handleSave = async (content = editorContent) => {
-    if (!currentFile || !templateId) return;
-
-    try {
-      await updateFileContent(templateId, currentFile.id, content);
-      setHasUnsavedChanges(false);
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
+  const handleSave = useCallback(
+    async (content = editorContent) => {
+      if (!currentFile || !templateId) return;
+      try {
+        await updateFileContent(templateId, currentFile.id, content);
+        setHasUnsavedChanges(false);
+        if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      } catch (err) {
+        console.error("Failed to save file:", err);
       }
-    } catch (err) {
-      console.error("Failed to save file:", err);
-    }
-  };
+    },
+    [currentFile, templateId, updateFileContent, editorContent]
+  );
 
   const handleFileCreated = useCallback(
     (file) => {
@@ -104,7 +104,7 @@ export default function FileEditor({ templateId, fileId }) {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [hasUnsavedChanges, isLoading, editorContent]);
+  }, [hasUnsavedChanges, isLoading, handleSave]);
 
   const getLanguage = (fileName) => {
     const extension = fileName.split(".").pop()?.toLowerCase();

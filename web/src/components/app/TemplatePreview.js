@@ -20,12 +20,7 @@ export default function TemplatePreview({ templateId }) {
   const [isLoadingVariables, setIsLoadingVariables] = useState(false);
   const [variablesError, setVariablesError] = useState(null);
 
-  // Load variables when template changes
-  useEffect(() => {
-    if (currentTemplate && templateId) loadVariables();
-  }, [templateId]);
-
-  const loadVariables = async () => {
+  const loadVariables = useCallback(async () => {
     setIsLoadingVariables(true);
     setVariablesError(null);
 
@@ -45,7 +40,12 @@ export default function TemplatePreview({ templateId }) {
     } finally {
       setIsLoadingVariables(false);
     }
-  };
+  }, [templateId]);
+
+  // Load variables when template changes
+  useEffect(() => {
+    if (currentTemplate && templateId) loadVariables();
+  }, [templateId, loadVariables, currentTemplate]);
 
   const generatePreview = useCallback(
     async (customVariables = null) => {

@@ -31,11 +31,6 @@ export default function AccountPage() {
   const [editValues, setEditValues] = useState({});
 
   // Form state
-  const [emailForm, setEmailForm] = useState({
-    email: "",
-    isEditing: false,
-    isSaving: false,
-  });
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -50,7 +45,6 @@ export default function AccountPage() {
       try {
         const data = await apiClient("/api/me");
         setUser(data.data.user);
-        setEmailForm({ ...emailForm, email: data.email });
       } catch (err) {
         console.error("Failed to load user data:", err);
       } finally {
