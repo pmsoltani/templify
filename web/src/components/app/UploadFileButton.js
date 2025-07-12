@@ -12,7 +12,7 @@ export default function UploadFileButton({
   size = "sm",
   text = "Upload File",
   showIcon = true,
-  accept = ".html,.css,.js,.txt,.json,.md",
+  accept = ".html,.htm,.css,.svg,.png,.jpg,.jpeg",
   disabled = false,
   className = "",
 }) {

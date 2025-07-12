@@ -23,8 +23,8 @@ export default function CreateFileButton({
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState(null);
 
-  const allowedExtensions = ["html", "css"];
-  const mimeTypes = { html: "text/html", css: "text/css" };
+  const allowedExtensions = ["html", "htm", "css"];
+  const mimeTypes = { html: "text/html", htm: "text/html", css: "text/css" };
 
   const handlePopoverOpenChange = (open) => {
     setIsPopoverOpen(open);

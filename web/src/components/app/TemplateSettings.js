@@ -280,7 +280,7 @@ export default function TemplateSettings({ templateId, onSettingsChange }) {
                     onChange={(e) =>
                       handleSettingChange("headerTemplate", e.target.value)
                     }
-                    placeholder="<span class='title'></span>"
+                    placeholder={`<span class="title" style="font-size: 8px;"></span>`}
                     rows={3}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
@@ -297,7 +297,7 @@ export default function TemplateSettings({ templateId, onSettingsChange }) {
                     onChange={(e) =>
                       handleSettingChange("footerTemplate", e.target.value)
                     }
-                    placeholder="<span class='pageNumber'></span> / <span class='totalPages'></span>"
+                    placeholder={`<span class="pageNumber" style="font-size: 8px;"></span>`}
                     rows={3}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
