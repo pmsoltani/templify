@@ -47,6 +47,9 @@ export default class PdfService {
         userPublicId
       );
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+      if (!templateDb.html_entrypoint) {
+        throw new AppError("Template HTML entrypoint is not set.", 400, { logData });
+      }
 
       // Fetch template files from storage
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
