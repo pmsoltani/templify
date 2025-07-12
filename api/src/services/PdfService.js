@@ -2,6 +2,7 @@ import fs from "fs";
 import mustache from "mustache";
 import path from "path";
 import { pathToFileURL } from "url";
+import { DEFAULT_PDF_SETTINGS } from "../config/constants.js";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
@@ -61,7 +62,7 @@ export default class PdfService {
       const htmlPath = path.join(tempDir, templateDb.html_entrypoint);
       const fileUrl = pathToFileURL(htmlPath).href;
       await page.goto(fileUrl, { waitUntil: "networkidle0" });
-      const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
+      const pdfBuffer = await page.pdf(templateDb.settings || DEFAULT_PDF_SETTINGS);
 
       // Upload PDF to storage and return the public URL
       if (preview) {

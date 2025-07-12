@@ -22,6 +22,16 @@ const ENTITIES = {
   file: { prefix: "fil" },
 };
 
+const DEFAULT_PDF_SETTINGS = {
+  format: "A4",
+  margin: { top: "20mm", bottom: "20mm", left: "20mm", right: "20mm" },
+  orientation: "portrait",
+  printBackground: true,
+  displayHeaderFooter: false,
+  headerTemplate: "",
+  footerTemplate: "",
+};
+
 const ALLOWED_ACTIONS = [
   "SCHEMA_VALIDATION",
   "USER_LOGIN",
@@ -39,6 +49,7 @@ const ALLOWED_ACTIONS = [
   "TEMPLATE_UPDATE",
   "TEMPLATE_REMOVE",
   "TEMPLATE_PREVIEW",
+  "TEMPLATE_GET",
   "TEMPLATE_GET_VARIABLES",
   "FILE_CREATE",
   "FILE_UPDATE",
@@ -55,6 +66,7 @@ export {
   allowedExtensions,
   allowedFileTypes,
   allowedMimeTypes,
+  DEFAULT_PDF_SETTINGS,
   ENTITIES,
   MAX_FILE_SIZE,
   NANO_ALPHABET,
