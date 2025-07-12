@@ -46,7 +46,8 @@ export default function VariablesModal({
             Template Variables
           </DialogTitle>
           <DialogDescription>
-            Modify the variables and click "Update Preview" to generate a new preview.
+            Modify the variables and click &quot;Update Preview&quot; to generate a new
+            preview.
           </DialogDescription>
         </DialogHeader>
 

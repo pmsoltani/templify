@@ -174,7 +174,7 @@ export default function TemplatePreview({ templateId }) {
             <div className="flex items-center justify-center h-full text-gray-500">
               <div className="text-center">
                 <FileIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Click "Refresh" to generate PDF preview</p>
+                <p>Click &quot;Refresh&quot; to generate PDF preview</p>
                 <p className="text-xs mt-2">
                   Preview will auto-update when you save files (Ctrl+S)
                 </p>
