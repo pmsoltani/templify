@@ -37,11 +37,22 @@ const create = z.object({
 });
 
 const update = z.object({
-  body: z.object({
-    name: text.nullish(),
-    htmlEntrypoint: text.nullish(),
-    description: text.nullish(),
-  }),
+  body: z
+    .object({
+      name: text.nullish(),
+      htmlEntrypoint: text.nullish(),
+      description: text.nullish(),
+    })
+    .refine(
+      (data) => {
+        return (
+          data.name !== undefined ||
+          data.htmlEntrypoint !== undefined ||
+          data.description !== undefined
+        );
+      },
+      { error: "At least one field must be provided for update." }
+    ),
 });
 
 const updateSettings = z.object({ body: z.object({ settings: templateSettingsFull }) });
