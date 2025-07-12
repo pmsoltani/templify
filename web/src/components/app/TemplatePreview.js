@@ -5,6 +5,7 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import apiClient from "@/lib/apiClient";
 import { FileIcon, RefreshCwIcon, VariableIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import TemplateSettings from "./TemplateSettings";
 import VariablesModal from "./VariablesModal";
 
 export default function TemplatePreview({ templateId }) {
@@ -76,6 +77,17 @@ export default function TemplatePreview({ templateId }) {
     setIsVariablesModalOpen(false);
   };
 
+  const handleSettingsChange = useCallback(
+    (newSettings) => {
+      // Settings change should trigger a preview regeneration
+      // The settings are stored on the server side and will be applied automatically
+      if (!isGenerating) {
+        generatePreview();
+      }
+    },
+    [generatePreview, isGenerating]
+  );
+
   const handleRefreshPreview = () => generatePreview();
   const handleOpenVariablesModal = async () => {
     setIsVariablesModalOpen(true);
@@ -102,51 +114,57 @@ export default function TemplatePreview({ templateId }) {
     <>
       <div className="flex flex-col bg-white border-l border-gray-200 h-full">
         {/* Preview Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <FileIcon className="h-4 w-4 text-gray-600" />
-            <span className="text-sm font-medium">PDF Preview</span>
-            {error && (
-              <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
-                {error}
-              </span>
-            )}
-            {variablesError && (
-              <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
-                {variablesError}
-              </span>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleOpenVariablesModal}
-              disabled={isGenerating || isLoadingVariables}
-              className="flex items-center gap-2"
-            >
-              <VariableIcon className="h-4 w-4" />
-              Variables
-              {variables.length > 0 && (
-                <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">
-                  {variables.length}
+        <div className="border-b border-gray-200 bg-gray-50 flex-shrink-0">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-2">
+              <FileIcon className="h-4 w-4 text-gray-600" />
+              <span className="text-sm font-medium">PDF Preview</span>
+              {error && (
+                <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
+                  {error}
                 </span>
               )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefreshPreview}
-              disabled={isGenerating || isLoadingVariables}
-              className="flex items-center gap-2"
-            >
-              {isGenerating ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900" />
-              ) : (
-                <RefreshCwIcon className="h-4 w-4" />
+              {variablesError && (
+                <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
+                  {variablesError}
+                </span>
               )}
-              Refresh
-            </Button>
+            </div>
+            <div className="flex gap-2">
+              <TemplateSettings
+                templateId={templateId}
+                onSettingsChange={handleSettingsChange}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleOpenVariablesModal}
+                disabled={isGenerating || isLoadingVariables}
+                className="flex items-center gap-2"
+              >
+                <VariableIcon className="h-4 w-4" />
+                Variables
+                {variables.length > 0 && (
+                  <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">
+                    {variables.length}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefreshPreview}
+                disabled={isGenerating || isLoadingVariables}
+                className="flex items-center gap-2"
+              >
+                {isGenerating ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900" />
+                ) : (
+                  <RefreshCwIcon className="h-4 w-4" />
+                )}
+                Refresh
+              </Button>
+            </div>
           </div>
         </div>
 
