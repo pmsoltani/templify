@@ -6,7 +6,7 @@ import TemplateTable from "@/components/app/TemplateTable";
 import UploadTemplateDialog from "@/components/app/UploadTemplateDialog";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
-import { RefreshCwIcon, UploadIcon } from "lucide-react";
+import { PlusIcon, RefreshCwIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -77,8 +77,8 @@ export default function AppDashboard({ templateId = null }) {
                 onClick={handleUploadTemplate}
                 className="flex items-center gap-2"
               >
-                <UploadIcon className="h-4 w-4" />
-                Upload New Template
+                <PlusIcon className="h-4 w-4" />
+                Create New Template
               </Button>
             </div>
           </div>

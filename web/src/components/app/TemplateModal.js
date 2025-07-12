@@ -15,6 +15,7 @@ import formatDate from "@/utils/formatDate";
 import { CalendarIcon, FolderOpenIcon, HashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import EditableField from "../EditableField";
+import CreateFileButton from "./CreateFileButton";
 import FileTable from "./FileTable";
 
 export default function TemplateModal({ open, onOpenChange }) {
@@ -146,7 +147,10 @@ export default function TemplateModal({ open, onOpenChange }) {
                 <FolderOpenIcon className="h-5 w-5" />
                 Template Files
               </h3>
-              <UploadFileButton templateId={editingTemplate.id} text="Add File" />
+              <div className="flex gap-2">
+                <CreateFileButton templateId={editingTemplate.id} />
+                <UploadFileButton templateId={editingTemplate.id} />
+              </div>
             </div>
 
             <FileTable />
