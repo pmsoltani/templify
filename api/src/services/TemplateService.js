@@ -13,6 +13,24 @@ export default class TemplateService {
     this.context = context;
   }
 
+  async get(publicId) {
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "TEMPLATE_GET" };
+
+    try {
+      const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+        publicId,
+        userPublicId
+      );
+      if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      return templateDb;
+    } catch (err) {
+      if (err instanceof AppError && err.logData) throw err;
+      throw new AppError(`Failed to get template: ${err.message}`, 500, { logData });
+    }
+  }
+
   async getAllByUserPublicId() {
     // TODO: add logic for pagination, etc.
     return await templateRepo.getAllByUserPublicId(this.context.user.id);
