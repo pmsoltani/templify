@@ -5,7 +5,7 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import { FileIcon, SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CreateFileButton from "./CreateFileButton";
 import UploadFileButton from "./UploadFileButton";
 
@@ -82,6 +82,17 @@ export default function FileEditor({ templateId, fileId }) {
     }
   };
 
+  const handleFileCreated = useCallback(
+    (file) => {
+      try {
+        router.push(`/app/templates/${templateId}/${file.id}`);
+      } catch (err) {
+        console.error("Failed to navigate to new file:", err);
+      }
+    },
+    [templateId, router]
+  );
+
   // Handle Ctrl+S for explicit save
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -148,12 +159,7 @@ export default function FileEditor({ templateId, fileId }) {
           )}
         </div>
         <div className="flex gap-2">
-          <CreateFileButton
-            templateId={templateId}
-            onFileCreated={(file) =>
-              router.push(`/app/templates/${templateId}/${file.id}`)
-            }
-          />
+          <CreateFileButton templateId={templateId} onFileCreated={handleFileCreated} />
           <UploadFileButton templateId={templateId} />
           <Button
             size="sm"
