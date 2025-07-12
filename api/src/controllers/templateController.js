@@ -25,7 +25,7 @@ const create = async (req, res) => {
   const templateDb = await new TemplateService(getContext(req)).create(
     req.body.name,
     req.body.description,
-    req.body.htmlEntrypoint,
+    req.body.entrypoint,
     req.files
   );
   res.status(201).json({

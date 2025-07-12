@@ -2,7 +2,7 @@ import fs from "fs";
 import mustache from "mustache";
 import path from "path";
 import { pathToFileURL } from "url";
-import { DEFAULT_PDF_SETTINGS } from "../config/constants.js";
+import { DEFAULT_PDF_SETTINGS, TEXT_FILE_EXTENSIONS } from "../config/constants.js";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
@@ -47,8 +47,8 @@ export default class PdfService {
         userPublicId
       );
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
-      if (!templateDb.html_entrypoint) {
-        throw new AppError("Template HTML entrypoint is not set.", 400, { logData });
+      if (!templateDb.entrypoint) {
+        throw new AppError("Template entrypoint is not set.", 400, { logData });
       }
 
       // Fetch template files from storage
@@ -62,8 +62,7 @@ export default class PdfService {
       page = await browser.newPage();
 
       // Tell puppeteer to treat the temp dir as the base for linked assets (CSS, images)
-      const htmlPath = path.join(tempDir, templateDb.html_entrypoint);
-      const fileUrl = pathToFileURL(htmlPath).href;
+      const fileUrl = pathToFileURL(path.join(tempDir, templateDb.entrypoint)).href;
       await page.goto(fileUrl, { waitUntil: "networkidle0" });
       const pdfBuffer = await page.pdf(templateDb.settings || DEFAULT_PDF_SETTINGS);
 
@@ -98,10 +97,9 @@ export default class PdfService {
 
   async applyMustache(tempDir, jsonData) {
     if (!jsonData || Object.keys(jsonData).length === 0) return;
-    const textExtensions = [".html", ".htm", ".css"];
     const files = await fs.promises.readdir(tempDir);
     files
-      .filter((file) => textExtensions.includes(path.extname(file).toLowerCase()))
+      .filter((file) => TEXT_FILE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
       .forEach(async (file) => {
         const filePath = path.join(tempDir, file);
         try {

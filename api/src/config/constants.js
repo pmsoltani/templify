@@ -1,8 +1,8 @@
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const allowedFileTypes = {
-  ".zip": ["application/zip", "application/x-zip-compressed"],
   ".html": ["text/html"],
+  ".htm": ["text/html"],
   ".css": ["text/css"],
   ".png": ["image/png"],
   ".jpg": ["image/jpeg"],
@@ -11,6 +11,8 @@ const allowedFileTypes = {
 };
 const allowedExtensions = Object.keys(allowedFileTypes);
 const allowedMimeTypes = Object.values(allowedFileTypes).flat();
+
+const TEXT_FILE_EXTENSIONS = [".html", ".htm", ".css"];
 
 const NANO_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -70,4 +72,5 @@ export {
   ENTITIES,
   MAX_FILE_SIZE,
   NANO_ALPHABET,
+  TEXT_FILE_EXTENSIONS,
 };

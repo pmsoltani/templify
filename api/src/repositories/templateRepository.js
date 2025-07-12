@@ -31,17 +31,17 @@ const getAllByUserPublicId = async (userPublicId) => {
   return res.rows;
 };
 
-const create = async (userPublicId, name, htmlEntrypoint, description, publicId) => {
+const create = async (userPublicId, name, entrypoint, description, publicId) => {
   const res = await db.query(
     `
-    INSERT INTO templates (user_id, name, html_entrypoint, description, public_id)
+    INSERT INTO templates (user_id, name, entrypoint, description, public_id)
     VALUES (
       (SELECT id FROM users WHERE public_id = $1),
       $2, $3, $4, $5
     )
     RETURNING *;
     `,
-    [userPublicId, name, htmlEntrypoint, description, publicId]
+    [userPublicId, name, entrypoint, description, publicId]
   );
   return res.rows[0];
 };
@@ -55,10 +55,6 @@ const remove = async (publicId) => {
 };
 
 const update = async (publicId, updateData) => {
-  if (updateData.hasOwnProperty("htmlEntrypoint")) {
-    updateData["html_entrypoint"] = updateData["htmlEntrypoint"];
-    delete updateData["htmlEntrypoint"];
-  }
   const updateEntries = Object.entries(updateData); // Assume updateEntries isn't empty
   const setClause = updateEntries.map(([k], idx) => `"${k}" = $${idx + 1}`).join(", ");
   const values = updateEntries.map(([, v]) => v);

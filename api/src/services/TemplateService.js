@@ -1,4 +1,5 @@
 import path from "path";
+import { TEXT_FILE_EXTENSIONS } from "../config/constants.js";
 import * as fileRepo from "../repositories/fileRepository.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
@@ -39,7 +40,7 @@ export default class TemplateService {
   async create(
     templateName,
     description = null,
-    htmlEntrypoint = "template.html",
+    entrypoint = "template.html",
     files = []
   ) {
     let publicId = secretService.generatePublicId("template");
@@ -50,7 +51,7 @@ export default class TemplateService {
       const templateDb = await templateRepo.create(
         userPublicId,
         templateName,
-        htmlEntrypoint || "template.html",
+        entrypoint || "template.html",
         description,
         publicId
       );
@@ -134,10 +135,10 @@ export default class TemplateService {
         throw new AppError("No HTML files found in template.", 404, { logData });
       }
 
-      const textExtensions = [".html", ".htm", ".css"];
       const allVariables = new Set();
       for (const file of filesDb) {
-        if (!textExtensions.includes(path.extname(file.name).toLowerCase())) continue;
+        const fileExt = path.extname(file.name).toLowerCase();
+        if (!TEXT_FILE_EXTENSIONS.includes(fileExt)) continue;
         const fileObj = await storageService.getFileObject(`${bucketPath}${file.name}`);
         const fileContent = await fileObj.Body.transformToString();
 
@@ -158,16 +159,16 @@ export default class TemplateService {
   /**
    * Extract mustache variables from HTML content
    * Supports: {{variable}}, {{user.name}}, {{#section}}{{/section}}
-   * @param {String} htmlContent
+   * @param {String} textContent
    */
-  extractMustacheVariables(htmlContent) {
+  extractMustacheVariables(textContent) {
     const variables = new Set();
 
     // Regex to match mustache variables: {{variable}} or {{user.name}}
     // Excludes sections/partials: {{#section}}, {{/section}}, {{>partial}}
     const mustacheRegex = /\{\{(?!\#|\/|\>)\s*([^}]+?)\s*\}\}/g;
 
-    for (const match of htmlContent.matchAll(mustacheRegex)) {
+    for (const match of textContent.matchAll(mustacheRegex)) {
       const variable = match[1].trim();
 
       // Skip mustache helpers/conditionals

@@ -21,7 +21,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    htmlEntrypoint: "",
+    entrypoint: "",
     files: null,
   });
   const [dragActive, setDragActive] = useState(false);
@@ -62,7 +62,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
       setFormData({
         name: "",
         description: "",
-        htmlEntrypoint: "",
+        entrypoint: "",
         files: null,
       });
       onOpenChange(false);
@@ -109,12 +109,12 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="htmlEntrypoint">HTML Entrypoint (optional)</Label>
+              <Label htmlFor="entrypoint">HTML Entrypoint (optional)</Label>
               <Input
-                id="htmlEntrypoint"
-                placeholder="index.html"
-                value={formData.htmlEntrypoint}
-                onChange={(e) => handleInputChange("htmlEntrypoint", e.target.value)}
+                id="entrypoint"
+                placeholder="template.html"
+                value={formData.entrypoint}
+                onChange={(e) => handleInputChange("entrypoint", e.target.value)}
               />
             </div>
 
@@ -138,7 +138,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
                     Drop files here or click to upload
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    HTML, CSS, JS, images, and other assets
+                    HTML, CSS, images, and other assets
                   </p>
                   <input
                     id="fileInput"
@@ -146,7 +146,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
                     multiple
                     className="hidden"
                     onChange={handleFileInputChange}
-                    accept=".html,.htm,.css,.js,.json,.png,.jpg,.jpeg,.gif,.svg,.webp"
+                    accept=".html,.htm,.css,.svg,.png,.jpg,.jpeg"
                   />
                 </div>
               ) : (

@@ -27,7 +27,7 @@ const up = async (pgm) => {
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
       name VARCHAR(255) NOT NULL,
-      html_entrypoint VARCHAR(255) NOT NULL DEFAULT 'template.html',
+      entrypoint VARCHAR(255) NOT NULL DEFAULT 'template.html',
       description TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

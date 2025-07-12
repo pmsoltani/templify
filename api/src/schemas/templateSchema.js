@@ -30,7 +30,7 @@ const templateSettingsFull = templateSettings.optional().transform((val) => {
 const create = z.object({
   body: z.object({
     name: text,
-    htmlEntrypoint: text.default("template.html"),
+    entrypoint: text.default("template.html"),
     description: text.nullish(),
     settings: templateSettingsFull,
   }),
@@ -40,14 +40,14 @@ const update = z.object({
   body: z
     .object({
       name: text.nullish(),
-      htmlEntrypoint: text.nullish(),
+      entrypoint: text.nullish(),
       description: text.nullish(),
     })
     .refine(
       (data) => {
         return (
           data.name !== undefined ||
-          data.htmlEntrypoint !== undefined ||
+          data.entrypoint !== undefined ||
           data.description !== undefined
         );
       },
@@ -63,7 +63,7 @@ const publicTemplateDb = z.object({
   user_id: id,
   user_public_id: publicId.nullish(),
   name: text,
-  html_entrypoint: text,
+  entrypoint: text,
   description: text.nullish(),
   settings: templateSettingsFull,
   created_at: dateTime,
@@ -75,7 +75,7 @@ const publicTemplate = publicTemplateDb.transform((dbData) => {
     id: dbData.public_id,
     userId: dbData.user_public_id,
     name: dbData.name,
-    htmlEntrypoint: dbData.html_entrypoint,
+    entrypoint: dbData.entrypoint,
     description: dbData.description,
     settings: dbData.settings,
     createdAt: dbData.created_at,

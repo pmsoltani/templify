@@ -117,7 +117,7 @@ function AppProvider({ children }) {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("description", data.description);
-      formData.append("htmlEntrypoint", data.htmlEntrypoint);
+      formData.append("entrypoint", data.entrypoint);
       if (data.files) {
         Array.from(data.files).forEach((file) => formData.append("files", file));
       }

@@ -128,10 +128,10 @@ export default function TemplateModal({ open, onOpenChange }) {
             />
 
             <EditableField
-              fieldName="htmlEntrypoint"
-              fieldLabel=" HTML Entrypoint"
-              fieldValue={editingTemplate.htmlEntrypoint}
-              editingField={editingFields.htmlEntrypoint}
+              fieldName="entrypoint"
+              fieldLabel="HTML Entrypoint"
+              fieldValue={editingTemplate.entrypoint}
+              editingField={editingFields.entrypoint}
               editValues={editValues}
               onChange={setEditValues}
               onSave={saveField}
