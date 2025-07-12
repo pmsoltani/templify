@@ -2,9 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
-import { FileIcon, RotateCcwIcon, SaveIcon } from "lucide-react";
+import { FileIcon, SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import CreateFileButton from "./CreateFileButton";
 import UploadFileButton from "./UploadFileButton";
 
 // Dynamically import Monaco Editor to avoid SSR issues
@@ -34,6 +36,8 @@ export default function FileEditor({ templateId, fileId }) {
   const [editorContent, setEditorContent] = useState("");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const saveTimeoutRef = useRef(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     if (templateId && fileId && currentFiles.length > 0) {
@@ -91,14 +95,6 @@ export default function FileEditor({ templateId, fileId }) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [hasUnsavedChanges, isLoading, editorContent]);
 
-  const handleRevert = () => {
-    setEditorContent(fileContent);
-    setHasUnsavedChanges(false);
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-  };
-
   const getLanguage = (fileName) => {
     const extension = fileName.split(".").pop()?.toLowerCase();
     switch (extension) {
@@ -152,16 +148,13 @@ export default function FileEditor({ templateId, fileId }) {
           )}
         </div>
         <div className="flex gap-2">
+          <CreateFileButton
+            templateId={templateId}
+            onFileCreated={(file) =>
+              router.push(`/app/templates/${templateId}/${file.id}`)
+            }
+          />
           <UploadFileButton templateId={templateId} />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRevert}
-            disabled={!hasUnsavedChanges || isLoading}
-          >
-            <RotateCcwIcon className="h-4 w-4 mr-1" />
-            Revert
-          </Button>
           <Button
             size="sm"
             onClick={() => handleSave()}
