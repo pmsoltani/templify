@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dateTime, fileName, id, publicId } from "./sharedSchema.js";
+import { dateTime, fileName, id, publicId, text } from "./sharedSchema.js";
 
 const create = z.object({ body: z.object({ name: fileName.optional() }) });
 
@@ -9,10 +9,10 @@ const publicFileDb = z.object({
   id: id,
   public_id: publicId,
   template_id: id,
-  template_public_id: publicId.optional().nullable(),
+  template_public_id: publicId.nullish(),
   name: fileName,
   size: z.number().int(),
-  mime: z.string(),
+  mime: text,
   created_at: dateTime,
   updated_at: dateTime,
 });

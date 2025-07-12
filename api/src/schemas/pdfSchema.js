@@ -5,11 +5,11 @@ const publicPdfDb = z.object({
   id: id,
   public_id: publicId,
   user_id: id,
-  user_public_id: publicId.optional().nullable(),
+  user_public_id: publicId.nullish(),
   template_id: id,
-  template_public_id: publicId.optional().nullable(),
+  template_public_id: publicId.nullish(),
   created_at: dateTime,
-  temp_url: z.string().url().optional().nullable(),
+  temp_url: z.url().nullish(),
 });
 
 const publicPdf = publicPdfDb.transform((dbData) => {
