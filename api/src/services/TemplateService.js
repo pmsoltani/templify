@@ -166,7 +166,7 @@ export default class TemplateService {
 
     // Regex to match mustache variables: {{variable}} or {{user.name}}
     // Excludes sections/partials: {{#section}}, {{/section}}, {{>partial}}
-    const mustacheRegex = /\{\{(?!\#|\/|\>)\s*([^}]+?)\s*\}\}/g;
+    const mustacheRegex = /\{{2,3}(?!\#|\/|\>)\s*([^}]+?)\s*\}{2,3}/g;
 
     for (const match of textContent.matchAll(mustacheRegex)) {
       const variable = match[1].trim();
@@ -176,6 +176,6 @@ export default class TemplateService {
       // For nested objects like 'user.name', we might want just 'user'
       // or keep the full path - let's keep the full path for now
     }
-    return Array.from(variables);
+    return Array.from(variables).sort((a, b) => a.localeCompare(b));
   }
 }
