@@ -71,4 +71,19 @@ const update = async (publicId, updateData) => {
   return res.rows[0];
 };
 
-export { create, getAllByUserPublicId, getByPublicIdAndUserPublicId, remove, update };
+const updateTimestamp = async (publicId) => {
+  const res = await db.query(
+    "UPDATE templates SET updated_at = NOW() WHERE public_id = $1;",
+    [publicId]
+  );
+  return res.rows[0]?.updated_at || null;
+};
+
+export {
+  create,
+  getAllByUserPublicId,
+  getByPublicIdAndUserPublicId,
+  remove,
+  update,
+  updateTimestamp,
+};

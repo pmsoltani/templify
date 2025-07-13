@@ -1,5 +1,6 @@
 import fs from "fs";
 import * as fileRepo from "../repositories/fileRepository.js";
+import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
 import * as secretService from "./secretService.js";
@@ -115,6 +116,8 @@ export default class FileService {
       // Update file size in database
       const updateData = { size: buffer.length };
       fileDb = await fileRepo.update(publicId, updateData);
+
+      await templateRepo.updateTimestamp(templatePublicId);
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return fileDb;
