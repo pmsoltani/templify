@@ -31,17 +31,24 @@ const getAllByUserPublicId = async (userPublicId) => {
   return res.rows;
 };
 
-const create = async (userPublicId, name, entrypoint, description, publicId) => {
+const create = async (
+  userPublicId,
+  name,
+  entrypoint,
+  description,
+  settings,
+  publicId
+) => {
   const res = await db.query(
     `
-    INSERT INTO templates (user_id, name, entrypoint, description, public_id)
+    INSERT INTO templates (user_id, name, entrypoint, description, settings, public_id)
     VALUES (
       (SELECT id FROM users WHERE public_id = $1),
-      $2, $3, $4, $5
+      $2, $3, $4, $5, $6
     )
     RETURNING *;
     `,
-    [userPublicId, name, entrypoint, description, publicId]
+    [userPublicId, name, entrypoint, description, settings, publicId]
   );
   return res.rows[0];
 };

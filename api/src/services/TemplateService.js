@@ -41,6 +41,7 @@ export default class TemplateService {
     templateName,
     description = null,
     entrypoint = "template.html",
+    settings = {},
     files = []
   ) {
     let publicId = secretService.generatePublicId("template");
@@ -51,8 +52,9 @@ export default class TemplateService {
       const templateDb = await templateRepo.create(
         userPublicId,
         templateName,
-        entrypoint || "template.html",
+        entrypoint,
         description,
+        settings,
         publicId
       );
 

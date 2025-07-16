@@ -26,6 +26,7 @@ const create = async (req, res) => {
     req.body.name,
     req.body.description,
     req.body.entrypoint,
+    req.body.settings,
     req.files
   );
   res.status(201).json({
