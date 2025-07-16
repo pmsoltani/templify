@@ -1,38 +1,41 @@
 import { z } from "zod";
+import {
+  DEFAULT_PDF_MARGIN,
+  DEFAULT_PDF_SETTINGS,
+  PDF_FORMATS,
+  PDF_ORIENTATIONS,
+} from "../config/pdfSettings.js";
 import { dateTime, id, publicId, text } from "./sharedSchema.js";
 
 const margin = text
   .regex(/^(\d+\.?\d*)(px|mm|cm|in|pt|pc)$/, "Invalid margin format")
+  .default(DEFAULT_PDF_MARGIN);
+
+const templateSettings = z
+  .strictObject({
+    format: z.enum(PDF_FORMATS),
+    orientation: z.enum(PDF_ORIENTATIONS),
+    margin: z.strictObject({
+      top: margin,
+      right: margin,
+      bottom: margin,
+      left: margin,
+    }),
+    printBackground: z.boolean(),
+    displayHeaderFooter: z.boolean(),
+    headerTemplate: text,
+    footerTemplate: text,
+  })
+  .partial()
   .optional()
-  .default("20mm");
-
-const templateSettings = z.strictObject({
-  format: z
-    .enum(["A5", "A4", "A3", "A2", "A1", "A0", "Letter", "Legal"])
-    .optional()
-    .default("A4"),
-  orientation: z.enum(["portrait", "landscape"]).optional().default("portrait"),
-  margin: z
-    .strictObject({ top: margin, right: margin, bottom: margin, left: margin })
-    .optional()
-    .default({ top: "20mm", right: "20mm", bottom: "20mm", left: "20mm" }),
-  printBackground: z.boolean().optional().default(true),
-  displayHeaderFooter: z.boolean().optional().default(false),
-  headerTemplate: text.optional().default(""),
-  footerTemplate: text.optional().default(""),
-});
-
-const templateSettingsFull = templateSettings.optional().transform((val) => {
-  if (val === undefined) return templateSettings.parse({});
-  return val;
-});
+  .transform((data) => ({ ...DEFAULT_PDF_SETTINGS, ...data }));
 
 const create = z.object({
   body: z.object({
     name: text,
-    entrypoint: text.default("template.html"),
+    entrypoint: text.nullish().transform((val) => (val ? val : "template.html")),
     description: text.nullish(),
-    settings: templateSettingsFull,
+    settings: templateSettings,
   }),
 });
 
@@ -55,7 +58,7 @@ const update = z.object({
     ),
 });
 
-const updateSettings = z.object({ body: z.object({ settings: templateSettingsFull }) });
+const updateSettings = z.object({ body: z.object({ settings: templateSettings }) });
 
 const publicTemplateDb = z.object({
   id: id,
@@ -65,7 +68,7 @@ const publicTemplateDb = z.object({
   name: text,
   entrypoint: text,
   description: text.nullish(),
-  settings: templateSettingsFull,
+  settings: templateSettings,
   created_at: dateTime,
   updated_at: dateTime,
 });
