@@ -24,6 +24,7 @@ registerRoute(router, "post", "/", upload.array("files"), validate(templateSchem
 registerRoute(router, "get", "/:templateId", templateController.get); // prettier-ignore
 registerRoute(router, "patch", "/:templateId", validate(templateSchema.update), templateController.update); // prettier-ignore
 registerRoute(router, "delete", "/:templateId", templateController.remove);
+registerRoute(router, "get", "/:templateId/download", templateController.download);
 registerRoute(router, "post", "/:templateId/preview", templateController.generatePdfPreview); // prettier-ignore
 registerRoute(router, "put", "/:templateId/settings", validate(templateSchema.updateSettings), templateController.update); // prettier-ignore
 registerRoute(router, "get", "/:templateId/variables", templateController.getVariables); // prettier-ignore

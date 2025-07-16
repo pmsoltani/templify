@@ -1,3 +1,5 @@
+import AdmZip from "adm-zip";
+import fs from "fs";
 import path from "path";
 import { TEXT_FILE_EXTENSIONS } from "../config/constants.js";
 import * as fileRepo from "../repositories/fileRepository.js";
@@ -12,6 +14,36 @@ import * as storageService from "./storageService.js";
 export default class TemplateService {
   constructor(context = {}) {
     this.context = context;
+  }
+
+  async download(publicId) {
+    let tempDir = null;
+    const userPublicId = this.context.user.id;
+    const logData = { userPublicId: userPublicId, action: "TEMPLATE_DOWNLOAD" };
+
+    try {
+      const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
+        publicId,
+        userPublicId
+      );
+      if (!templateDb) throw new AppError("Template not found.", 404, { logData });
+
+      const bucketPath = storageService.getBucketPath(userPublicId, publicId);
+      tempDir = await storageService.downloadTemplate(bucketPath);
+
+      const zip = new AdmZip();
+      zip.addLocalFolder(tempDir);
+
+      await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
+      return zip;
+    } catch (err) {
+      if (err instanceof AppError && err.logData) throw err;
+      throw new AppError(`Failed to download template: ${err.message}`, 500, {
+        logData,
+      });
+    } finally {
+      if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   }
 
   async get(publicId) {

@@ -4,6 +4,19 @@ import PdfService from "../services/PdfService.js";
 import TemplateService from "../services/TemplateService.js";
 import getContext from "../utils/getContext.js";
 
+const download = async (req, res) => {
+  const { templateId } = req.params;
+  const zipObj = await new TemplateService(getContext(req)).download(templateId, res);
+  const zipBuffer = zipObj.toBuffer();
+
+  res.set({
+    "Content-Type": "application/zip",
+    "Content-Disposition": `attachment; filename="${templateId}.zip"`,
+    "Content-Length": zipBuffer.length,
+  });
+  res.send(zipBuffer);
+};
+
 const get = async (req, res) => {
   const { templateId } = req.params;
   const templateDb = await new TemplateService(getContext(req)).get(templateId);
@@ -86,6 +99,7 @@ const getVariables = async (req, res) => {
 
 export {
   create,
+  download,
   generatePdf,
   generatePdfPreview,
   get,
