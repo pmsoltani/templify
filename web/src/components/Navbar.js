@@ -21,10 +21,8 @@ export default function Navbar({ breadcrumb }) {
       <div className="flex items-center justify-right gap-4">
         <Link href={isLoggedIn ? "/app" : "/"} className="flex items-center space-x-2">
           <Logo />
-          <span className="font-semibold text-lg hidden sm:block">Templify</span>
         </Link>
 
-        {isLoggedIn && templateId && <span className="text-gray-400">|</span>}
         <nav className="flex items-center">{breadcrumb}</nav>
       </div>
 
