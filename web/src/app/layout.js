@@ -22,11 +22,20 @@ export const metadata = {
     title: "Templify | Automated PDF Generation Made Simple",
     description: "Generate custom PDFs from data using your own HTML/CSS templates.",
     type: "website",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Templify | Automated PDF Generation Made Simple",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Templify | Automated PDF Generation Made Simple",
     description: "Generate custom PDFs from data using your own HTML/CSS templates.",
+    images: ["/images/twitter-image.png"],
   },
   icons: {
     icon: [
