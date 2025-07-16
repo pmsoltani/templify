@@ -1,6 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL),
   title: "Templify | Automated PDF Generation Made Simple",
   description: "Generate custom PDFs from data using your own HTML/CSS templates.",
   authors: [{ name: "Pooria Soltani", url: "https://github.com/pmsoltani" }],
