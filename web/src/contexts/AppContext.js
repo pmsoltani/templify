@@ -186,6 +186,33 @@ function AppProvider({ children }) {
     [currentTemplate]
   );
 
+  const downloadTemplate = useCallback(async (templateId) => {
+    setIsLoading(true);
+    let url;
+    let link;
+    try {
+      const blob = await apiClient(`/api/templates/${templateId}/download`, {
+        responseType: "blob",
+      });
+
+      url = window.URL.createObjectURL(blob);
+
+      // Create temporary link and click it to trigger download
+      link = document.createElement("a");
+      link.href = url;
+      link.download = `${templateId}.zip`;
+      document.body.appendChild(link);
+      link.click();
+    } catch (err) {
+      console.error("Failed to download template:", err);
+      throw err;
+    } finally {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      setIsLoading(false);
+    }
+  }, []);
+
   const createFile = useCallback(async (templateId, file) => {
     setIsLoading(true);
     try {
@@ -290,6 +317,7 @@ function AppProvider({ children }) {
     loadTemplateFiles,
     loadFileContent,
     createTemplate,
+    downloadTemplate,
     updateTemplate,
     removeTemplate,
     createFile,

@@ -84,7 +84,7 @@ export default function FileTable() {
                   {formatDate(file.updatedAt)}
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <Link href={`/app/templates/${editingTemplate.id}/${file.id}`}>
                       <Button variant="outline" size="sm" title="Open Editor">
                         <Edit2Icon className="h-4 w-4" />

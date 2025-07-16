@@ -61,7 +61,7 @@ export default function PDFTable() {
             Created At
           </div>
         </TableHead>
-        <TableHead className="w-[80px]">Actions</TableHead>
+        <TableHead className="w-[100px]">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );

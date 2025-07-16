@@ -10,18 +10,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAppContext } from "@/contexts/AppContext.js";
-import { EyeIcon, FileTextIcon, HashIcon } from "lucide-react";
+import { DownloadIcon, EyeIcon, FileTextIcon, HashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Status from "../Status";
 import TableLoading from "../TableLoading";
 
 export default function TemplateTable() {
-  const { templates, isTemplatesLoading } = useAppContext();
+  const { templates, isTemplatesLoading, downloadTemplate } = useAppContext();
   const router = useRouter();
 
   const handleViewTemplate = (template) => {
     // Navigate to the template page instead of opening modal
     router.push(`/app/templates/${template.id}`);
+  };
+
+  const handleDownloadTemplate = (template) => {
+    downloadTemplate(template.id).catch((err) => {
+      console.error("Failed to download template:", err);
+    });
   };
 
   const renderTableHeader = () => (
@@ -40,7 +46,7 @@ export default function TemplateTable() {
           </div>
         </TableHead>
         <TableHead>Description</TableHead>
-        <TableHead className="w-[80px]">Actions</TableHead>
+        <TableHead className="w-[100px]">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );
@@ -83,16 +89,28 @@ export default function TemplateTable() {
                 {template.description}
               </TableCell>
               <TableCell>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewTemplate(template);
-                  }}
-                >
-                  <EyeIcon className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewTemplate(template);
+                    }}
+                  >
+                    <EyeIcon className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownloadTemplate(template);
+                    }}
+                  >
+                    <DownloadIcon className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))
