@@ -2,10 +2,11 @@ import fs from "fs";
 import mustache from "mustache";
 import path from "path";
 import { pathToFileURL } from "url";
-import { DEFAULT_PDF_SETTINGS, TEXT_FILE_EXTENSIONS } from "../config/constants.js";
+import { TEXT_FILE_EXTENSIONS } from "../config/constants.js";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
+import { publicTemplate } from "../schemas/templateSchema.js";
 import AppError from "../utils/AppError.js";
 import { log } from "./eventService.js";
 import * as secretService from "./secretService.js";
@@ -50,6 +51,7 @@ export default class PdfService {
       if (!templateDb.entrypoint) {
         throw new AppError("Template entrypoint is not set.", 400, { logData });
       }
+      const templateSettings = publicTemplate.parse(templateDb).settings;
 
       // Fetch template files from storage
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
@@ -64,7 +66,7 @@ export default class PdfService {
       // Tell puppeteer to treat the temp dir as the base for linked assets (CSS, images)
       const fileUrl = pathToFileURL(path.join(tempDir, templateDb.entrypoint)).href;
       await page.goto(fileUrl, { waitUntil: "networkidle0" });
-      const pdfBuffer = await page.pdf(templateDb.settings || DEFAULT_PDF_SETTINGS);
+      const pdfBuffer = await page.pdf(templateSettings);
 
       // Upload PDF to storage and return the public URL
       if (preview) {
