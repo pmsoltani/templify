@@ -2,15 +2,13 @@
 
 import { getAuthToken } from "@/lib/auth";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AccountMenuDropdown from "./app/AccountMenuDropdown";
-import Logo from "./Logo";
+import Logo from "./common/Logo";
 import { Button } from "./ui/button";
 
 export default function Navbar({ breadcrumb }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { templateId } = useParams();
 
   useEffect(() => {
     setIsLoggedIn(!!getAuthToken());
