@@ -5,6 +5,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import makeToast from "@/utils/makeToast";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { Input } from "../ui/input";
 
 export default function ConfirmRemovePopover({
   title = "Remove Item",
@@ -15,13 +17,18 @@ export default function ConfirmRemovePopover({
   triggerSize = "sm",
   triggerText = "Remove",
   confirmText = "Remove",
+  input = false,
+  placeholder = "Type 'remove' to confirm.",
+  inputType = "text",
   children,
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const handleConfirm = async () => {
     try {
-      await onConfirm();
+      if (input && inputValue.trim() === "") return toast.error(placeholder);
+      await onConfirm(inputValue);
       setShowConfirm(false);
     } catch (err) {
       makeToast("Error during confirmation", err);
@@ -44,6 +51,16 @@ export default function ConfirmRemovePopover({
             <h4 className="font-medium">{title}</h4>
             <p className="text-sm text-gray-600">{message}</p>
           </div>
+          {input && (
+            <Input
+              type={inputType}
+              placeholder={placeholder}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+          )}
           <div className="flex gap-2">
             <Button
               variant="destructive"

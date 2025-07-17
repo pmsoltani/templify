@@ -1,8 +1,10 @@
 "use client";
 
 import apiClient from "@/lib/apiClient";
+import { removeAuthToken } from "@/lib/auth";
 import makeToast from "@/utils/makeToast";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const AppContext = createContext();
 
@@ -332,6 +334,24 @@ function AppProvider({ children }) {
     }
   }, []);
 
+  const removeUser = useCallback(async (password) => {
+    setIsLoading(true);
+    try {
+      await apiClient("/api/me", { method: "DELETE", body: { password } });
+      toast.success("Account removed successfully");
+
+      // Clear user data and redirect
+      setUser(null);
+      removeAuthToken();
+      window.location.href = "/";
+    } catch (err) {
+      makeToast("Failed to remove account.", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const regenerateApiKey = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -384,6 +404,7 @@ function AppProvider({ children }) {
     loadUser,
     updateUser,
     updateUserPassword,
+    removeUser,
     regenerateApiKey,
 
     // Event subscriptions

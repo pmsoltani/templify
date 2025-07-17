@@ -1,6 +1,7 @@
 "use client";
 
 import ApiKeyCard from "@/components/account/ApiKeyCard";
+import ConfirmRemovePopover from "@/components/app/ConfirmRemovePopover";
 import EditableField from "@/components/common/EditableField";
 import Spinner from "@/components/common/Spinner";
 import Status from "@/components/common/Status";
@@ -36,6 +37,7 @@ export default function AccountPage() {
     isLoading,
     updateUser,
     updateUserPassword,
+    removeUser,
     regenerateApiKey,
   } = useAppContext();
 
@@ -96,6 +98,10 @@ export default function AccountPage() {
     } catch (err) {
       setPasswordForm({ ...passwordForm, isSaving: false });
     }
+  };
+
+  const handleDeleteAccount = async (password) => {
+    await removeUser(password);
   };
 
   const handleRegenerateApiKey = async () => {
@@ -261,6 +267,40 @@ export default function AccountPage() {
               </div>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Delete Account - Danger Zone */}
+      <Card className="border-red-200 bg-red-50">
+        <CardHeader>
+          <CardTitle className="text-red-700">Danger Zone</CardTitle>
+          <CardDescription className="text-red-600">
+            Irreversible and destructive actions
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-red-700">Delete Account</h3>
+              <p className="text-sm text-red-600">
+                Permanently delete your account and all associated data. This action
+                cannot be undone.
+              </p>
+            </div>
+            <ConfirmRemovePopover
+              title="Delete Account"
+              message="Are you sure you want to delete your account? This will permanently remove all your templates, generated PDFs, and account data. This action cannot be undone."
+              onConfirm={handleDeleteAccount}
+              isLoading={isLoading}
+              triggerVariant="destructive"
+              triggerSize="sm"
+              triggerText="Delete Account"
+              confirmText="Delete Account"
+              input
+              placeholder="Enter your password to confirm"
+              inputType="password"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
