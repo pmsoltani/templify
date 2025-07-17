@@ -1,6 +1,7 @@
 "use client";
 
 import apiClient from "@/lib/apiClient";
+import makeToast from "@/utils/makeToast";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const AppContext = createContext();
@@ -52,7 +53,7 @@ function AppProvider({ children }) {
       const data = await apiClient("/api/templates/");
       setTemplates(data.data.templates);
     } catch (err) {
-      console.error("Failed to load templates:", err); // TODO: Handle errors appropriately
+      makeToast("Failed to load templates.", err);
     } finally {
       setIsTemplatesLoading(false);
     }
@@ -68,7 +69,7 @@ function AppProvider({ children }) {
       const data = await apiClient("/api/pdfs/");
       setPdfs(data.data.pdfs);
     } catch (err) {
-      console.error("Failed to load PDFs:", err); // TODO: Handle errors appropriately
+      makeToast("Failed to load PDFs.", err);
     } finally {
       setIsPdfsLoading(false);
     }
@@ -84,7 +85,7 @@ function AppProvider({ children }) {
         const template = templates.find((t) => t.id === templateId);
         if (template) setCurrentTemplate(template);
       } catch (err) {
-        console.error("Failed to load template files:", err); // TODO: Handle errors appropriately
+        makeToast("Failed to load template files.", err);
       } finally {
         setIsFilesLoading(false);
       }
@@ -105,7 +106,7 @@ function AppProvider({ children }) {
         const file = currentFiles.find((f) => f.id === fileId);
         if (file) setCurrentFile(file);
       } catch (err) {
-        console.error("Failed to load file content:", err); // TODO: Handle errors appropriately
+        makeToast("Failed to load file content.", err);
       } finally {
         setIsFileContentLoading(false);
       }
@@ -131,7 +132,7 @@ function AppProvider({ children }) {
       setTemplates((prev) => [...prev, newTemplate.data.template]);
       return newTemplate.data.template;
     } catch (err) {
-      console.error("Failed to create template:", err); // TODO: Handle errors appropriately
+      makeToast("Failed to create template.", err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -156,7 +157,7 @@ function AppProvider({ children }) {
 
         return updatedTemplate.data.template;
       } catch (err) {
-        console.error("Failed to update template:", err); // TODO: Handle errors appropriately
+        makeToast("Failed to update template.", err);
         throw err;
       } finally {
         setIsLoading(false);
@@ -179,7 +180,7 @@ function AppProvider({ children }) {
           setFileContent("");
         }
       } catch (err) {
-        console.error("Failed to remove template:", err); // TODO: Handle errors appropriately
+        makeToast("Failed to remove template.", err);
         throw err;
       } finally {
         setIsLoading(false);
@@ -206,7 +207,7 @@ function AppProvider({ children }) {
       document.body.appendChild(link);
       link.click();
     } catch (err) {
-      console.error("Failed to download template:", err);
+      makeToast("Failed to download template.", err);
       throw err;
     } finally {
       document.body.removeChild(link);
@@ -229,7 +230,7 @@ function AppProvider({ children }) {
       setCurrentFiles((prev) => [...prev, newFile.data.file]);
       return newFile.data.file;
     } catch (err) {
-      console.error("Failed to create file:", err); // TODO: Handle errors appropriately
+      makeToast("Failed to create file.", err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -255,7 +256,7 @@ function AppProvider({ children }) {
           }
         });
       } catch (err) {
-        console.error("Failed to update file content:", err); // TODO: Handle errors appropriately
+        makeToast("Failed to update file content.", err);
         throw err;
       } finally {
         setIsLoading(false);
@@ -278,8 +279,7 @@ function AppProvider({ children }) {
           setFileContent("");
         }
       } catch (err) {
-        console.error("Failed to remove file:", err); // TODO: Handle errors appropriately
-        throw err;
+        makeToast("Failed to remove file.", err);
       } finally {
         setIsLoading(false);
       }
@@ -292,7 +292,7 @@ function AppProvider({ children }) {
       const data = await apiClient(`/api/pdfs/${pdfId}/download`);
       return data.data.pdf.tempUrl;
     } catch (err) {
-      console.error("Failed to get PDF download URL:", err);
+      makeToast("Failed to get PDF download URL.", err);
       throw err;
     }
   }, []);
@@ -303,7 +303,7 @@ function AppProvider({ children }) {
       const data = await apiClient("/api/me");
       setUser(data.data.user);
     } catch (err) {
-      console.error("Failed to load user data:", err);
+      makeToast("Failed to load user data.", err);
     } finally {
       setIsUserLoading(false);
     }
@@ -314,7 +314,7 @@ function AppProvider({ children }) {
     try {
       await apiClient("/api/me", { method: "PATCH", body: updateData });
     } catch (err) {
-      console.error("Failed to update user:", err);
+      makeToast("Failed to update user.", err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -326,8 +326,7 @@ function AppProvider({ children }) {
     try {
       await apiClient("/api/me/password", { method: "PUT", body: passwordData });
     } catch (err) {
-      console.error("Failed to update password:", err);
-      throw err;
+      makeToast("Failed to update password.", err);
     } finally {
       setIsLoading(false);
     }
@@ -340,7 +339,7 @@ function AppProvider({ children }) {
       setUser(data.data.user);
       return data.data.user;
     } catch (err) {
-      console.error("Failed to regenerate API key:", err);
+      makeToast("Failed to regenerate API key.", err);
       throw err;
     } finally {
       setIsLoading(false);
