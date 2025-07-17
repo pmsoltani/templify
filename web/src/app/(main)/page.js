@@ -1,5 +1,6 @@
 "use client";
 
+import StructuredData from "@/components/common/StructuredData";
 import TypewriterText from "@/components/TypewriterText";
 import { Button } from "@/components/ui/button";
 import { APP_INFO } from "@/lib/config";
@@ -17,6 +18,8 @@ export default function HomePage() {
 
   return (
     <>
+      <StructuredData />
+
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
