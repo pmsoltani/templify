@@ -2,7 +2,9 @@
 
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
+import makeToast from "@/utils/makeToast";
 import { useState } from "react";
+import { toast } from "sonner";
 import ConfirmEmailCard from "./components/ConfirmEmailCard";
 import RegisterForm from "./components/RegisterForm";
 
@@ -11,17 +13,15 @@ const initialState = { email: "", password: "", passwordConfirm: "" };
 export default function RegisterPage() {
   const [formState, setField] = useFormReducer(initialState);
 
-  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleRegister = async () => {
-    setError(null);
     setIsLoading(true);
 
     const { email, password, passwordConfirm } = formState;
     if (password !== passwordConfirm) {
-      setError("Passwords do not match.");
+      toast.error("Passwords do not match.");
       setIsLoading(false);
       return;
     }
@@ -30,14 +30,13 @@ export default function RegisterPage() {
       await apiClient("/api/register", { method: "POST", body: { email, password } });
       setIsSubmitted(true);
     } catch (err) {
-      setError(err.message);
+      makeToast("Failed to register user.", err);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResend = async () => {
-    setError(null);
     setIsLoading(true);
 
     const { email } = formState;
@@ -45,7 +44,7 @@ export default function RegisterPage() {
     try {
       await apiClient("/api/resend-confirmation", { method: "POST", body: { email } });
     } catch (err) {
-      setError(err.message);
+      makeToast("Failed to resend confirmation email.", err);
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +61,6 @@ export default function RegisterPage() {
       formState={formState}
       setField={setField}
       isLoading={isLoading}
-      error={error}
       onSubmit={handleRegister}
     />
   );

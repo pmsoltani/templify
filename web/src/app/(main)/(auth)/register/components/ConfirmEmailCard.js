@@ -12,7 +12,7 @@ import {
 
 export default function ConfirmEmailCard({ email, onResend, isLoading }) {
   return (
-    <Card className="min-w-sm">
+    <Card className="w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Confirmation email sent</CardTitle>
         <CardDescription>Check your inbox.</CardDescription>

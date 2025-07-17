@@ -13,13 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
-export default function ForgotForm({
-  formState,
-  setField,
-  isLoading,
-  error,
-  onSubmit,
-}) {
+export default function ForgotForm({ formState, setField, isLoading, onSubmit }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     onSubmit();
@@ -51,11 +45,6 @@ export default function ForgotForm({
               Send reset link
             </Button>
           </div>
-          {error && (
-            <div className="flex flex-col gap-3">
-              <p className="text-center text-sm text-red-500">{error}</p>
-            </div>
-          )}
         </form>
       </CardContent>
 

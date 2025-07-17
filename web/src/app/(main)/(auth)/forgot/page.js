@@ -2,6 +2,7 @@
 
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
+import makeToast from "@/utils/makeToast";
 import { useState } from "react";
 import ForgotForm from "./components/ForgotForm";
 import ResetEmailSentCard from "./components/ResetEmailSentCard";
@@ -11,12 +12,10 @@ const initialState = { email: "" };
 export default function ForgotPage() {
   const [formState, setField] = useFormReducer(initialState);
 
-  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleRequestResetPassword = async () => {
-    setError(null);
     setIsLoading(true);
     const { email } = formState;
 
@@ -24,21 +23,20 @@ export default function ForgotPage() {
       await apiClient("/api/forgot", { method: "POST", body: { email } });
       setIsSubmitted(true);
     } catch (err) {
-      setError(err.message);
+      makeToast("Failed to request password reset.", err);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResend = async () => {
-    setError(null);
     setIsLoading(true);
     const { email } = formState;
 
     try {
       await apiClient("/api/forgot", { method: "POST", body: { email } });
     } catch (err) {
-      setError(err.message);
+      makeToast("Failed to resend reset email.", err);
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +53,6 @@ export default function ForgotPage() {
       formState={formState}
       setField={setField}
       isLoading={isLoading}
-      error={error}
       onSubmit={handleRequestResetPassword}
     />
   );

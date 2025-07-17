@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
 import { setAuthToken } from "@/lib/auth";
+import makeToast from "@/utils/makeToast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,14 +24,12 @@ const initialState = { email: "", password: "" };
 export default function LoginPage() {
   const [formState, setField] = useFormReducer(initialState);
 
-  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    setError(null);
     setIsLoading(true);
 
     const { email, password } = formState;
@@ -42,7 +41,7 @@ export default function LoginPage() {
       setAuthToken(data.data.accessToken);
       router.replace("/app");
     } catch (err) {
-      setError(err.message);
+      makeToast("Failed to login.", err);
     } finally {
       setIsLoading(false);
     }
@@ -92,11 +91,6 @@ export default function LoginPage() {
               Login
             </Button>
           </div>
-          {error && (
-            <div className="flex flex-col gap-3">
-              <p className="text-center text-sm text-red-500">{error}</p>
-            </div>
-          )}
         </form>
       </CardContent>
 

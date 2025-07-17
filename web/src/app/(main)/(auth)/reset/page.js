@@ -2,8 +2,10 @@
 
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
+import makeToast from "@/utils/makeToast";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 import ResetForm from "./components/ResetForm";
 import ResetSuccessCard from "./components/ResetSuccessCard";
 
@@ -13,26 +15,27 @@ function ResetStatus() {
   const searchParams = useSearchParams();
   const [formState, setField] = useFormReducer(initialState);
 
-  const [error, setError] = useState(null);
   const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
     const token = searchParams.get("token");
-    if (!token) return setError("No confirmation token found. Please check the link.");
+    if (!token) {
+      toast.error("No confirmation token found. check the link.");
+      return;
+    }
 
     setToken(token);
   }, [searchParams]);
 
   const handleResetPassword = async () => {
-    setError(null);
     setIsLoading(true);
 
     const { password, passwordConfirm } = formState;
 
     if (password !== passwordConfirm) {
-      setError("Passwords do not match.");
+      toast.error("Passwords do not match.");
       setIsLoading(false);
       return;
     }
@@ -41,7 +44,7 @@ function ResetStatus() {
       await apiClient("/api/reset", { method: "POST", body: { token, password } });
       setIsSubmitted(true);
     } catch (err) {
-      setError(err.message);
+      makeToast("Failed to reset password", err);
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +57,6 @@ function ResetStatus() {
       formState={formState}
       setField={setField}
       isLoading={isLoading}
-      error={error}
       onSubmit={handleResetPassword}
     />
   );
