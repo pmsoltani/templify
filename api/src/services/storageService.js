@@ -8,12 +8,13 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { APP_INFO } from "../config/constants.js";
 import s3Client from "../config/s3Client.js";
 import AppError from "../utils/AppError.js";
 
 const downloadTemplate = async (bucketPath) => {
   // Create a unique temporary directory on the local filesystem
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "templify-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), `${APP_INFO.name}-`));
 
   // List all files in the template
   const listParams = { Bucket: process.env.R2_BUCKET_NAME, Prefix: bucketPath };

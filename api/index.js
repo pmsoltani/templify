@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import { APP_INFO } from "./src/config/constants.js";
 import db from "./src/config/database.js";
 import { closeBrowserInstance, initializeBrowser } from "./src/config/puppeteer.js";
 import errorHandler from "./src/middlewares/errorHandler.js";
@@ -24,7 +25,7 @@ const runServer = async () => {
 
     app.use(express.json()); // Middleware to parse JSON request bodies
     app.use("/api", apiRoutes);
-    app.get("/", (req, res) => res.json({ message: "Welcome to Templify!" }));
+    app.get("/", (req, res) => res.json({ message: `Welcome to ${APP_INFO.name}!` }));
 
     // Global error handler (must be after all routes)
     app.use(errorHandler);

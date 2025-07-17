@@ -1,3 +1,4 @@
+import { APP_INFO } from "@/lib/config";
 import Image from "next/image";
 
 export default function Logo({
@@ -12,7 +13,7 @@ export default function Logo({
     return (
       <Image
         src="/images/icons/icon0.svg"
-        alt="Templify"
+        alt={APP_INFO.name}
         className={`${className} h-8 w-8`}
         priority
       />
@@ -22,7 +23,7 @@ export default function Logo({
   return (
     <Image
       src="/images/logo.svg"
-      alt="Templify"
+      alt={APP_INFO.name}
       width={width}
       height={height}
       className={className}

@@ -1,3 +1,14 @@
+const APP_INFO = {
+  name: process.env.APP_NAME || "Templify",
+  tagline: process.env.APP_TAGLINE || "Automated PDF Generation Made Simple",
+  description:
+    process.env.APP_DESCRIPTION ||
+    "Generate custom PDFs from data using your own HTML/CSS templates.",
+  version: process.env.APP_VERSION || "0.1.0",
+  author: process.env.APP_AUTHOR || "Pooria Soltani",
+  authorUrl: process.env.APP_AUTHOR_URL || "https://github.com/pmsoltani",
+};
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const allowedFileTypes = {
@@ -59,6 +70,7 @@ export {
   allowedExtensions,
   allowedFileTypes,
   allowedMimeTypes,
+  APP_INFO,
   ENTITIES,
   MAX_FILE_SIZE,
   NANO_ALPHABET,

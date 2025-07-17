@@ -2,6 +2,7 @@
 
 import TypewriterText from "@/components/TypewriterText";
 import { Button } from "@/components/ui/button";
+import { APP_INFO } from "@/lib/config";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -117,8 +118,8 @@ export default function HomePage() {
             Ready to start generating PDFs?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join developers who trust Templify for their PDF generation needs. Start
-            creating professional documents today.
+            Join developers who trust {APP_INFO.name} to automate their PDF generation.
+            Start creating professional documents today.
           </p>
           <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6">
             <Link href="/register">Start for Free</Link>

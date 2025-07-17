@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import useFormReducer from "@/hooks/useFormReducer";
 import apiClient from "@/lib/apiClient";
 import { setAuthToken } from "@/lib/auth";
+import { APP_INFO } from "@/lib/config";
 import makeToast from "@/utils/makeToast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -50,7 +51,7 @@ export default function LoginPage() {
     <Card className="min-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Welcome back</CardTitle>
-        <CardDescription>Login to your Templify account</CardDescription>
+        <CardDescription>Login to your {APP_INFO.name} account</CardDescription>
       </CardHeader>
 
       <CardContent>
