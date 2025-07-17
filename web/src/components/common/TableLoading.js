@@ -1,4 +1,4 @@
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "../ui/skeleton";
 import { TableCell, TableRow } from "./ui/table";
 
 export default function TableLoading({ cols, rows = 3 }) {
