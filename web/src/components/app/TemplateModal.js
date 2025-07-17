@@ -14,7 +14,7 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import formatDate from "@/utils/formatDate";
 import { CalendarIcon, FolderOpenIcon, HashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import EditableField from "../EditableField";
+import EditableField from "../common/EditableField";
 import CreateFileButton from "./CreateFileButton";
 import FileTable from "./FileTable";
 
