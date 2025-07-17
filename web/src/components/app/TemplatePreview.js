@@ -109,8 +109,8 @@ export default function TemplatePreview({ templateId }) {
     <>
       <div className="flex flex-col bg-white border-l border-gray-200 h-full">
         {/* Preview Header */}
-        <div className="border-b border-gray-200 bg-gray-50 flex-shrink-0">
-          <div className="flex items-center justify-between p-4">
+        <div className="px-4 py-2 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <FileIcon className="h-4 w-4 text-gray-600" />
               <span className="text-sm font-medium">PDF Preview</span>

@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
+import { getFileIcon, getFileIconColor } from "@/utils/fileIcons";
 import makeToast from "@/utils/makeToast";
-import { FileIcon, SaveIcon } from "lucide-react";
+import { SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -96,6 +97,9 @@ export default function FileEditor({ templateId, fileId }) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [hasUnsavedChanges, isLoading, handleSave]);
 
+  const FileIconComponent = getFileIcon(currentFile?.name || "");
+  const iconColor = getFileIconColor(currentFile?.name || "");
+
   const getLanguage = (fileName) => {
     const extension = fileName.split(".").pop()?.toLowerCase();
     switch (extension) {
@@ -135,9 +139,9 @@ export default function FileEditor({ templateId, fileId }) {
   return (
     <div className="flex-1 flex flex-col w-full bg-white">
       {/* Editor Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center gap-2">
-          <FileIcon className="h-4 w-4 text-gray-600" />
+          <FileIconComponent className={`h-4 w-4 ${iconColor}`} />
           <span className="text-sm font-medium">{currentFile?.name || ""}</span>
           {hasUnsavedChanges && (
             <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
