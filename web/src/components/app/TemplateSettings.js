@@ -13,6 +13,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import apiClient from "@/lib/apiClient";
+import makeToast from "@/utils/makeToast";
 import { SaveIcon, SettingsIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Spinner from "../common/Spinner";
@@ -54,7 +55,7 @@ export default function TemplateSettings({ templateId, onSettingsChange }) {
       const settingsDb = data.data.template.settings || {};
       if (settingsDb && Object.keys(settingsDb).length > 0) setSettings(settingsDb);
     } catch (err) {
-      console.error("Failed to load settings:", err);
+      makeToast("Failed to load template settings.", err);
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +72,7 @@ export default function TemplateSettings({ templateId, onSettingsChange }) {
         setSettings(data.data.template.settings);
         onSettingsChange?.(data.data.template.settings); // Notify parent about change
       } catch (err) {
-        console.error("Failed to save settings:", err);
+        makeToast("Failed to save template settings.", err);
       } finally {
         setIsSaving(false);
       }

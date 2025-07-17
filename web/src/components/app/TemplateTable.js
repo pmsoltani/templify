@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAppContext } from "@/contexts/AppContext.js";
+import makeToast from "@/utils/makeToast";
 import { DownloadIcon, EyeIcon, FileTextIcon, HashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Status from "../common/Status";
@@ -26,7 +27,7 @@ export default function TemplateTable() {
 
   const handleDownloadTemplate = (template) => {
     downloadTemplate(template.id).catch((err) => {
-      console.error("Failed to download template:", err);
+      makeToast("Failed to download template.", err);
     });
   };
 

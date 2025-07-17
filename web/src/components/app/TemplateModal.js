@@ -32,9 +32,7 @@ export default function TemplateModal({ open, onOpenChange }) {
   const [editValues, setEditValues] = useState({});
 
   useEffect(() => {
-    if (editingTemplate && open) {
-      loadTemplateFiles(editingTemplate.id);
-    }
+    if (editingTemplate && open) loadTemplateFiles(editingTemplate.id);
   }, [editingTemplate, open, loadTemplateFiles]);
 
   const startEditing = (field, currentValue) => {
@@ -53,9 +51,7 @@ export default function TemplateModal({ open, onOpenChange }) {
       const updatedTemplate = await updateTemplate(editingTemplate.id, updateData);
       setEditingTemplate(updatedTemplate);
       setEditingFields((prev) => ({ ...prev, [field]: false }));
-    } catch (err) {
-      console.error(`Failed to update ${field}:`, err);
-    }
+    } catch (err) {}
   };
 
   const handleRemoveTemplate = async () => {

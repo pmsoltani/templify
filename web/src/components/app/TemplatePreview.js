@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
 import apiClient from "@/lib/apiClient";
+import makeToast from "@/utils/makeToast";
 import { FileIcon, RefreshCwIcon, VariableIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Spinner from "../common/Spinner";
@@ -14,18 +15,15 @@ export default function TemplatePreview({ templateId }) {
   const { currentTemplate, subscribeToFileSaves } = useAppContext();
   const [pdfUrl, setPdfUrl] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState(null);
   const [isVariablesModalOpen, setIsVariablesModalOpen] = useState(false);
 
   // Variables state moved here
   const [variables, setVariables] = useState([]);
   const [variableValues, setVariableValues] = useState({});
   const [isLoadingVariables, setIsLoadingVariables] = useState(false);
-  const [variablesError, setVariablesError] = useState(null);
 
   const loadVariables = useCallback(async () => {
     setIsLoadingVariables(true);
-    setVariablesError(null);
 
     try {
       const data = await apiClient(`/api/templates/${templateId}/variables`);
@@ -36,8 +34,7 @@ export default function TemplatePreview({ templateId }) {
       data.data.variables.forEach((variable) => (initialValues[variable] = ""));
       setVariableValues(initialValues);
     } catch (err) {
-      console.error("Failed to load variables:", err);
-      setVariablesError("Failed to load template variables");
+      makeToast("Failed to load template variables.", err);
       setVariables([]); // Still generate preview with empty variables
       setVariableValues({});
     } finally {
@@ -53,7 +50,6 @@ export default function TemplatePreview({ templateId }) {
   const generatePreview = useCallback(
     async (customVariables = null) => {
       setIsGenerating(true);
-      setError(null);
 
       try {
         const data = await apiClient(`/api/templates/${templateId}/preview`, {
@@ -64,8 +60,7 @@ export default function TemplatePreview({ templateId }) {
         setPdfUrl(data.data.tempUrl);
         if (isVariablesModalOpen) setIsVariablesModalOpen(false);
       } catch (err) {
-        console.error("Failed to generate PDF preview:", err);
-        setError("Failed to generate PDF preview. Please try again.");
+        makeToast("Failed to generate PDF preview.", err);
       } finally {
         setIsGenerating(false);
       }
@@ -83,9 +78,7 @@ export default function TemplatePreview({ templateId }) {
     (newSettings) => {
       // Settings change should trigger a preview regeneration
       // The settings are stored on the server side and will be applied automatically
-      if (!isGenerating) {
-        generatePreview();
-      }
+      if (!isGenerating) generatePreview();
     },
     [generatePreview, isGenerating]
   );
@@ -121,16 +114,6 @@ export default function TemplatePreview({ templateId }) {
             <div className="flex items-center gap-2">
               <FileIcon className="h-4 w-4 text-gray-600" />
               <span className="text-sm font-medium">PDF Preview</span>
-              {error && (
-                <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
-                  {error}
-                </span>
-              )}
-              {variablesError && (
-                <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
-                  {variablesError}
-                </span>
-              )}
             </div>
             <div className="flex gap-2">
               <TemplateSettings

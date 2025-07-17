@@ -19,6 +19,7 @@ import { useAppContext } from "@/contexts/AppContext";
 import { removeAuthToken } from "@/lib/auth";
 import { BadgeAlertIcon, BadgeCheckIcon, SaveIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const initialPasswordFormState = {
   currentPassword: "",
@@ -39,7 +40,6 @@ export default function AccountPage() {
   } = useAppContext();
 
   // UI state
-  const [error, setError] = useState(null);
   const [editingEmail, setEditingEmail] = useState(false);
   const [editValues, setEditValues] = useState({});
 
@@ -79,7 +79,6 @@ export default function AccountPage() {
       removeAuthToken();
       window.location.href = "/";
     } catch (err) {
-      console.error(`Failed to update ${field}:`, err);
     } finally {
       setEditingEmail(false);
     }
@@ -88,15 +87,13 @@ export default function AccountPage() {
   // Update password
   const handleUpdatePassword = async () => {
     const { currentPassword, newPassword, confirmPassword } = passwordForm;
-    if (newPassword !== confirmPassword) return setError("Passwords do not match.");
+    if (newPassword !== confirmPassword) return toast.error("Passwords do not match.");
     setPasswordForm({ ...passwordForm, isSaving: true });
-    setError(null);
     try {
       await updateUserPassword({ currentPassword, newPassword });
-      alert("Password updated successfully");
+      toast.success("Password updated successfully.");
       setPasswordForm(initialPasswordFormState);
     } catch (err) {
-      setError(err.message);
       setPasswordForm({ ...passwordForm, isSaving: false });
     }
   };
@@ -104,9 +101,7 @@ export default function AccountPage() {
   const handleRegenerateApiKey = async () => {
     try {
       await regenerateApiKey();
-    } catch (err) {
-      console.error("Failed to regenerate API key:", err);
-    }
+    } catch (err) {}
   };
 
   if (isUserLoading) {
@@ -264,12 +259,6 @@ export default function AccountPage() {
                   )}
                 </Button>
               </div>
-
-              {error && (
-                <div className="flex flex-col gap-3">
-                  <p className="text-center text-sm text-red-500">{error}</p>
-                </div>
-              )}
             </div>
           )}
         </CardContent>

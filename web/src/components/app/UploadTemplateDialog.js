@@ -17,14 +17,16 @@ import { UploadIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import Spinner from "../common/Spinner";
 
+const initialFormData = {
+  name: "",
+  description: "",
+  entrypoint: "",
+  files: null,
+};
+
 export default function UploadTemplateDialog({ open, onOpenChange }) {
   const { createTemplate, isLoading } = useAppContext();
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    entrypoint: "",
-    files: null,
-  });
+  const [formData, setFormData] = useState(initialFormData);
   const [dragActive, setDragActive] = useState(false);
 
   const handleInputChange = (field, value) => {
@@ -60,16 +62,9 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
     e.preventDefault();
     try {
       await createTemplate(formData);
-      setFormData({
-        name: "",
-        description: "",
-        entrypoint: "",
-        files: null,
-      });
+      setFormData(initialFormData);
       onOpenChange(false);
-    } catch (err) {
-      console.error("Failed to create template:", err); // TODO: Handle error properly
-    }
+    } catch (err) {}
   };
 
   const removeFiles = () => {

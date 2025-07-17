@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import makeToast from "@/utils/makeToast";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
@@ -23,7 +24,7 @@ export default function ConfirmRemovePopover({
       await onConfirm();
       setShowConfirm(false);
     } catch (err) {
-      console.error("Error during confirmation:", err);
+      makeToast("Error during confirmation", err);
     }
   };
 

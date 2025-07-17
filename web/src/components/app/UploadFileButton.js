@@ -28,7 +28,6 @@ export default function UploadFileButton({
       if (loadTemplateFiles) await loadTemplateFiles(templateId); // Refresh files
       if (onFileAdded) onFileAdded(file); // Call optional callback
     } catch (err) {
-      console.error("Error uploading file:", err);
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = ""; // Clear the file input
     }

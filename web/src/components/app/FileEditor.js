@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
+import makeToast from "@/utils/makeToast";
 import { FileIcon, SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -41,9 +42,7 @@ export default function FileEditor({ templateId, fileId }) {
   useEffect(() => {
     if (templateId && fileId && currentFiles.length > 0) {
       const file = currentFiles.find((f) => f.id === fileId);
-      if (file) {
-        loadFileContent(templateId, fileId);
-      }
+      if (file) loadFileContent(templateId, fileId);
     }
   }, [templateId, fileId, currentFiles, loadFileContent]);
 
@@ -56,14 +55,10 @@ export default function FileEditor({ templateId, fileId }) {
     setEditorContent(value || "");
     setHasUnsavedChanges(value !== fileContent);
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
 
     saveTimeoutRef.current = setTimeout(() => {
-      if (value !== fileContent) {
-        handleSave(value);
-      }
+      if (value !== fileContent) handleSave(value);
     }, 10000); // Auto-save after 10 seconds of inactivity
   };
 
@@ -74,20 +69,16 @@ export default function FileEditor({ templateId, fileId }) {
         await updateFileContent(templateId, currentFile.id, content);
         setHasUnsavedChanges(false);
         if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      } catch (err) {
-        console.error("Failed to save file:", err);
-      }
+      } catch (err) {}
     },
     [currentFile, templateId, updateFileContent, editorContent]
   );
 
   const handleFileCreated = useCallback(
     (file) => {
-      try {
-        router.push(`/app/templates/${templateId}/${file.id}`);
-      } catch (err) {
-        console.error("Failed to navigate to new file:", err);
-      }
+      router.push(`/app/templates/${templateId}/${file.id}`).catch((err) => {
+        makeToast("Failed to navigate to new file:", err);
+      });
     },
     [templateId, router]
   );

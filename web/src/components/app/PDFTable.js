@@ -13,7 +13,6 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import formatDate from "@/utils/formatDate";
 import { CalendarIcon, DownloadIcon, HashIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Spinner from "../common/Spinner";
 import Status from "../common/Status";
@@ -23,15 +22,12 @@ export default function PDFTable() {
   const { pdfs, isPdfsLoading, downloadPdf } = useAppContext();
   const [downloadingIds, setDownloadingIds] = useState(new Set());
 
-  const router = useRouter();
-
   const handleDownload = async (pdfId) => {
     setDownloadingIds((prev) => new Set([...prev, pdfId]));
     try {
       const tempUrl = await downloadPdf(pdfId);
       window.open(tempUrl, "_blank"); // Open the PDF in a new tab
     } catch (err) {
-      console.error("Failed to download PDF:", err);
     } finally {
       setDownloadingIds((prev) => {
         const newSet = new Set(prev);

@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useAppContext } from "@/contexts/AppContext.js";
 import { FileTextIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import Spinner from "../common/Spinner";
 
 export default function CreateFileButton({
@@ -22,26 +23,21 @@ export default function CreateFileButton({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [fileName, setFileName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState(null);
 
   const allowedExtensions = ["html", "htm", "css"];
   const mimeTypes = { html: "text/html", htm: "text/html", css: "text/css" };
 
   const handlePopoverOpenChange = (open) => {
     setIsPopoverOpen(open);
-    if (!open) {
-      setError(null);
-      setFileName("");
-    }
+    if (!open) setFileName("");
   };
 
   const handleCreateFile = async () => {
-    setError(null);
     if (!templateId) return;
-    if (!fileName.trim()) return setError("File name is required.");
+    if (!fileName.trim()) return toast.error("File name is required.");
     const extension = fileName.split(".").pop().toLowerCase();
     if (!allowedExtensions.includes(extension)) {
-      return setError(`Invalid extension. Allowed: ${allowedExtensions.join(", ")}`);
+      return toast.error(`Invalid file type. Allowed: ${allowedExtensions.join(", ")}`);
     }
     setIsCreating(true);
     try {
@@ -56,8 +52,6 @@ export default function CreateFileButton({
       if (onFileCreated) onFileCreated(createdFile); // Call optional callback
       handlePopoverOpenChange(false); // Reset form and close popover
     } catch (err) {
-      console.error("Error creating file:", err);
-      setError("Failed to create file. Please try again.");
     } finally {
       setIsCreating(false);
     }
@@ -70,7 +64,6 @@ export default function CreateFileButton({
     } else if (e.key === "Escape") {
       setIsPopoverOpen(false);
       setFileName("");
-      setError(null);
     }
   };
 
@@ -119,7 +112,6 @@ export default function CreateFileButton({
               Cancel
             </Button>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
       </PopoverContent>
     </Popover>
