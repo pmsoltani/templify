@@ -1,4 +1,5 @@
 const APP_INFO = {
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
   name: process.env.NEXT_PUBLIC_APP_NAME || "Templify",
   tagline:
     process.env.NEXT_PUBLIC_APP_TAGLINE || "Automated PDF Generation Made Simple",
@@ -6,15 +7,20 @@ const APP_INFO = {
     process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
     "Generate custom PDFs from data using your own HTML/CSS templates.",
   version: process.env.NEXT_PUBLIC_APP_VERSION || "0.1.0",
-  author: process.env.NEXT_PUBLIC_APP_AUTHOR || "Pooria Soltani",
-  authorUrl: process.env.NEXT_PUBLIC_APP_AUTHOR_URL || "https://github.com/pmsoltani",
+  author: {
+    name: process.env.NEXT_PUBLIC_APP_AUTHOR || "Pooria Soltani",
+    url: process.env.NEXT_PUBLIC_APP_AUTHOR_URL || "https://github.com/pmsoltani",
+  },
 };
 
 const HTML_METADATA = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL),
-  title: `${APP_INFO.name} | ${APP_INFO.tagline}`,
+  metadataBase: new URL(APP_INFO.baseUrl),
+  title: {
+    template: `%s | ${APP_INFO.name}`,
+    default: `${APP_INFO.name} | ${APP_INFO.tagline}`,
+  },
   description: APP_INFO.description,
-  authors: [{ name: APP_INFO.author, url: APP_INFO.authorUrl }],
+  authors: [{ name: APP_INFO.author.name, url: APP_INFO.author.url }],
   keywords: [
     "PDF Generator API",
     "HTML to PDF",
@@ -24,11 +30,16 @@ const HTML_METADATA = {
     "PDF Automation",
     "Template to PDF",
     "PDF Generation Service",
+    "Invoice Generator",
+    "Document Automation",
   ],
-  creator: APP_INFO.author,
+  creator: APP_INFO.author.name,
   publisher: APP_INFO.name,
   robots: "index, follow",
   manifest: "/manifest.json",
+  alternates: { canonical: APP_INFO.baseUrl },
+  category: "Technology",
+  classification: "Business Application",
   openGraph: {
     title: `${APP_INFO.name} | ${APP_INFO.tagline}`,
     description: APP_INFO.description,

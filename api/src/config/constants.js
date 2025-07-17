@@ -5,8 +5,10 @@ const APP_INFO = {
     process.env.APP_DESCRIPTION ||
     "Generate custom PDFs from data using your own HTML/CSS templates.",
   version: process.env.APP_VERSION || "0.1.0",
-  author: process.env.APP_AUTHOR || "Pooria Soltani",
-  authorUrl: process.env.APP_AUTHOR_URL || "https://github.com/pmsoltani",
+  author: {
+    name: process.env.APP_AUTHOR || "Pooria Soltani",
+    url: process.env.APP_AUTHOR_URL || "https://github.com/pmsoltani",
+  },
 };
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
