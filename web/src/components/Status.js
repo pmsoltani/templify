@@ -1,4 +1,5 @@
-import { CircleXIcon, InboxIcon, Loader2Icon } from "lucide-react";
+import { CircleXIcon, InboxIcon } from "lucide-react";
+import Spinner from "./common/Spinner";
 
 export default function Status({
   type = "empty",
@@ -7,7 +8,7 @@ export default function Status({
 }) {
   const variants = {
     loading: {
-      icon: <Loader2Icon className="animate-spin" size={48} strokeWidth={1} />,
+      icon: <Spinner variant="outline" size="lg" className="mb-2" />,
       color: "text-gray-500",
     },
     empty: { icon: <InboxIcon size={48} strokeWidth={0.5} />, color: "text-gray-500" },
@@ -15,12 +16,10 @@ export default function Status({
   };
 
   return (
-    <>
-      <div className={`flex flex-col items-center ${variants[type].color}`}>
-        {variants[type].icon}
-        <p className="text-l font-semibold">{title}</p>
-        {message && <p className="text-sm">{message}</p>}
-      </div>
-    </>
+    <div className={`flex flex-col items-center ${variants[type].color}`}>
+      {variants[type].icon}
+      <p className="text-l font-semibold">{title}</p>
+      {message && <p className="text-sm">{message}</p>}
+    </div>
   );
 }
