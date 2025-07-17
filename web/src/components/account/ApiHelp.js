@@ -1,4 +1,4 @@
-import CodeInline from "@/components/CodeInline";
+import CodeInline from "@/components/common/CodeInline";
 import {
   Dialog,
   DialogContent,
