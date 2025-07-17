@@ -29,8 +29,8 @@ export default function Navbar({ breadcrumb }) {
       {isLoggedIn ? (
         <AccountMenuDropdown />
       ) : (
-        <div className="flex items-center">
-          <Link href="/login" className="mr-4 hover:text-blue-600">
+        <div className="flex items-center gap-4">
+          <Link href="/login" className="hover:text-blue-600">
             Login
           </Link>
           <Link href="/register">

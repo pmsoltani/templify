@@ -25,19 +25,19 @@ export default function AccountMenuDropdown() {
 
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem asChild>
-          <Link href="/app" className="flex items-center">
-            <LayoutIcon className="mr-2 h-4 w-4" />
+          <Link href="/app" className="flex items-center gap-4">
+            <LayoutIcon className="h-4 w-4" />
             App
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/app/account" className="flex items-center">
-            <SettingsIcon className="mr-2 h-4 w-4" />
+          <Link href="/app/account" className="flex items-center gap-4">
+            <SettingsIcon className="h-4 w-4" />
             Account
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout} className="flex items-center">
-          <LogOutIcon className="mr-2 h-4 w-4" />
+        <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-4">
+          <LogOutIcon className="h-4 w-4" />
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

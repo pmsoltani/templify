@@ -26,7 +26,7 @@ export default function HomePage() {
             </h1>
 
             <div className="text-2xl lg:text-3xl text-gray-700 mb-8 h-12 flex items-center justify-center lg:justify-start">
-              <span className="mr-3">We do</span>
+              <span className="mr-2">We do</span>
               <TypewriterText
                 words={words}
                 className="text-blue-600 font-semibold"

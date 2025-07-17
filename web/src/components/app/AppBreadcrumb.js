@@ -44,8 +44,11 @@ export default function AppBreadcrumb({ templateId, fileId }) {
               asChild
               className={template.id === templateId ? "bg-gray-50" : ""}
             >
-              <Link href={`/app/templates/${template.id}`}>
-                <FolderOpenIcon className="w-4 h-4 mr-2" />
+              <Link
+                href={`/app/templates/${template.id}`}
+                className="flex items-center gap-4"
+              >
+                <FolderOpenIcon className="w-4 h-4" />
                 <div className="flex-1">
                   <div className="font-medium">{template.name}</div>
                   {template.description && (
@@ -82,8 +85,11 @@ export default function AppBreadcrumb({ templateId, fileId }) {
                 asChild
                 className={file.id === currentFileData?.id ? "bg-gray-50" : ""}
               >
-                <Link href={`/app/templates/${templateId}/${file.id}`}>
-                  <IconComponent className={`h-4 w-4 mr-2 ${iconColor}`} />
+                <Link
+                  href={`/app/templates/${templateId}/${file.id}`}
+                  className="flex items-center gap-4"
+                >
+                  <IconComponent className={`h-4 w-4 ${iconColor}`} />
                   <div className="flex-1">
                     <div className="font-medium">{file.name}</div>
                     <div className="text-xs text-gray-500">
