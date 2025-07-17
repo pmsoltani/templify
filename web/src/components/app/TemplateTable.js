@@ -70,7 +70,7 @@ export default function TemplateTable() {
           <TableRow>
             <TableCell colSpan={4}>
               <Status
-                type="empty"
+                variant="empty"
                 title="No templates yet"
                 message="Create a template to get started."
               />

@@ -86,7 +86,7 @@ export default function PDFTable() {
           <TableRow>
             <TableCell colSpan={4}>
               <Status
-                type="empty"
+                variant="empty"
                 title="No PDFs yet"
                 message="Make an API call to generate a PDF."
               />

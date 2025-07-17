@@ -55,7 +55,7 @@ export default function FileTable() {
           <TableRow>
             <TableCell colSpan={6}>
               <Status
-                type="empty"
+                variant="empty"
                 title="No files yet"
                 message="Add your first file to get started."
               />

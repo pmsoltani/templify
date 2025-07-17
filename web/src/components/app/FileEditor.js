@@ -16,7 +16,7 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
     <div className="h-full flex items-center justify-center bg-gray-50">
-      <Status type="loading" title="Loading editor..." />
+      <Status variant="loading" title="Loading editor..." />
     </div>
   ),
 });
@@ -136,7 +136,7 @@ export default function FileEditor({ templateId, fileId }) {
   if (isFileContentLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
-        <Status type="loading" title="Loading file..." />
+        <Status variant="loading" title="Loading file..." />
       </div>
     );
   }

@@ -54,7 +54,7 @@ export default function VariablesModal({
 
         {isLoadingVariables ? (
           <div className="flex items-center justify-center py-8">
-            <Status type="loading" title="Loading variables..." />
+            <Status variant="loading" title="Loading variables..." />
           </div>
         ) : (
           <div className="flex-1 overflow-hidden">
