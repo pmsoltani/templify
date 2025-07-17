@@ -23,11 +23,17 @@ const apiClient = async (endpoint, options = {}) => {
     if (response.status === 204) return null; // No content response
 
     if (!response.ok) {
-      throw new AppError(
-        data.message || "An API error occurred.",
-        response.status,
-        data.details
-      );
+      try {
+        const errorData = await response.json();
+        throw new AppError(
+          errorData.message || "An API error occurred.",
+          response.status,
+          errorData.details
+        );
+      } catch (err) {
+        if (err instanceof AppError) throw err;
+        throw new AppError("An API error occurred2.", response.status);
+      }
     }
 
     const responseType = options.responseType || "json";
