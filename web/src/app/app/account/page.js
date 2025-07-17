@@ -3,6 +3,7 @@
 import ApiKeyCard from "@/components/account/ApiKeyCard";
 import EditableField from "@/components/common/EditableField";
 import Spinner from "@/components/common/Spinner";
+import Status from "@/components/common/Status";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,20 +15,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import apiClient from "@/lib/apiClient";
+import { useAppContext } from "@/contexts/AppContext";
 import { removeAuthToken } from "@/lib/auth";
 import { BadgeAlertIcon, BadgeCheckIcon, SaveIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function AccountPage() {
-  // User data state
-  const [user, setUser] = useState(null);
+  const {
+    user,
+    isUserLoading,
+    isLoading,
+    updateUser,
+    updateUserPassword,
+    regenerateApiKey,
+  } = useAppContext();
 
   // UI state
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState(null);
-
   const [editingEmail, setEditingEmail] = useState(false);
   const [editValues, setEditValues] = useState({});
 
@@ -39,22 +43,6 @@ export default function AccountPage() {
     isEditing: false,
     isSaving: false,
   });
-
-  // Load user data
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const data = await apiClient("/api/me");
-        setUser(data.data.user);
-      } catch (err) {
-        console.error("Failed to load user data:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadUserData();
-  }, []);
 
   const emailFieldLabel = () => (
     <div
@@ -85,7 +73,7 @@ export default function AccountPage() {
   const saveField = async (field) => {
     try {
       const updateData = { [field]: editValues[field] };
-      await apiClient("/api/me", { method: "PATCH", body: updateData });
+      await updateUser(updateData);
       removeAuthToken();
       window.location.href = "/";
     } catch (err) {
@@ -98,14 +86,11 @@ export default function AccountPage() {
   // Update password
   const handleUpdatePassword = async () => {
     const { currentPassword, newPassword, confirmPassword } = passwordForm;
-    if (newPassword !== confirmPassword) setError("Passwords do not match.");
+    if (newPassword !== confirmPassword) return setError("Passwords do not match.");
     setPasswordForm({ ...passwordForm, isSaving: true });
     setError(null);
     try {
-      await apiClient("/api/me/password", {
-        method: "PUT",
-        body: { currentPassword, newPassword },
-      });
+      await updateUserPassword({ currentPassword, newPassword });
       setPasswordForm({
         currentPassword: "",
         newPassword: "",
@@ -122,18 +107,14 @@ export default function AccountPage() {
   };
 
   const handleRegenerateApiKey = async () => {
-    setIsRegenerating(true);
     try {
-      const data = await apiClient("/api/me/regenerate-key", { method: "POST" });
-      setUser(data.data.user);
+      await regenerateApiKey();
     } catch (err) {
       console.error("Failed to regenerate API key:", err);
-    } finally {
-      setIsRegenerating(false);
     }
   };
 
-  if (isLoading) {
+  if (isUserLoading) {
     return (
       <div className="container mx-auto p-6 space-y-6">
         <Skeleton className="h-8 w-48" />
@@ -142,6 +123,18 @@ export default function AccountPage() {
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-48 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Status
+          variant="error"
+          title="Failed to load user data."
+          message="Please refresh the page."
+        />
       </div>
     );
   }
@@ -189,7 +182,7 @@ export default function AccountPage() {
 
       <ApiKeyCard
         user={user}
-        isRegenerating={isRegenerating}
+        isRegenerating={isLoading}
         handleRegenerateApiKey={handleRegenerateApiKey}
       />
 

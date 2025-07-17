@@ -19,6 +19,7 @@ function AppProvider({ children }) {
   const [currentFiles, setCurrentFiles] = useState([]);
   const [currentFile, setCurrentFile] = useState(null);
   const [fileContent, setFileContent] = useState(""); // For text-based file content
+  const [user, setUser] = useState(null);
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +27,7 @@ function AppProvider({ children }) {
   const [isPdfsLoading, setIsPdfsLoading] = useState(false);
   const [isFilesLoading, setIsFilesLoading] = useState(false);
   const [isFileContentLoading, setIsFileContentLoading] = useState(false);
+  const [isUserLoading, setIsUserLoading] = useState(false);
 
   // UI state
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
@@ -295,6 +297,60 @@ function AppProvider({ children }) {
     }
   }, []);
 
+  const loadUser = useCallback(async () => {
+    setIsUserLoading(true);
+    try {
+      const data = await apiClient("/api/me");
+      setUser(data.data.user);
+    } catch (err) {
+      console.error("Failed to load user data:", err);
+    } finally {
+      setIsUserLoading(false);
+    }
+  }, []);
+
+  const updateUser = useCallback(async (updateData) => {
+    setIsLoading(true);
+    try {
+      await apiClient("/api/me", { method: "PATCH", body: updateData });
+    } catch (err) {
+      console.error("Failed to update user:", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updateUserPassword = useCallback(async (passwordData) => {
+    setIsLoading(true);
+    try {
+      await apiClient("/api/me/password", { method: "PUT", body: passwordData });
+    } catch (err) {
+      console.error("Failed to update password:", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const regenerateApiKey = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await apiClient("/api/me/regenerate-key", { method: "POST" });
+      setUser(data.data.user);
+      return data.data.user;
+    } catch (err) {
+      console.error("Failed to regenerate API key:", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
   const contextValue = {
     // Data
     templates,
@@ -303,6 +359,7 @@ function AppProvider({ children }) {
     currentFiles,
     currentFile,
     fileContent,
+    user,
 
     // Loading states
     isLoading,
@@ -310,6 +367,7 @@ function AppProvider({ children }) {
     isPdfsLoading,
     isFilesLoading,
     isFileContentLoading,
+    isUserLoading,
 
     // Actions
     loadTemplates,
@@ -324,6 +382,10 @@ function AppProvider({ children }) {
     updateFileContent,
     removeFile,
     downloadPdf,
+    loadUser,
+    updateUser,
+    updateUserPassword,
+    regenerateApiKey,
 
     // Event subscriptions
     subscribeToFileSaves,
