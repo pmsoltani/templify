@@ -1,3 +1,4 @@
+import { useAppContext } from "@/contexts/AppContext";
 import { removeAuthToken } from "@/lib/auth";
 import { LayoutIcon, LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
@@ -6,10 +7,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
 export default function AccountMenuDropdown() {
+  const { user, isUserLoading } = useAppContext();
+
   const handleLogout = () => {
     removeAuthToken();
     window.location.href = "/";
@@ -24,6 +29,16 @@ export default function AccountMenuDropdown() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuLabel>
+          {user && !isUserLoading && (
+            <div className="flex flex-col gap-2 cursor-default">
+              <span>{user.email}</span>
+              <span className="font-mono text-xs">{user.id}</span>
+            </div>
+          )}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem asChild>
           <Link href="/app" className="flex items-center gap-4">
             <LayoutIcon className="h-4 w-4" />
