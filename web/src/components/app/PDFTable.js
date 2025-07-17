@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/table";
 import { useAppContext } from "@/contexts/AppContext.js";
 import formatDate from "@/utils/formatDate";
-import { CalendarIcon, CircleIcon, DownloadIcon, HashIcon } from "lucide-react";
+import { CalendarIcon, DownloadIcon, HashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Status from "../Status";
 import TableLoading from "../TableLoading";
+import Spinner from "../common/Spinner";
 
 export default function PDFTable() {
   const { pdfs, isPdfsLoading, downloadPdf } = useAppContext();
@@ -110,7 +111,7 @@ export default function PDFTable() {
                   disabled={downloadingIds.has(pdf.id)}
                 >
                   {downloadingIds.has(pdf.id) ? (
-                    <CircleIcon className="h-4 w-4 animate-spin text-white rounded-full border-2 border-gray-300 border-t-gray-900" />
+                    <Spinner variant="outline" />
                   ) : (
                     <DownloadIcon className="h-4 w-4" />
                   )}

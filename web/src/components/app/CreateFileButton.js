@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useAppContext } from "@/contexts/AppContext.js";
 import { FileTextIcon } from "lucide-react";
 import { useState } from "react";
+import Spinner from "../common/Spinner";
 
 export default function CreateFileButton({
   templateId,
@@ -107,11 +108,7 @@ export default function CreateFileButton({
               disabled={!fileName?.trim() || isCreating}
               className="flex-1"
             >
-              {isCreating ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white mr-1" />
-              ) : (
-                <FileTextIcon className="h-4 w-4 mr-1" />
-              )}
+              {isCreating ? <Spinner /> : <FileTextIcon className="h-4 w-4" />}
               {isCreating ? "Creating..." : "Create"}
             </Button>
             <Button

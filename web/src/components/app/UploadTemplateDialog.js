@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAppContext } from "@/contexts/AppContext.js";
 import { UploadIcon, XIcon } from "lucide-react";
 import { useState } from "react";
+import Spinner from "../common/Spinner";
 
 export default function UploadTemplateDialog({ open, onOpenChange }) {
   const { createTemplate, isLoading } = useAppContext();
@@ -192,7 +193,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
             <Button type="submit" disabled={isLoading || !formData.name.trim()}>
               {isLoading ? (
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white" />
+                  <Spinner />
                   Creating...
                 </div>
               ) : (

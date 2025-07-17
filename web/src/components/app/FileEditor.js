@@ -6,6 +6,8 @@ import { FileIcon, SaveIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Spinner from "../common/Spinner";
+import Status from "../Status";
 import CreateFileButton from "./CreateFileButton";
 import UploadFileButton from "./UploadFileButton";
 
@@ -14,10 +16,7 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
     <div className="h-full flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900 mx-auto mb-2" />
-        <p className="text-sm text-gray-600">Loading editor...</p>
-      </div>
+      <Status type="loading" title="Loading editor..." />
     </div>
   ),
 });
@@ -137,10 +136,7 @@ export default function FileEditor({ templateId, fileId }) {
   if (isFileContentLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Loading file content...</p>
-        </div>
+        <Status type="loading" title="Loading file..." />
       </div>
     );
   }
@@ -165,12 +161,9 @@ export default function FileEditor({ templateId, fileId }) {
             size="sm"
             onClick={() => handleSave()}
             disabled={!hasUnsavedChanges || isLoading}
+            className="flex items-center gap-2"
           >
-            {isLoading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white mr-1" />
-            ) : (
-              <SaveIcon className="h-4 w-4 mr-1" />
-            )}
+            {isLoading ? <Spinner /> : <SaveIcon className="h-4 w-4" />}
             Save
           </Button>
         </div>

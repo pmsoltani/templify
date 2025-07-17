@@ -8,8 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CheckIcon, CopyIcon, Loader2Icon, RotateCcwKeyIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, RotateCcwKeyIcon } from "lucide-react";
 import { useState } from "react";
+import Spinner from "../common/Spinner";
 import { Skeleton } from "../ui/skeleton";
 import { ApiHelp } from "./ApiHelp";
 
@@ -62,11 +63,7 @@ export default function ApiKeyCard({ user, isRegenerating, handleRegenerateApiKe
           title="Generate a new key"
           disabled={isRegenerating}
         >
-          {isRegenerating ? (
-            <Loader2Icon className="animate-spin" />
-          ) : (
-            <RotateCcwKeyIcon />
-          )}
+          {isRegenerating ? <Spinner variant="outline" /> : <RotateCcwKeyIcon />}
         </Button>
       </CardContent>
     </Card>

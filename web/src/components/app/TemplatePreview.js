@@ -5,6 +5,8 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import apiClient from "@/lib/apiClient";
 import { FileIcon, RefreshCwIcon, VariableIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import Spinner from "../common/Spinner";
+import Status from "../Status";
 import TemplateSettings from "./TemplateSettings";
 import VariablesModal from "./VariablesModal";
 
@@ -158,7 +160,7 @@ export default function TemplatePreview({ templateId }) {
                 className="flex items-center gap-2"
               >
                 {isGenerating ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900" />
+                  <Spinner variant="outline" />
                 ) : (
                   <RefreshCwIcon className="h-4 w-4" />
                 )}
@@ -179,14 +181,14 @@ export default function TemplatePreview({ templateId }) {
             />
           ) : isGenerating || isLoadingVariables ? (
             <div className="flex items-center justify-center h-full text-gray-500">
-              <div className="text-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900 mx-auto mb-4" />
-                <p>
-                  {isLoadingVariables
+              <Status
+                type="loading"
+                title={
+                  isLoadingVariables
                     ? "Loading variables..."
-                    : "Generating PDF preview..."}
-                </p>
-              </div>
+                    : "Generating PDF preview..."
+                }
+              />
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">

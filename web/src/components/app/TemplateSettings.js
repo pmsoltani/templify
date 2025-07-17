@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import apiClient from "@/lib/apiClient";
 import { SaveIcon, SettingsIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import Spinner from "../common/Spinner";
 import {
   Sheet,
   SheetContent,
@@ -125,15 +126,16 @@ export default function TemplateSettings({ templateId, onSettingsChange }) {
           className="flex items-center gap-2"
           disabled={isLoading}
         >
-          <SettingsIcon className="h-4 w-4" />
+          {isSaving ? (
+            <Spinner variant="outline" />
+          ) : (
+            <SettingsIcon className="h-4 w-4" />
+          )}
           Settings
           {hasUnsavedChanges && (
             <span className="text-xs bg-orange-100 text-orange-800 px-1 rounded">
               *
             </span>
-          )}
-          {isSaving && (
-            <div className="h-3 w-3 animate-spin rounded-full border border-gray-300 border-t-gray-900" />
           )}
         </Button>
       </SheetTrigger>
@@ -314,18 +316,10 @@ export default function TemplateSettings({ templateId, onSettingsChange }) {
               onClick={handleSave}
               disabled={!hasUnsavedChanges || isSaving}
               size="sm"
+              className="flex items-center gap-2"
             >
-              {isSaving ? (
-                <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white mr-2" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <SaveIcon className="h-4 w-4 mr-2" />
-                  Save Settings
-                </>
-              )}
+              {isSaving ? <Spinner /> : <SaveIcon className="h-4 w-4" />}
+              {isSaving ? "Saving..." : "Save Settings"}
             </Button>
           </div>
         </div>

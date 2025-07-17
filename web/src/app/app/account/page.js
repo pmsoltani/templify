@@ -1,6 +1,7 @@
 "use client";
 
 import ApiKeyCard from "@/components/account/ApiKeyCard";
+import Spinner from "@/components/common/Spinner";
 import EditableField from "@/components/EditableField";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import apiClient from "@/lib/apiClient";
 import { removeAuthToken } from "@/lib/auth";
-import { BadgeAlertIcon, BadgeCheckIcon, RefreshCwIcon, SaveIcon } from "lucide-react";
+import { BadgeAlertIcon, BadgeCheckIcon, SaveIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function AccountPage() {
@@ -277,7 +278,7 @@ export default function AccountPage() {
                   className="px-3"
                 >
                   {passwordForm.isSaving ? (
-                    <RefreshCwIcon className="h-4 w-4 animate-spin" />
+                    <Spinner />
                   ) : (
                     <SaveIcon className="h-4 w-4" />
                   )}

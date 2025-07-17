@@ -9,6 +9,7 @@ import { useAppContext } from "@/contexts/AppContext.js";
 import { PlusIcon, RefreshCwIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Spinner from "../common/Spinner";
 
 export default function AppDashboard({ templateId = null }) {
   const router = useRouter();
@@ -65,11 +66,11 @@ export default function AppDashboard({ templateId = null }) {
                 disabled={isTemplatesLoading || isPdfsLoading}
                 className="flex items-center gap-2"
               >
-                <RefreshCwIcon
-                  className={`h-4 w-4 ${
-                    isTemplatesLoading || isPdfsLoading ? "animate-spin" : ""
-                  }`}
-                />
+                {isTemplatesLoading || isPdfsLoading ? (
+                  <Spinner variant="outline" />
+                ) : (
+                  <RefreshCwIcon className="h-4 w-4" />
+                )}
                 Refresh
               </Button>
               <Button

@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { VariableIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import Status from "../Status";
 
 export default function VariablesModal({
   variables,
@@ -53,10 +54,7 @@ export default function VariablesModal({
 
         {isLoadingVariables ? (
           <div className="flex items-center justify-center py-8">
-            <div className="text-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900 mx-auto mb-4" />
-              <p className="text-gray-500">Loading variables...</p>
-            </div>
+            <Status type="loading" title="Loading variables..." />
           </div>
         ) : (
           <div className="flex-1 overflow-hidden">
