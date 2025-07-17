@@ -32,7 +32,7 @@ const apiClient = async (endpoint, options = {}) => {
         );
       } catch (err) {
         if (err instanceof AppError) throw err;
-        throw new AppError("An API error occurred2.", response.status);
+        throw new AppError("An API error occurred.", response.status);
       }
     }
 
