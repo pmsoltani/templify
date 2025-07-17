@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { VariableIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import Status from "../Status";
+import Status from "../common/Status";
 
 export default function VariablesModal({
   variables,

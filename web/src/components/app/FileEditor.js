@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Spinner from "../common/Spinner";
-import Status from "../Status";
+import Status from "../common/Status";
 import CreateFileButton from "./CreateFileButton";
 import UploadFileButton from "./UploadFileButton";
 

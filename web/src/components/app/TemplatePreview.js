@@ -6,7 +6,7 @@ import apiClient from "@/lib/apiClient";
 import { FileIcon, RefreshCwIcon, VariableIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Spinner from "../common/Spinner";
-import Status from "../Status";
+import Status from "../common/Status";
 import TemplateSettings from "./TemplateSettings";
 import VariablesModal from "./VariablesModal";
 

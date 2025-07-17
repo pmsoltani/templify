@@ -15,9 +15,9 @@ import { CalendarIcon, DownloadIcon, HashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Status from "../Status";
-import TableLoading from "../TableLoading";
 import Spinner from "../common/Spinner";
+import Status from "../common/Status";
+import TableLoading from "../TableLoading";
 
 export default function PDFTable() {
   const { pdfs, isPdfsLoading, downloadPdf } = useAppContext();

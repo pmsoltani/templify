@@ -12,7 +12,7 @@ import {
 import { useAppContext } from "@/contexts/AppContext.js";
 import { DownloadIcon, EyeIcon, FileTextIcon, HashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Status from "../Status";
+import Status from "../common/Status";
 import TableLoading from "../TableLoading";
 
 export default function TemplateTable() {

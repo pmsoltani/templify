@@ -1,5 +1,5 @@
 import { CircleXIcon, InboxIcon } from "lucide-react";
-import Spinner from "./common/Spinner";
+import Spinner from "./Spinner";
 
 const statusVariants = {
   loading: {

@@ -16,7 +16,7 @@ import formatDate from "@/utils/formatDate";
 import formatFileSize from "@/utils/formatFileSize";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
-import Status from "../Status";
+import Status from "../common/Status";
 import TableLoading from "../TableLoading";
 
 export default function FileTable() {
