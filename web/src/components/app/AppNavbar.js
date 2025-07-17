@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import Navbar from "../Navbar";
+import Navbar from "../layout/Navbar";
 import AppBreadcrumb from "./AppBreadcrumb";
 
 export default function AppNavbar() {

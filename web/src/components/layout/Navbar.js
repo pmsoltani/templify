@@ -3,9 +3,9 @@
 import { getAuthToken } from "@/lib/auth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import AccountMenuDropdown from "./app/AccountMenuDropdown";
-import Logo from "./common/Logo";
-import { Button } from "./ui/button";
+import AccountMenuDropdown from "../app/AccountMenuDropdown";
+import Logo from "../common/Logo";
+import { Button } from "../ui/button";
 
 export default function Navbar({ breadcrumb }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
