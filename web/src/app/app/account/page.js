@@ -20,6 +20,14 @@ import { removeAuthToken } from "@/lib/auth";
 import { BadgeAlertIcon, BadgeCheckIcon, SaveIcon } from "lucide-react";
 import { useState } from "react";
 
+const initialPasswordFormState = {
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+  isEditing: false,
+  isSaving: false,
+};
+
 export default function AccountPage() {
   const {
     user,
@@ -36,13 +44,7 @@ export default function AccountPage() {
   const [editValues, setEditValues] = useState({});
 
   // Form state
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-    isEditing: false,
-    isSaving: false,
-  });
+  const [passwordForm, setPasswordForm] = useState(initialPasswordFormState);
 
   const emailFieldLabel = () => (
     <div
@@ -91,17 +93,10 @@ export default function AccountPage() {
     setError(null);
     try {
       await updateUserPassword({ currentPassword, newPassword });
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-        isEditing: false,
-        isSaving: false,
-      });
       alert("Password updated successfully");
+      setPasswordForm(initialPasswordFormState);
     } catch (err) {
       setError(err.message);
-    } finally {
       setPasswordForm({ ...passwordForm, isSaving: false });
     }
   };
@@ -127,7 +122,7 @@ export default function AccountPage() {
     );
   }
 
-  if (!user) {
+  if (!user && !isUserLoading) {
     return (
       <div className="flex items-center justify-center p-4">
         <Status
@@ -252,15 +247,7 @@ export default function AccountPage() {
               <div className="flex space-x-2">
                 <Button
                   variant="outline"
-                  onClick={() =>
-                    setPasswordForm({
-                      currentPassword: "",
-                      newPassword: "",
-                      confirmPassword: "",
-                      isEditing: false,
-                      isSaving: false,
-                    })
-                  }
+                  onClick={() => setPasswordForm(initialPasswordFormState)}
                   disabled={passwordForm.isSaving}
                 >
                   Cancel

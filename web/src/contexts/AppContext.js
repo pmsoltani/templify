@@ -27,7 +27,7 @@ function AppProvider({ children }) {
   const [isPdfsLoading, setIsPdfsLoading] = useState(false);
   const [isFilesLoading, setIsFilesLoading] = useState(false);
   const [isFileContentLoading, setIsFileContentLoading] = useState(false);
-  const [isUserLoading, setIsUserLoading] = useState(false);
+  const [isUserLoading, setIsUserLoading] = useState(true);
 
   // UI state
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
