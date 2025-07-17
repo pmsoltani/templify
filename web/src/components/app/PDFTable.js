@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Spinner from "../common/Spinner";
 import Status from "../common/Status";
-import TableLoading from "../TableLoading";
+import TableLoading from "../common/TableLoading";
 
 export default function PDFTable() {
   const { pdfs, isPdfsLoading, downloadPdf } = useAppContext();

@@ -17,7 +17,7 @@ import formatFileSize from "@/utils/formatFileSize";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import Status from "../common/Status";
-import TableLoading from "../TableLoading";
+import TableLoading from "../common/TableLoading";
 
 export default function FileTable() {
   const { editingTemplate, isFilesLoading, currentFiles, removeFile, isLoading } =
