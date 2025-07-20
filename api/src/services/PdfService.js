@@ -1,8 +1,10 @@
 import fs from "fs";
+import DOMPurify from "isomorphic-dompurify";
 import mustache from "mustache";
 import path from "path";
 import { pathToFileURL } from "url";
 import { TEXT_FILE_EXTENSIONS } from "../config/constants.js";
+import { PURIFY_EXTENSIONS, PURIFY_OPTIONS } from "../config/domPurify.js";
 import { getBrowserInstance } from "../config/puppeteer.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
@@ -57,11 +59,14 @@ export default class PdfService {
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
       tempDir = await storageService.downloadTemplate(bucketPath);
 
-      await this.applyMustache(tempDir, jsonData);
+      await this.applyMustacheAndSanitize(tempDir, jsonData);
 
       // Generate PDF with Puppeteer
       const browser = await getBrowserInstance();
       page = await browser.newPage();
+
+      // Disable JavaScript
+      await page.setJavaScriptEnabled(false);
 
       // Tell puppeteer to treat the temp dir as the base for linked assets (CSS, images)
       const fileUrl = pathToFileURL(path.join(tempDir, templateDb.entrypoint)).href;
@@ -97,20 +102,24 @@ export default class PdfService {
     }
   }
 
-  async applyMustache(tempDir, jsonData) {
+  async applyMustacheAndSanitize(tempDir, jsonData) {
     if (!jsonData || Object.keys(jsonData).length === 0) return;
     const files = await fs.promises.readdir(tempDir);
-    files
-      .filter((file) => TEXT_FILE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
-      .forEach(async (file) => {
-        const filePath = path.join(tempDir, file);
-        try {
-          const content = await fs.promises.readFile(filePath, "utf-8");
-          const processedContent = mustache.render(content, jsonData);
-          await fs.promises.writeFile(filePath, processedContent, "utf-8");
-        } catch (err) {
-          console.warn(`Skipping file ${filePath}: ${err.message}`);
+    files.forEach(async (file) => {
+      const fileExtension = path.extname(file).toLowerCase();
+      if (!TEXT_FILE_EXTENSIONS.includes(fileExtension)) return;
+      const filePath = path.join(tempDir, file);
+      try {
+        const content = await fs.promises.readFile(filePath, "utf-8");
+        const processedContent = mustache.render(content, jsonData);
+        let sanitizedContent = processedContent;
+        if (PURIFY_EXTENSIONS.includes(fileExtension)) {
+          sanitizedContent = DOMPurify.sanitize(processedContent, PURIFY_OPTIONS);
         }
-      });
+        await fs.promises.writeFile(filePath, sanitizedContent, "utf-8");
+      } catch (err) {
+        console.warn(`Skipping file ${filePath}: ${err.message}`);
+      }
+    });
   }
 }
