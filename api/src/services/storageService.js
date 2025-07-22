@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
   ListObjectsV2Command,
@@ -82,7 +83,35 @@ const uploadBuffer = async (bucketPath, name, buffer) => {
   await uploadFiles(bucketPath, [file]);
 };
 
+const copyTemplate = async (sourceBucketPath, destBucketPath) => {
+  // List all files in the source template
+  const listParams = { Bucket: process.env.R2_BUCKET_NAME, Prefix: sourceBucketPath };
+  const listObjectsResult = await s3Client.send(new ListObjectsV2Command(listParams));
+
+  if (!listObjectsResult.Contents || listObjectsResult.Contents.length === 0) {
+    throw new AppError("Source template is empty or not found.", 404);
+  }
+
+  // Copy each file to the destination
+  const copyPromises = listObjectsResult.Contents.map(async (object) => {
+    const sourceKey = object.Key;
+    const fileName = path.basename(sourceKey);
+    const destKey = `${destBucketPath}${fileName}`;
+
+    const copyParams = {
+      Bucket: process.env.R2_BUCKET_NAME,
+      CopySource: `${process.env.R2_BUCKET_NAME}/${sourceKey}`,
+      Key: destKey,
+    };
+
+    return s3Client.send(new CopyObjectCommand(copyParams));
+  });
+
+  await Promise.all(copyPromises);
+};
+
 export {
+  copyTemplate,
   downloadTemplate,
   getBucketPath,
   getFileObject,
