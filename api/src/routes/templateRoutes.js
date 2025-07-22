@@ -1,12 +1,14 @@
 import express from "express";
 import upload from "../config/multer.js";
 import * as fileController from "../controllers/fileController.js";
+import * as hubController from "../controllers/hubController.js";
 import * as templateController from "../controllers/templateController.js";
 import {
   authenticateToken,
   authenticateTokenOrApiKey,
 } from "../middlewares/authenticate.js";
 import validate from "../middlewares/validate.js";
+import * as hubSchema from "../schemas/hubSchema.js";
 import * as templateSchema from "../schemas/templateSchema.js";
 import catchAsync from "../utils/catchAsync.js";
 import registerRoute from "../utils/registerRoute.js";
@@ -28,6 +30,9 @@ registerRoute(router, "get", "/:templateId/download", templateController.downloa
 registerRoute(router, "post", "/:templateId/preview", templateController.generatePdfPreview); // prettier-ignore
 registerRoute(router, "put", "/:templateId/settings", validate(templateSchema.updateSettings), templateController.update); // prettier-ignore
 registerRoute(router, "get", "/:templateId/variables", templateController.getVariables); // prettier-ignore
+
+// Hub publication route
+registerRoute(router, "post", "/:templateId/publish", validate(hubSchema.publish), hubController.publish); // prettier-ignore
 
 // File sub-routes
 registerRoute(router, "get", "/:templateId/files", fileController.getAllByTemplateId);
