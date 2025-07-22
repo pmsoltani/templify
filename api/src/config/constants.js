@@ -35,6 +35,7 @@ const ENTITIES = {
   pdf: { prefix: "pdf" },
   event: { prefix: "evt" },
   file: { prefix: "fil" },
+  hubTemplate: { prefix: "hub" },
 };
 
 const ALLOWED_ACTIONS = [
@@ -65,6 +66,11 @@ const ALLOWED_ACTIONS = [
   "PDF_GENERATE",
   "PDF_GENERATE_PREVIEW",
   "PDF_GENERATE_URL",
+  "HUB_TEMPLATE_CREATE",
+  "HUB_TEMPLATE_GET",
+  "HUB_TEMPLATE_IMPORT",
+  "HUB_TEMPLATE_REMOVE",
+  "HUB_TEMPLATE_UPDATE",
 ];
 
 export {
