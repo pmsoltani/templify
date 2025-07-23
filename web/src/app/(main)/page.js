@@ -4,6 +4,7 @@ import StructuredData from "@/components/common/StructuredData";
 import TypewriterText from "@/components/TypewriterText";
 import { Button } from "@/components/ui/button";
 import { APP_INFO } from "@/lib/config";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -58,13 +59,12 @@ export default function HomePage() {
 
           {/* Right Content - Placeholder for image */}
           <div className="flex-1 flex justify-center">
-            <div className="w-96 h-96 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center shadow-lg">
-              <div className="text-center text-gray-600">
-                <div className="text-6xl mb-4">📄</div>
-                <p className="font-medium">Template → PDF</p>
-                <p className="text-sm">Visual representation</p>
-              </div>
-            </div>
+            <Image
+              src="/images/heroImage.png"
+              alt="Hero Image"
+              width={600}
+              height={600}
+            />
           </div>
         </div>
       </section>
