@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import EditableField from "../common/EditableField";
 import CreateFileButton from "./CreateFileButton";
 import FileTable from "./FileTable";
+import PublishTemplatePopover from "./PublishTemplatePopover";
 
 export default function TemplateModal({ open, onOpenChange }) {
   const {
@@ -144,6 +145,7 @@ export default function TemplateModal({ open, onOpenChange }) {
                 Template Files
               </h3>
               <div className="flex gap-2">
+                <PublishTemplatePopover templateId={editingTemplate.id} />
                 <CreateFileButton templateId={editingTemplate.id} />
                 <UploadFileButton templateId={editingTemplate.id} />
               </div>
