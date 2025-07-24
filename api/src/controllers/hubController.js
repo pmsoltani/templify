@@ -5,7 +5,7 @@ import getContext from "../utils/getContext.js";
 const getAll = async (req, res) => {
   const filters = {
     category: req.query.category,
-    featured: req.query.featured === "true",
+    featured: req.query.featured,
     tags: req.query.tags ? req.query.tags.split(",") : undefined,
     limit: req.query.limit ? parseInt(req.query.limit) : undefined,
     offset: req.query.offset ? parseInt(req.query.offset) : undefined,
