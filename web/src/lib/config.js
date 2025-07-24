@@ -69,4 +69,27 @@ const HTML_METADATA = {
   },
 };
 
-export { APP_INFO, HTML_METADATA };
+const allowedFileTypes = {
+  ".css": ["text/css"],
+  ".gif": ["image/gif"],
+  ".htm": ["text/html"],
+  ".html": ["text/html"],
+  ".jpeg": ["image/jpeg"],
+  ".jpg": ["image/jpeg"],
+  ".otf": ["font/otf"],
+  ".png": ["image/png"],
+  ".svg": ["image/svg+xml"],
+  ".ttf": ["font/ttf"],
+  ".woff": ["font/woff"],
+  ".woff2": ["font/woff2"],
+};
+const allowedExtensions = Object.keys(allowedFileTypes);
+const allowedMimeTypes = Object.values(allowedFileTypes).flat();
+
+export {
+  allowedExtensions,
+  allowedFileTypes,
+  allowedMimeTypes,
+  APP_INFO,
+  HTML_METADATA,
+};
