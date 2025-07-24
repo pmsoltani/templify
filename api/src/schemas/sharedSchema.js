@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ENTITIES } from "../config/constants.js";
+import { allowedExtensions, ENTITIES } from "../config/constants.js";
 
 const id = z.number().int();
 
@@ -17,6 +17,8 @@ const token = text.length(64);
 
 const dateTime = z.date();
 
-const fileName = text.regex(/^[^\\\/:*?"<>|]+?\.[a-zA-Z0-9]+$/);
+const fileExtensionPattern = allowedExtensions.map((ext) => ext.slice(1)).join("|");
+const fileNamePattern = new RegExp(`^[^\\\\/:*?"<>|]+\\.(${fileExtensionPattern})$`);
+const fileName = text.regex(fileNamePattern);
 
 export { dateTime, email, fileName, id, password, publicId, text, token };
