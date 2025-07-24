@@ -1,19 +1,20 @@
 import {
-  CodeIcon,
   FileCodeIcon,
+  FileCogIcon,
   FileIcon,
+  FileImageIcon,
+  FileJsonIcon,
   FileTextIcon,
-  ImageIcon,
+  FileTypeIcon,
   PaletteIcon,
-  SettingsIcon,
 } from "lucide-react";
 
 function getFileIcon(fileName) {
   const extension = fileName.split(".").pop()?.toLowerCase();
 
   switch (extension) {
-    case "html":
     case "htm":
+    case "html":
       return FileTextIcon;
     case "css":
       return PaletteIcon;
@@ -21,23 +22,28 @@ function getFileIcon(fileName) {
     case "jsx":
     case "ts":
     case "tsx":
-      return CodeIcon;
-    case "json":
       return FileCodeIcon;
-    case "png":
-    case "jpg":
-    case "jpeg":
+    case "json":
+      return FileJsonIcon;
     case "gif":
+    case "jpeg":
+    case "jpg":
+    case "png":
     case "svg":
     case "webp":
-      return ImageIcon;
+      return FileImageIcon;
+    case "otf":
+    case "ttf":
+    case "woff":
+    case "woff2":
+      return FileTypeIcon;
     case "md":
     case "txt":
       return FileTextIcon;
     case "xml":
-    case "yml":
     case "yaml":
-      return SettingsIcon;
+    case "yml":
+      return FileCogIcon;
     default:
       return FileIcon;
   }
@@ -47,8 +53,8 @@ function getFileIconColor(fileName) {
   const extension = fileName.split(".").pop()?.toLowerCase();
 
   switch (extension) {
-    case "html":
     case "htm":
+    case "html":
       return "text-orange-500";
     case "css":
       return "text-blue-500";
@@ -60,20 +66,25 @@ function getFileIconColor(fileName) {
       return "text-blue-600";
     case "json":
       return "text-green-500";
-    case "png":
-    case "jpg":
-    case "jpeg":
     case "gif":
+    case "jpeg":
+    case "jpg":
+    case "png":
     case "svg":
     case "webp":
       return "text-purple-500";
+    case "otf":
+    case "ttf":
+    case "woff":
+    case "woff2":
+      return "text-green-600";
     case "md":
       return "text-gray-600";
     case "txt":
       return "text-gray-500";
     case "xml":
-    case "yml":
     case "yaml":
+    case "yml":
       return "text-red-500";
     default:
       return "text-gray-400";
