@@ -18,6 +18,7 @@ function AppProvider({ children }) {
   // Data state
   const [templates, setTemplates] = useState([]);
   const [pdfs, setPdfs] = useState([]);
+  const [hubTemplates, setHubTemplates] = useState([]);
   const [currentTemplate, setCurrentTemplate] = useState(null);
   const [currentFiles, setCurrentFiles] = useState([]);
   const [currentFile, setCurrentFile] = useState(null);
@@ -28,6 +29,7 @@ function AppProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isTemplatesLoading, setIsTemplatesLoading] = useState(false);
   const [isPdfsLoading, setIsPdfsLoading] = useState(false);
+  const [isHubTemplatesLoading, setIsHubTemplatesLoading] = useState(false);
   const [isFilesLoading, setIsFilesLoading] = useState(false);
   const [isFileContentLoading, setIsFileContentLoading] = useState(false);
   const [isUserLoading, setIsUserLoading] = useState(true);
@@ -299,6 +301,80 @@ function AppProvider({ children }) {
     }
   }, []);
 
+  const publishTemplate = useCallback(async (templateId, publishData) => {
+    setIsLoading(true);
+    try {
+      const hubTemplate = await apiClient(`/api/templates/${templateId}/publish`, {
+        method: "POST",
+        body: publishData,
+      });
+
+      return hubTemplate.data.hubTemplate;
+    } catch (err) {
+      makeToast("Failed to publish template to hub.", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const importHubTemplate = useCallback(
+    async (hubTemplateId) => {
+      setIsLoading(true);
+      try {
+        const newTemplate = await apiClient(`/api/hub/${hubTemplateId}/import`, {
+          method: "POST",
+        });
+
+        // Refresh templates list
+        await loadTemplates();
+
+        return newTemplate.data.template;
+      } catch (err) {
+        makeToast("Failed to import template from hub.", err);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadTemplates]
+  );
+
+  const updateHubTemplate = useCallback(async (hubTemplateId, updateData) => {
+    setIsLoading(true);
+    try {
+      const updatedTemplate = await apiClient(`/api/hub/${hubTemplateId}`, {
+        method: "PATCH",
+        body: updateData,
+      });
+
+      setHubTemplates((prev) =>
+        prev.map((t) => (t.id === hubTemplateId ? updatedTemplate.data.hubTemplate : t))
+      );
+
+      return updatedTemplate.data.hubTemplate;
+    } catch (err) {
+      makeToast("Failed to update hub template.", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const removeHubTemplate = useCallback(async (hubTemplateId) => {
+    setIsLoading(true);
+    try {
+      await apiClient(`/api/hub/${hubTemplateId}`, { method: "DELETE" });
+
+      setHubTemplates((prev) => prev.filter((t) => t.id !== hubTemplateId));
+    } catch (err) {
+      makeToast("Failed to remove hub template.", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const loadUser = useCallback(async () => {
     setIsUserLoading(true);
     try {
@@ -374,6 +450,7 @@ function AppProvider({ children }) {
     // Data
     templates,
     pdfs,
+    hubTemplates,
     currentTemplate,
     currentFiles,
     currentFile,
@@ -384,6 +461,7 @@ function AppProvider({ children }) {
     isLoading,
     isTemplatesLoading,
     isPdfsLoading,
+    isHubTemplatesLoading,
     isFilesLoading,
     isFileContentLoading,
     isUserLoading,
@@ -406,6 +484,12 @@ function AppProvider({ children }) {
     updateUserPassword,
     removeUser,
     regenerateApiKey,
+
+    // Hub Actions
+    publishTemplate,
+    importHubTemplate,
+    updateHubTemplate,
+    removeHubTemplate,
 
     // Event subscriptions
     subscribeToFileSaves,
