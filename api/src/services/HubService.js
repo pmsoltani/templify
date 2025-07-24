@@ -46,39 +46,37 @@ export default class HubService {
     }
   }
 
-  async publish(templateId, publishData) {
+  async publish(templatePublicId, publishData) {
     const userPublicId = this.context.user.id;
     const logData = { userPublicId, action: "HUB_TEMPLATE_CREATE" };
 
     try {
       // Check if template exists and belongs to user
       const templateDb = await templateRepo.getByPublicIdAndUserPublicId(
-        templateId,
+        templatePublicId,
         userPublicId
       );
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
 
       // Check if template is already published
-      const existingHubTemplate = await hubRepo.getByTemplateId(templateId);
+      const existingHubTemplate = await hubRepo.getByTemplateId(templateDb.id);
       if (existingHubTemplate) {
-        throw new AppError("Template is already published to hub.", 409, {
-          logData,
-        });
+        throw new AppError("Hub template already exists.", 409, { logData });
       }
 
       // Generate public ID for hub template
       const publicId = secretService.generatePublicId("hubTemplate");
 
       // Copy template files from user bucket to hub bucket
-      const userBucketPath = storageService.getBucketPath(userPublicId, templateId);
+      const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
       const hubBucketPath = `hub/${publicId}/`;
 
-      await storageService.copyTemplate(userBucketPath, hubBucketPath);
+      await storageService.copyTemplate(bucketPath, hubBucketPath);
 
       // Create hub template record
       const hubTemplateDb = await hubRepo.create(
         templateDb.user_id,
-        templateId,
+        templateDb.id,
         publishData.name,
         templateDb.entrypoint,
         publishData.description,
