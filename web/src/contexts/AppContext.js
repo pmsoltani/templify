@@ -3,6 +3,7 @@
 import apiClient from "@/lib/apiClient";
 import { removeAuthToken } from "@/lib/auth";
 import makeToast from "@/utils/makeToast";
+import { fileTypeFromBuffer } from "file-type";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -222,7 +223,12 @@ function AppProvider({ children }) {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+
+      // Read the file as a buffer to detect its MIME type
+      const buffer = await file.arrayBuffer();
+      const fileType = await fileTypeFromBuffer(buffer);
+      const blob = new Blob([buffer], { type: fileType ? fileType.mime : file.type });
+      formData.append("file", blob, file.name);
 
       const newFile = await apiClient(`/api/templates/${templateId}/files`, {
         method: "POST",
