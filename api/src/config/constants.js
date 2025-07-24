@@ -14,13 +14,18 @@ const APP_INFO = {
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const allowedFileTypes = {
-  ".html": ["text/html"],
-  ".htm": ["text/html"],
   ".css": ["text/css"],
-  ".png": ["image/png"],
-  ".jpg": ["image/jpeg"],
+  ".gif": ["image/gif"],
+  ".htm": ["text/html"],
+  ".html": ["text/html"],
   ".jpeg": ["image/jpeg"],
+  ".jpg": ["image/jpeg"],
+  ".otf": ["font/otf"],
+  ".png": ["image/png"],
   ".svg": ["image/svg+xml"],
+  ".ttf": ["font/ttf"],
+  ".woff": ["font/woff"],
+  ".woff2": ["font/woff2"],
 };
 const allowedExtensions = Object.keys(allowedFileTypes);
 const allowedMimeTypes = Object.values(allowedFileTypes).flat();
