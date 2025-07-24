@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppContext } from "@/contexts/AppContext.js";
+import { allowedExtensions } from "@/lib/config";
 import { UploadIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import Spinner from "../common/Spinner";
@@ -142,7 +143,7 @@ export default function UploadTemplateDialog({ open, onOpenChange }) {
                     multiple
                     className="hidden"
                     onChange={handleFileInputChange}
-                    accept=".html,.htm,.css,.svg,.png,.jpg,.jpeg"
+                    accept={allowedExtensions.join(",")}
                   />
                 </div>
               ) : (

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/AppContext.js";
+import { allowedExtensions } from "@/lib/config";
 import { UploadIcon } from "lucide-react";
 import { useRef } from "react";
 
@@ -12,7 +13,7 @@ export default function UploadFileButton({
   size = "sm",
   text = "Upload File",
   showIcon = true,
-  accept = ".html,.htm,.css,.svg,.png,.jpg,.jpeg",
+  accept = allowedExtensions.join(","),
   disabled = false,
   className = "",
 }) {
