@@ -5,7 +5,7 @@ const hubTemplate = z.object({
   name: text,
   description: text.nullish(),
   category: text.nullish(),
-  tags: z.array(text).optional(),
+  tags: z.array(text).nullish(),
 });
 
 const publish = z.object({ body: hubTemplate });
