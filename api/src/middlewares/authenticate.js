@@ -39,4 +39,26 @@ const authenticateTokenOrApiKey = async (req, res, next) => {
   }
 };
 
-export { authenticateApiKey, authenticateToken, authenticateTokenOrApiKey };
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      throw new AppError(`Access denied. Must be: ${roles.join(", ")}.`, 403);
+    }
+    next();
+  };
+};
+
+const preventChangesToDemoUser = (req, res, next) => {
+  if (req.user.email === process.env.DEMO_EMAIL) {
+    throw new AppError("Cannot modify demo user.", 403);
+  }
+  next();
+};
+
+export {
+  authenticateApiKey,
+  authenticateToken,
+  authenticateTokenOrApiKey,
+  authorize,
+  preventChangesToDemoUser,
+};
