@@ -20,6 +20,7 @@ export default class AuthService {
       email,
       passwordHash,
       confirmationToken,
+      "user",
       publicId
     );
     await mailer.sendConfirmationEmail(email, confirmationToken);
