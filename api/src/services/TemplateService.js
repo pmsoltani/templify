@@ -2,6 +2,8 @@ import AdmZip from "adm-zip";
 import fs from "fs";
 import path from "path";
 import { TEXT_FILE_EXTENSIONS } from "../config/constants.js";
+import { DEFAULT_PDF_SETTINGS } from "../config/pdfSettings.js";
+import { BUCKETS } from "../config/s3Client.js";
 import * as fileRepo from "../repositories/fileRepository.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
@@ -29,7 +31,7 @@ export default class TemplateService {
       if (!templateDb) throw new AppError("Template not found.", 404, { logData });
 
       const bucketPath = storageService.getBucketPath(userPublicId, publicId);
-      tempDir = await storageService.downloadTemplate(bucketPath);
+      tempDir = await storageService.downloadTemplate(BUCKETS.templates, bucketPath);
 
       const zip = new AdmZip();
       zip.addLocalFolder(tempDir);
@@ -73,7 +75,7 @@ export default class TemplateService {
     templateName,
     description = null,
     entrypoint = "template.html",
-    settings = {},
+    settings = DEFAULT_PDF_SETTINGS,
     files = []
   ) {
     let publicId = secretService.generatePublicId("template");
@@ -92,7 +94,9 @@ export default class TemplateService {
 
       if (files.length > 0) {
         const fileService = new FileService(this.context);
-        files.forEach(async (file) => await fileService.create(publicId, file));
+        for (const file of files) {
+          await fileService.create(publicId, file);
+        }
       }
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
@@ -116,7 +120,7 @@ export default class TemplateService {
     // Remove all PDFs associated with this template
     const pdfsDb = await pdfRepo.getAllByTemplatePublicId(publicId);
     const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
-    await storageService.removeFiles(pdfKeys);
+    await storageService.removeFiles(BUCKETS.pdfs, pdfKeys);
 
     // Remove the template files from storage
     const bucketPath = storageService.getBucketPath(userPublicId, publicId);
@@ -140,7 +144,9 @@ export default class TemplateService {
 
       if (files.length > 0) {
         const fileService = new FileService(this.context);
-        files.forEach(async (file) => await fileService.create(publicId, file));
+        for (const file of files) {
+          await fileService.create(publicId, file);
+        }
       }
 
       templateDb = await templateRepo.update(publicId, updateData);

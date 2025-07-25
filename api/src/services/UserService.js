@@ -1,3 +1,4 @@
+import { BUCKETS } from "../config/s3Client.js";
 import * as eventRepo from "../repositories/eventRepository.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
@@ -72,7 +73,7 @@ export default class UserService {
     // Remove all user's PDFs
     const pdfsDb = await pdfRepo.getAllByUserPublicId(publicId);
     const pdfKeys = pdfsDb.map((pdf) => pdf.storage_object_key);
-    await storageService.removeFiles(pdfKeys);
+    await storageService.removeFiles(BUCKETS.pdfs, pdfKeys);
 
     // Remove all user's templates
     const templatesDb = await templateRepo.getAllByUserPublicId(publicId);

@@ -1,4 +1,5 @@
 import fs from "fs";
+import { BUCKETS } from "../config/s3Client.js";
 import * as fileRepo from "../repositories/fileRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import AppError from "../utils/AppError.js";
@@ -61,14 +62,15 @@ export default class FileService {
       );
       fileDb.template_public_id = fileDb.template_public_id || templatePublicId;
 
-      await storageService.uploadFiles(bucketPath, [file]);
+      await storageService.uploadFiles(BUCKETS.templates, bucketPath, [file]);
       isUploaded = true;
 
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return fileDb;
     } catch (err) {
       if (isUploaded) {
-        await storageService.removeFiles([`${bucketPath}${file.originalname}`]);
+        const fileKey = `${bucketPath}${file.originalname}`;
+        await storageService.removeFiles(BUCKETS.templates, [fileKey]);
       }
       if (publicId) await fileRepo.remove(publicId);
       if (err instanceof AppError && err.logData) throw err;
@@ -88,7 +90,8 @@ export default class FileService {
       if (!fileDb) throw new AppError("File not found.", 404, { logData });
 
       // Remove the file from the storage
-      await storageService.removeFiles([`${bucketPath}${fileDb.name}`]);
+      const fileKey = `${bucketPath}${fileDb.name}`;
+      await storageService.removeFiles(BUCKETS.templates, [fileKey]);
 
       // Remove the file record from the database
       await fileRepo.remove(publicId);
@@ -111,7 +114,12 @@ export default class FileService {
       // Upload new content to storage
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
       const buffer = Buffer.from(content, "utf8");
-      await storageService.uploadBuffer(bucketPath, fileDb.name, buffer);
+      await storageService.uploadBuffer(
+        BUCKETS.templates,
+        bucketPath,
+        fileDb.name,
+        buffer
+      );
 
       // Update file size in database
       const updateData = { size: buffer.length };

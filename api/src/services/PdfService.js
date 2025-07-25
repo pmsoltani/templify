@@ -6,6 +6,7 @@ import { pathToFileURL } from "url";
 import { TEXT_FILE_EXTENSIONS } from "../config/constants.js";
 import { PURIFY_EXTENSIONS, PURIFY_OPTIONS } from "../config/domPurify.js";
 import { getBrowserInstance } from "../config/puppeteer.js";
+import { BUCKETS } from "../config/s3Client.js";
 import * as pdfRepo from "../repositories/pdfRepository.js";
 import * as templateRepo from "../repositories/templateRepository.js";
 import { publicTemplate } from "../schemas/templateSchema.js";
@@ -30,7 +31,10 @@ export default class PdfService {
     const pdfDb = await pdfRepo.getByPublicIdAndUserPublicID(publicId, userPublicId);
     if (!pdfDb) throw new AppError("PDF record not found.", 404, { logData });
 
-    pdfDb.temp_url = await storageService.getPresignedUrl(pdfDb.storage_object_key);
+    pdfDb.temp_url = await storageService.getPresignedUrl(
+      BUCKETS.pdfs,
+      pdfDb.storage_object_key
+    );
     await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
     return pdfDb;
   }
@@ -57,7 +61,7 @@ export default class PdfService {
 
       // Fetch template files from storage
       const bucketPath = storageService.getBucketPath(userPublicId, templatePublicId);
-      tempDir = await storageService.downloadTemplate(bucketPath);
+      tempDir = await storageService.downloadTemplate(BUCKETS.templates, bucketPath);
 
       await this.applyMustacheAndSanitize(tempDir, jsonData);
 
@@ -75,22 +79,30 @@ export default class PdfService {
 
       // Upload PDF to storage and return the public URL
       if (preview) {
-        const pdfBucketPath = `previews/${templatePublicId}/`;
+        const pdfBucketPath = `previews/${userPublicId}/${templatePublicId}/`;
         const name = `${Date.now()}.pdf`;
-        await storageService.uploadBuffer(pdfBucketPath, name, pdfBuffer);
-        const tempUrl = await storageService.getPresignedUrl(`${pdfBucketPath}${name}`);
+        await storageService.uploadBuffer(
+          BUCKETS.previews,
+          pdfBucketPath,
+          name,
+          pdfBuffer
+        );
+        const tempUrl = await storageService.getPresignedUrl(
+          BUCKETS.previews,
+          `${pdfBucketPath}${name}`
+        );
         await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
         return tempUrl;
       }
       publicId = secretService.generatePublicId("pdf");
-      const pdfBucketPath = `userFiles/${userPublicId}/pdfs/`;
+      const pdfBucketPath = `pdfs/${userPublicId}/${templatePublicId}/`;
       const name = `${publicId}.pdf`;
       const key = `${pdfBucketPath}${name}`;
-      await storageService.uploadBuffer(pdfBucketPath, name, pdfBuffer);
+      await storageService.uploadBuffer(BUCKETS.pdfs, pdfBucketPath, name, pdfBuffer);
 
       // Create the PDF record and log the event
       const pdfDb = await pdfRepo.create(userPublicId, templatePublicId, key, publicId);
-      pdfDb.temp_url = await storageService.getPresignedUrl(key);
+      pdfDb.temp_url = await storageService.getPresignedUrl(BUCKETS.pdfs, key);
       await log(logData.userPublicId, logData.action, "SUCCESS", this.context);
       return pdfDb;
     } catch (err) {
@@ -105,9 +117,9 @@ export default class PdfService {
   async applyMustacheAndSanitize(tempDir, jsonData) {
     if (!jsonData || Object.keys(jsonData).length === 0) return;
     const files = await fs.promises.readdir(tempDir);
-    files.forEach(async (file) => {
+    for (const file of files) {
       const fileExtension = path.extname(file).toLowerCase();
-      if (!TEXT_FILE_EXTENSIONS.includes(fileExtension)) return;
+      if (!TEXT_FILE_EXTENSIONS.includes(fileExtension)) continue;
       const filePath = path.join(tempDir, file);
       try {
         const content = await fs.promises.readFile(filePath, "utf-8");
@@ -120,6 +132,6 @@ export default class PdfService {
       } catch (err) {
         console.warn(`Skipping file ${filePath}: ${err.message}`);
       }
-    });
+    }
   }
 }
