@@ -40,14 +40,14 @@ const getByResetToken = async (token) => {
   return res.rows[0];
 };
 
-const create = async (email, passwordHash, confirmationToken, publicId) => {
+const create = async (email, passwordHash, confirmationToken, role, publicId) => {
   const res = await db.query(
     `
-    INSERT INTO users (email, password_hash, confirmation_token, public_id)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO users (email, password_hash, confirmation_token, role, public_id)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *
     `,
-    [email, passwordHash, confirmationToken, publicId]
+    [email, passwordHash, confirmationToken, role, publicId]
   );
   return res.rows[0];
 };
