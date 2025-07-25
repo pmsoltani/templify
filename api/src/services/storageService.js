@@ -48,6 +48,15 @@ const getPresignedUrl = async (bucket, objectKey, expiresIn = 900) => {
   return getSignedUrl(s3Client, new GetObjectCommand(params), { expiresIn: expiresIn });
 };
 
+const listDirs = async (bucket, bucketPath) => {
+  const listParams = { Bucket: bucket, Prefix: bucketPath, Delimiter: "/" };
+  const listObjectsResult = await s3Client.send(new ListObjectsV2Command(listParams));
+  if (!listObjectsResult.CommonPrefixes) return [];
+  return listObjectsResult.CommonPrefixes.map((prefix) =>
+    prefix.Prefix.replace(bucketPath, "").replace(/\/$/, "")
+  );
+};
+
 const removeFiles = async (bucket, fileKeys) => {
   const removePromises = fileKeys.map((key) => {
     const removeParams = { Bucket: bucket, Key: key };
@@ -87,6 +96,7 @@ export {
   getBucketPath,
   getFileObject,
   getPresignedUrl,
+  listDirs,
   removeFiles,
   removeTemplate,
   uploadBuffer,
