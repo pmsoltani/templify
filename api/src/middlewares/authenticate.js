@@ -49,7 +49,7 @@ const authorize = (...roles) => {
 };
 
 const preventChangesToDemoUser = (req, res, next) => {
-  if (req.user.email === process.env.DEMO_EMAIL) {
+  if (req.user.email === process.env.DB_SEED_DEMO_EMAIL) {
     throw new AppError("Cannot modify demo user.", 403);
   }
   next();
