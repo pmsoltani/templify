@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { USER_ROLES } from "../config/constants.js";
 import { dateTime, email, id, password, publicId, token } from "./sharedSchema.js";
 
 const updateEmail = z.object({ body: z.object({ email }) });
@@ -15,6 +16,7 @@ const publicUserDb = z.object({
   email: email,
   is_confirmed: z.boolean(),
   api_key: token.nullable(),
+  role: z.enum(USER_ROLES),
   created_at: dateTime,
   updated_at: dateTime,
 });
@@ -25,6 +27,7 @@ const publicUser = publicUserDb.transform((dbData) => {
     email: dbData.email,
     isConfirmed: dbData.is_confirmed,
     apiKey: dbData.api_key,
+    role: dbData.role,
     createdAt: dbData.created_at,
     updatedAt: dbData.updated_at,
   };
