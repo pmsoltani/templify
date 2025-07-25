@@ -11,6 +11,8 @@ const APP_INFO = {
   },
 };
 
+const USER_ROLES = ["admin", "user"];
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const allowedFileTypes = {
@@ -82,4 +84,5 @@ export {
   MAX_FILE_SIZE,
   NANO_ALPHABET,
   TEXT_FILE_EXTENSIONS,
+  USER_ROLES,
 };
