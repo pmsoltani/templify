@@ -44,7 +44,6 @@ const seedDb = async () => {
   });
   await seedDemoUser().catch((err) => {
     console.error("Error seeding demo user:", err);
-    throw err;
   });
 };
 
