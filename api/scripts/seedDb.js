@@ -26,14 +26,14 @@ const seedUser = async (email, password, role) => {
 };
 
 const seedAdmin = async () => {
-  const email = process.env.ADMIN_EMAIL;
-  const password = process.env.ADMIN_PASSWORD;
+  const email = process.env.DB_SEED_ADMIN_EMAIL;
+  const password = process.env.DB_SEED_ADMIN_PASSWORD;
   await seedUser(email, password, "admin");
 };
 
 const seedDemoUser = async () => {
-  const email = process.env.DEMO_EMAIL;
-  const password = process.env.DEMO_PASSWORD;
+  const email = process.env.DB_SEED_DEMO_EMAIL;
+  const password = process.env.DB_SEED_DEMO_PASSWORD;
   await seedUser(email, password, "user");
 };
 
