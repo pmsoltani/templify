@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import seedDb from "./scripts/seedDb.js";
 import { APP_INFO } from "./src/config/constants.js";
 import db from "./src/config/database.js";
 import { closeBrowserInstance, initializeBrowser } from "./src/config/puppeteer.js";
@@ -17,6 +18,9 @@ const runServer = async () => {
     await initializeBrowser();
     await db.query("SELECT 1");
     console.log("Database connection verified.");
+
+    // Seed the database
+    await seedDb();
 
     const corsOptions = {
       origin: process.env.FRONTEND_URL || "http://localhost:3000",
