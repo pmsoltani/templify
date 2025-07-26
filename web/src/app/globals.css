@@ -118,3 +118,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes blink-cursor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink-cursor 1s steps(1) infinite;
+}

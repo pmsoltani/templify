@@ -62,8 +62,10 @@ export default function TypewriterText({
 
   return (
     <span className={className}>
+      {"{{ "}
       {currentText}
-      <span className={`${cursorClassName} animate-pulse`}>|</span>
+      <span className={`${cursorClassName} animate-blink`}>|</span>
+      {" }}"}
     </span>
   );
 }
