@@ -60,7 +60,7 @@ export default function HomePage() {
           {/* Right Content - Placeholder for image */}
           <div className="flex-1 flex justify-center">
             <Image
-              src="/images/heroImage.png"
+              src="/images/heroImage.svg"
               alt="Hero Image"
               width={600}
               height={600}
